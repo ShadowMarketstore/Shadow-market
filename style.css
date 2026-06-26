@@ -1,52 +1,17 @@
-/* Définition des couleurs de ta charte */
-:root {
-    --noir-profond: #000000;
-    --cyan-neon: #00f3ff;
-    --rouge-cramoisi: #dc143c;
-    --fond-boite: #0a0a0a;
+body { background: #000; margin: 0; }
+
+.logo-box { 
+    width: 120px; height: 120px; 
+    border: 2px solid #dc143c; 
+    margin: 20px auto; 
+    display: flex; justify-content: center; align-items: center;
 }
 
-body {
-    background-color: var(--noir-profond);
-    color: #ffffff;
-    font-family: 'Segoe UI', sans-serif;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+.grid { 
+    display: grid; 
+    grid-template-columns: repeat(2, 1fr); 
+    gap: 15px; 
+    padding: 20px; 
 }
 
-/* Le cadre néon rouge pour ton en-tête */
-.navbar {
-    width: 100%;
-    border-bottom: 2px solid var(--rouge-cramoisi);
-    box-shadow: 0 0 15px var(--rouge-cramoisi);
-    display: flex;
-    justify-content: center;
-    padding: 20px;
-}
-
-/* La "boîte" principale (le style que tu veux pour le contenu) */
-.main-card {
-    background-color: var(--fond-boite);
-    border: 2px solid var(--cyan-neon);
-    box-shadow: 0 0 20px rgba(0, 243, 255, 0.3);
-    border-radius: 15px;
-    padding: 30px;
-    margin-top: 50px;
-    width: 90%;
-    max-width: 500px;
-}
-
-/* Style des boutons (le "look Shopify" sombre et pro) */
-button {
-    background-color: var(--cyan-neon);
-    color: var(--noir-profond);
-    border: none;
-    padding: 15px;
-    width: 100%;
-    font-weight: bold;
-    text-transform: uppercase;
-    cursor: pointer;
-    border-radius: 5px;
-}
+@media (min-width: 768px) { .grid { grid-template-columns: repeat(3, 1fr); } }
