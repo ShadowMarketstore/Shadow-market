@@ -1,91 +1,95 @@
-/* style.css - RESTAURATION DE L'INTERFACE PRIME */
-
-/* --- Réinitialisation et Base (Zéro Bug) --- */
-* { margin: 0; padding: 0; box-sizing: border-box; outline: none; }
+/* --- Réinitialisation et Base --- */
+* { margin: 0; padding: 0; box-sizing: border-box; }
 body { 
     background-color: #000000; 
     color: #ffffff; 
     font-family: 'Segoe UI', sans-serif; 
     min-height: 100vh; 
-    overflow-x: hidden; 
     position: relative; 
 }
+.main-content-wrapper { padding-bottom: 100px; padding-top: 40px; }
+.section-title { text-align: center; color: #00f3ff; margin-bottom: 30px; }
 
-/* --- Conteneur Principal (Stable) --- */
-.main-content-wrapper { padding-bottom: 120px; padding-top: 40px; width: 100%; display: flex; flex-direction: column; align-items: center; }
-
-/* --- Typographie : Blanc pur partout sauf titre --- */
-h1, h2, h3, p, label, input, textarea, select { color: #ffffff !important; font-family: 'Segoe UI', sans-serif; }
-.section-title { color: #00f3ff !important; text-align: center; margin-bottom: 30px; text-transform: uppercase; letter-spacing: 1px; }
-
-/* --- ÉLÉMENTS "PRIME" --- */
-
-/* 1. Espace Logo (Contour Rouge, image_23.png) */
-.logo-wrapper {
-    width: 90%; max-width: 450px; height: 100px;
-    background-color: #000000;
-    border: 3px solid #dc143c; border-radius: 12px;
-    margin: 20px auto 40px auto;
-    display: flex; justify-content: center; align-items: center;
-    color: #ffffff; font-weight: bold;
-}
-
-/* 2. Grille de Produits (Accueil, image_23.png - 2 colonnes mobile) */
+/* --- Page Accueil : Grille de Produits --- */
 .products-grid { 
     display: grid; 
-    grid-template-columns: repeat(2, 1fr); /* 2 colonnes sur mobile */
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
     gap: 20px; 
     padding: 0 20px; 
     max-width: 800px;
     margin: 0 auto;
 }
-
-/* 3. Cartes de Produits (Contour Cyan Néon, image_23.png) */
 .product-card { 
-    background: #0a0a0a; border: 2px solid #00f3ff; border-radius: 12px; 
-    padding: 20px; text-align: center; display: flex; flex-direction: column; justify-content: space-between;
+    background: #0a0a0a; 
+    border: 2px solid #00f3ff; 
+    border-radius: 12px; 
+    padding: 20px; 
+    text-align: center; 
 }
-.product-name { color: #ffffff; font-size: 16px; margin-bottom: 10px; font-weight: bold; }
-.product-price { color: #00f3ff; margin-bottom: 15px; font-weight: bold; }
+.product-name { color: #ffffff; font-size: 18px; margin-bottom: 15px; font-weight: bold; }
+.buy-button { 
+    display: block; 
+    width: 100%; 
+    padding: 12px; 
+    background: #dc143c; 
+    color: #ffffff; 
+    text-decoration: none; 
+    font-weight: bold; 
+    border-radius: 5px; 
+    text-transform: uppercase;
+}
 
-/* 4. Formulaire de Commande (Contour Cyan Néon, image_22.png) */
+/* --- Page Commande : Formulaire Complet --- */
 .order-form { 
-    background: #0a0a0a; padding: 25px; border: 2px solid #00f3ff; border-radius: 12px; 
-    max-width: 500px; margin: 0 auto 20px auto; width: 90%;
+    background: #0a0a0a; 
+    padding: 25px; 
+    border: 2px solid #00f3ff; 
+    border-radius: 12px; 
+    max-width: 500px; 
+    margin: 0 auto 20px auto; 
+    width: 90%;
 }
-.form-group { margin-bottom: 20px; }
-.form-group label { display: block; color: #00f3ff; margin-bottom: 8px; font-size: 14px; }
+.form-group { margin-bottom: 15px; }
+.form-group label { display: block; color: #00f3ff; margin-bottom: 6px; font-size: 14px; }
 .form-group input, .form-group textarea { 
-    width: 100%; padding: 12px; background: #000; border: 1px solid #dc143c; 
-    color: #ffffff; border-radius: 8px; 
+    width: 100%; 
+    padding: 12px; 
+    background: #111; 
+    border: 1px solid #dc143c; 
+    color: #ffffff; 
+    border-radius: 5px; 
 }
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-
-/* Boutons (Rouge Vif & Stable) */
-.submit-btn, .buy-btn { 
-    width: 100%; padding: 14px; background: #dc143c; border: none; 
-    color: white; font-weight: bold; cursor: pointer; border-radius: 8px; 
-    text-transform: uppercase; margin-top: 15px; display: block; text-align: center; text-decoration: none;
+.submit-button { 
+    width: 100%; 
+    padding: 14px; 
+    background: #dc143c; 
+    border: none; 
+    color: white; 
+    font-weight: bold; 
+    cursor: pointer; 
+    border-radius: 5px; 
+    text-transform: uppercase; 
+    margin-top: 10px;
 }
 
-/* 5. Menu Déroulant Stylisé (OS) */
+/* --- Menu Déroulant (OS) --- */
 .custom-select {
-    width: 100%; padding: 12px; background-color: #000; color: #ffffff; 
-    border: 1px solid #dc143c; border-radius: 8px; appearance: none; cursor: pointer;
+    width: 100%; padding: 12px; background-color: #111; color: #ffffff; 
+    border: 1px solid #dc143c; border-radius: 5px; appearance: none; cursor: pointer;
     background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2300f3ff%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');
     background-repeat: no-repeat; background-position: right 10px top 50%; background-size: 12px auto;
 }
 
-/* 6. Barre de Navigation Flottante (Fixée en bas, design image_22.png) */
-.floating-nav {
+/* --- Barre de Navigation Flottante --- */
+.floating-nav-bar {
     position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
     width: 90%; max-width: 400px; height: 65px; background: rgba(10, 10, 10, 0.95);
     border: 2px solid #00f3ff; border-radius: 35px; box-shadow: 0 0 20px rgba(0, 243, 255, 0.4);
-    display: flex; justify-content: space-around; align-items: center; z-index: 9999;
+    display: flex; justify-content: space-around; align-items: center; z-index: 2000;
 }
-.nav-link { 
+.nav-icon-link { 
     text-decoration: none; font-size: 24px; color: #ffffff; 
     width: 45px; height: 45px; display: flex; 
-    justify-content: center; align-items: center; border-radius: 50%; transition: 0.3s;
+    justify-content: center; align-items: center; border-radius: 50%; 
 }
-.nav-link.active { background: #00f3ff; color: #000; }
