@@ -1,4 +1,4 @@
-/* Réinitialisation et base sombre */
+/* Reset et Base Sombre */
 * {
     margin: 0;
     padding: 0;
@@ -12,10 +12,10 @@ body {
     min-height: 100vh;
 }
 
-/* En-tête */
+/* En-tête avec bandeau rouge cramoisi */
 .main-header {
     width: 100%;
-    padding: 30px;
+    padding: 20px;
     display: flex;
     justify-content: center;
     border-bottom: 3px solid #dc143c;
@@ -23,11 +23,12 @@ body {
     background-color: #050505;
 }
 
+/* Logo carré et large */
 .logo-wrapper {
-    width: 150px;
-    height: 150px;
-    border: 3px solid #dc143c;
-    border-radius: 15px;
+    width: 250px;
+    height: 100px;
+    border: 2px solid #dc143c;
+    border-radius: 8px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -35,11 +36,12 @@ body {
 }
 
 .logo-image {
-    max-width: 85%;
-    max-height: 85%;
+    max-width: 90%;
+    max-height: 90%;
+    object-fit: contain;
 }
 
-/* Grille */
+/* Grille et Mise en page */
 .store-content {
     padding: 40px 20px;
 }
@@ -54,11 +56,9 @@ body {
 .products-grid {
     display: grid;
     gap: 25px;
-    /* Mobile : 2 colonnes */
     grid-template-columns: repeat(2, 1fr);
 }
 
-/* PC : 3 colonnes */
 @media (min-width: 768px) {
     .products-grid {
         grid-template-columns: repeat(3, 1fr);
