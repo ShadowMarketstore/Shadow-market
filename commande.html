@@ -2,22 +2,38 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shadow Market - Commande</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <nav class="floating-nav-bar">
-        <a href="account.html" class="nav-icon-link">👤</a>
-        <a href="commande.html" class="nav-icon-link">🛒</a>
-        <a href="index.html" class="nav-icon-link">🏠</a>
-        <a href="https://discord.gg/XUtWdTPYr" target="_blank" class="nav-icon-link">💬</a>
+    <nav class="floating-nav">
+        <a href="account.html" class="nav-link">👤</a>
+        <a href="commande.html" class="nav-link active">🛒</a>
+        <a href="index.html" class="nav-link">🏠</a>
+        <a href="https://discord.gg/XUtWdTPYr" target="_blank" class="nav-link">💬</a>
     </nav>
-    <div class="main-content-wrapper">
+    <div class="main-wrapper">
         <h1 class="section-title">Passer une commande</h1>
         <form class="order-form">
-            <label>Modèle</label> <input type="text">
-            <label>Système</label> <select><option>Windows 10</option></select>
-            <button type="submit" class="submit-button">ENVOYER</button>
+            <div class="form-group">
+                <label>Marque & Modèle</label>
+                <input type="text" placeholder="Ex: HP ProBook 4440S" required>
+            </div>
+            <div class="form-group">
+                <label>Système d'exploitation</label>
+                <select>
+                    <option>Windows 10</option>
+                    <option>Windows 11</option>
+                    <option>Windows 8</option>
+                    <option>Linux</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Message pour le support</label>
+                <textarea placeholder="Décrivez vos besoins..." rows="5"></textarea>
+            </div>
+            <button type="submit" class="submit-btn">ENVOYER LA DEMANDE</button>
         </form>
     </div>
 </body>
