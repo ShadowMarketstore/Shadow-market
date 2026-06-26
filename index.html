@@ -1,17 +1,52 @@
 <!DOCTYPE html>
-<html>
-<head><link rel="stylesheet" href="style.css"></head>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shadow Market</title>
+    <link rel="stylesheet" href="style.css">
+</head>
 <body>
-    <div class="main-content-wrapper">
-        <form class="order-form">
-            <div class="form-group"><label>Modèle</label><input type="text"></div>
-            <button class="buy-btn">COMMANDER</button>
-        </form>
-    </div>
+
     <nav class="floating-nav">
-        <a href="account.html" class="nav-link">👤</a>
-        <a href="commande.html" class="nav-link">🛒</a>
-        <a href="index.html" class="nav-link">🏠</a>
+        <a href="account.html" class="nav-link" title="Mon Compte">👤</a>
+        <a href="commande.html" class="nav-link" title="Mon Panier">🛒</a>
+        <a href="index.html" class="nav-link active" title="Accueil">🏠</a>
+        <a href="https://discord.gg/XUtWdTPYr" target="_blank" class="nav-link" title="Discord">💬</a>
     </nav>
+
+    <div class="main-content-wrapper">
+        <header class="main-header">
+            <div class="logo-wrapper">
+                Shadow Market Logo
+            </div>
+        </header>
+
+        <main class="store-content">
+            <h1 class="section-title">Produits Disponibles</h1>
+            
+            <div class="products-grid">
+                
+                <div class="product-card">
+                    <h3 class="product-name">Shadow_Clean_Premium</h3>
+                    <p class="product-price">25.00 EUR</p>
+                    <a href="commande.html" class="buy-btn">AJOUTER AU PANIER</a>
+                </div>
+
+                <div class="product-card">
+                    <h3 class="product-name">Shadow_Craft_Java</h3>
+                    <p class="product-price">19.50 EUR</p>
+                    <a href="commande.html" class="buy-btn">AJOUTER AU PANIER</a>
+                </div>
+
+                <div class="product-card">
+                    <h3 class="product-name">Shadow_Debloat_Pro</h3>
+                    <p class="product-price">15.00 EUR</p>
+                    <a href="commande.html" class="buy-btn">AJOUTER AU PANIER</a>
+                </div>
+            </div>
+        </main>
+    </div>
+
 </body>
 </html>
