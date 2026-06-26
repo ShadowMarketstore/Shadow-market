@@ -1,47 +1,51 @@
-/* style.css - VERSION CORRIGÉE (PROPORTIONS) */
+/* style.css - AJUSTEMENT DES PROPORTIONS "PRIME" */
 
-* { margin: 0; padding: 0; box-sizing: border-box; outline: none; }
-body { background-color: #000000; color: #ffffff; font-family: 'Segoe UI', sans-serif; min-height: 100vh; overflow-x: hidden; }
-
-.main-content-wrapper { padding-bottom: 120px; padding-top: 20px; display: flex; flex-direction: column; align-items: center; }
-
-/* Logo : Plus compact */
-.logo-wrapper {
-    width: 85%; max-width: 300px; height: 70px;
-    background-color: #000000; border: 2px solid #dc143c; border-radius: 8px;
-    margin: 10px auto 25px auto;
-    display: flex; justify-content: center; align-items: center; font-weight: bold;
-}
-
-/* Grille : Limite de 500px pour éviter l'étalement */
+/* Grille : Resserrement pour une allure élancée */
 .products-grid { 
     display: grid; 
     grid-template-columns: repeat(2, 1fr); 
-    gap: 10px; 
-    padding: 0 10px; 
-    max-width: 500px; 
+    gap: 15px; /* Écart précis pour laisser respirer */
+    padding: 0 15px; 
+    max-width: 420px; /* Largeur totale plus étroite */
     margin: 0 auto;
 }
 
-/* Cartes : Padding réduit pour affiner */
+/* Cartes : Proportions allongées (plus de hauteur, moins de largeur apparente) */
 .product-card { 
-    background: #0a0a0a; border: 1.5px solid #00f3ff; border-radius: 8px; 
-    padding: 12px; text-align: center;
+    background: #0a0a0a; 
+    border: 1.5px solid #00f3ff; 
+    border-radius: 10px; 
+    padding: 15px 10px; /* Plus d'espace haut/bas que sur les côtés */
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
-.product-name { color: #ffffff; font-size: 13px; margin-bottom: 5px; font-weight: bold; }
-.product-price { color: #00f3ff; font-size: 12px; margin-bottom: 8px; }
 
+/* Texte : Taille adaptée pour ne pas charger visuellement */
+.product-name { font-size: 12px; margin-bottom: 8px; color: #ffffff; }
+.product-price { color: #00f3ff; font-size: 11px; margin-bottom: 10px; }
+
+/* Boutons : Plus fins */
 .buy-btn { 
-    width: 100%; padding: 8px; background: #dc143c; border: none; 
-    color: white; font-weight: bold; border-radius: 4px; font-size: 11px;
-    text-transform: uppercase; text-decoration: none; display: block;
+    padding: 6px; 
+    background: #dc143c; 
+    border: none; 
+    color: white; 
+    font-weight: bold; 
+    border-radius: 4px; 
+    font-size: 10px;
+    text-transform: uppercase; 
+    text-decoration: none; 
+    display: block;
 }
 
-/* --- LE RESTE (COMMANDE, NAV) RESTE INCHANGÉ --- */
-.order-form { background: #0a0a0a; padding: 25px; border: 2px solid #00f3ff; border-radius: 12px; max-width: 500px; margin: 0 auto 20px auto; width: 90%; }
-.form-group { margin-bottom: 20px; }
-.form-group label { display: block; color: #00f3ff; margin-bottom: 8px; font-size: 14px; }
-.form-group input, .form-group textarea { width: 100%; padding: 12px; background: #000; border: 1px solid #dc143c; color: #ffffff; border-radius: 8px; }
-.floating-nav { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 400px; height: 65px; background: rgba(10, 10, 10, 0.95); border: 2px solid #00f3ff; border-radius: 35px; display: flex; justify-content: space-around; align-items: center; z-index: 9999; }
-.nav-link { text-decoration: none; font-size: 24px; color: #ffffff; width: 45px; height: 45px; display: flex; justify-content: center; align-items: center; border-radius: 50%; }
-.nav-link.active { background: #00f3ff; color: #000; }
+/* Logo : Ajustement pour rester conforme au modèle */
+.logo-wrapper {
+    width: 80%; 
+    max-width: 260px; 
+    height: 60px;
+    border: 2px solid #dc143c; 
+    border-radius: 8px;
+    margin: 10px auto 20px auto;
+}
