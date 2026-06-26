@@ -68,3 +68,50 @@ body { background-color: #000000; color: #ffffff; font-family: 'Segoe UI', sans-
 .product-name { color: #ffffff; margin-bottom: 5px; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .product-price { color: #00f3ff; font-weight: bold; margin-bottom: 10px; font-size: 14px; }
 .buy-button { width: 100%; padding: 8px; background: #dc143c; border: none; color: white; font-weight: bold; cursor: pointer; border-radius: 5px; font-size: 11px; margin-top: auto; }
+
+/* Style du formulaire de commande */
+.order-form {
+    background: #0a0a0a;
+    padding: 25px;
+    border: 2px solid #00f3ff;
+    border-radius: 12px;
+    max-width: 500px;
+    margin: 40px auto;
+    box-shadow: 0 0 15px rgba(0, 243, 255, 0.2);
+}
+
+.order-form h2 { color: #fff; margin-bottom: 20px; text-align: center; font-size: 20px; }
+
+.form-group { margin-bottom: 15px; }
+
+.form-group label { display: block; color: #00f3ff; margin-bottom: 6px; font-size: 14px; }
+
+.form-group input, .form-group select, .form-group textarea {
+    width: 100%;
+    padding: 12px;
+    background: #111;
+    border: 1px solid #dc143c;
+    color: #fff;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+.form-group textarea { height: 100px; resize: vertical; }
+
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+.submit-button {
+    width: 100%;
+    padding: 14px;
+    background: #dc143c;
+    border: none;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 5px;
+    margin-top: 15px;
+    text-transform: uppercase;
+    transition: 0.3s;
+}
+
+.submit-button:hover { background: #ff1a4a; box-shadow: 0 0 10px #dc143c; }
