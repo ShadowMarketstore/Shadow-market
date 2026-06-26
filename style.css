@@ -1,59 +1,118 @@
-/* Réinitialisation globale */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
+/* Style global pour le fond noir sombre et les accents néon cyan */
 body {
-    background-color: #000000; /* Noir profond */
-    color: #ffffff;
-    font-family: 'Segoe UI', sans-serif;
-    line-height: 1.6;
+    background-color: #0d0d0d; /* Un noir très sombre */
+    color: #e0fbfc; /* Un blanc bleuté pour le texte principal */
+    font-family: 'Share Tech Mono', monospace; /* Police d'aspect technique */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
 }
 
-/* En-tête avec cadre néon rouge cramoisi */
+/* Container principal de la boutique avec bordure néon cyan */
+.store-container {
+    border: 3px solid #00ffff; /* Le cyan néon */
+    border-radius: 20px;
+    padding: 30px;
+    width: 350px;
+    background-color: #1a1a1a; /* Légèrement plus clair pour se détacher */
+    text-align: center;
+    box-shadow: 0 0 20px #00ffff; /* Effet de lueur cyan */
+}
+
+/* En-tête avec bordure néon rouge cramoisi et logo */
 .navbar {
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 30px;
-    border-bottom: 3px solid #dc143c; /* Rouge cramoisi */
-    box-shadow: 0 0 15px #dc143c, inset 0 0 5px #dc143c;
+    padding: 10px;
+    border-bottom: 2px solid #dc143c; /* Rouge cramoisi */
+    box-shadow: 0 0 10px #dc143c, inset 0 0 5px #dc143c; /* Effet néon rouge */
     margin-bottom: 20px;
 }
 
 .logo img {
-    max-height: 80px; /* Ajuste selon la taille de ton image */
-    filter: drop-shadow(0 0 10px #dc143c);
+    max-height: 80px; /* Taille maximale pour ton logo */
+    filter: drop-shadow(0 0 5px #dc143c); /* Ombre rouge pour le logo */
 }
 
-/* Grille des produits avec accents néon cyan */
-.grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 30px;
-    padding: 40px;
+/* Titre principal néon cyan */
+.main-title {
+    color: #00ffff; /* Le cyan néon */
+    font-size: 24px;
+    font-weight: bold;
+    text-shadow: 0 0 10px #00ffff; /* Effet de lueur cyan */
+    margin-bottom: 5px;
 }
 
-.product-card {
-    background: #0a0a0a;
-    border: 1px solid #00f3ff; /* Néon Cyan */
-    padding: 20px;
-    border-radius: 12px;
+.store-subtitle {
+    color: #a0a0a0; /* Texte secondaire gris */
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+
+/* Champ de saisie du code avec bordure néon cyan */
+.code-input {
+    background-color: transparent;
+    border: 1px solid #00ffff; /* Le cyan néon */
+    border-radius: 10px;
+    color: #00ffff; /* Texte cyan pour l'input */
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 18px;
+    padding: 15px;
+    width: calc(100% - 30px);
+    margin-bottom: 15px;
     text-align: center;
-    transition: 0.4s;
-    box-shadow: 0 0 8px rgba(0, 243, 255, 0.2);
+    outline: none; /* Enlève la bordure par défaut lors du focus */
 }
 
-.product-card:hover {
-    border-color: #fff;
-    box-shadow: 0 0 20px #00f3ff;
-    transform: scale(1.02);
+/* Bouton de validation néon cyan */
+.validate-button {
+    background-color: #00ffff; /* Fond cyan néon pour le bouton */
+    color: #0d0d0d; /* Texte noir pour le contraste */
+    border: none;
+    border-radius: 10px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 16px;
+    font-weight: bold;
+    padding: 15px 30px;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: 0.3s;
+    margin-bottom: 20px;
+    width: 100%;
 }
 
-/* Texte et boutons */
-h1, h2 {
-    color: #00f3ff;
-    text-shadow: 0 0 5px #00f3ff;
+.validate-button:hover {
+    box-shadow: 0 0 20px #00ffff; /* Accentue la lueur au survol */
+}
+
+/* Bloc "Code Valide" avec bordure néon cyan */
+.valid-code-block {
+    border: 1px solid #00ffff; /* Le cyan néon */
+    border-radius: 10px;
+    padding: 15px;
+    margin-top: 10px;
+}
+
+.valid-code-title {
+    color: #00ffff;
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.valid-code-message {
+    color: #a0a0a0;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+.download-link {
+    color: #00ffff;
+    font-size: 16px;
+    font-weight: bold;
+    text-decoration: underline;
+    cursor: pointer;
 }
