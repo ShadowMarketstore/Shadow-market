@@ -2,32 +2,25 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shadow Market</title>
     <link rel="stylesheet" href="style.css">
+    <title>Shadow Market</title>
 </head>
 <body>
     <header class="navbar">
-        <div class="logo">Shadow_ Market</div>
-        <nav>
-            <ul>
-                <li><a href="#accueil">Accueil</a></li>
-                <li><a href="#boutique">Boutique</a></li>
-            </ul>
-        </nav>
+        <img src="ton-logo.png" alt="Logo" class="logo">
     </header>
 
-    <main id="accueil">
-        <h1>L'optimisation Master Class</h1>
-        <p>Bienvenue dans ton interface de gestion.</p>
-    </main>
-
-    <section id="boutique">
-        <div id="product-container" class="grid">
+    <main class="store-container">
+        <h1 class="main-title">SHADOW MARKET STORE</h1>
+        <p class="store-subtitle">Veuillez entrer votre code d'accès.</p>
+        
+        <input type="text" id="code" class="code-input" placeholder="SHD...">
+        <button class="validate-button">VALIDER LE CODE</button>
+        
+        <div id="product-container">
             </div>
-    </section>
+    </main>
 
     <script src="script.js"></script>
 </body>
 </html>
-
