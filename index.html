@@ -1,110 +1,16 @@
-```html
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
     <title>Shadow Market</title>
-    <style>
-        body {
-            background-color: #000000;
-            color: #ffffff;
-            font-family: 'Segoe UI', sans-serif;
-            margin: 0;
-            padding: 0;
-        }
-
-        /* En-tête avec logo carré */
-        header {
-            padding: 20px;
-            text-align: center;
-            border-bottom: 3px solid #dc143c;
-            box-shadow: 0 4px 15px #dc143c;
-            background: #000;
-        }
-
-        .logo-container {
-            width: 120px; /* Espace carré pour le logo */
-            height: 120px;
-            margin: 0 auto;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #0a0a0a;
-            border: 2px solid #dc143c;
-            border-radius: 10px;
-        }
-
-        .logo-container img {
-            max-width: 90%;
-            max-height: 90%;
-        }
-
-        /* Grille Responsive Automatique */
-        .products-grid {
-            display: grid;
-            padding: 20px;
-            gap: 15px;
-            /* Mobile : 2 colonnes */
-            grid-template-columns: repeat(2, 1fr);
-        }
-
-        @media (min-width: 768px) {
-            /* Ordinateur : 3 colonnes */
-            .products-grid {
-                grid-template-columns: repeat(3, 1fr);
-                gap: 25px;
-                padding: 40px;
-            }
-        }
-
-        .product-card {
-            background-color: #0a0a0a;
-            border: 1px solid #00f3ff;
-            border-radius: 8px;
-            padding: 10px;
-            text-align: center;
-            transition: 0.3s;
-        }
-
-        .product-card:hover {
-            box-shadow: 0 0 15px #00f3ff;
-        }
-
-        .product-image {
-            width: 100%;
-            aspect-ratio: 1/1; /* Maintient le format carré */
-            background: #111;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #555;
-        }
-    </style>
 </head>
 <body>
-
     <header>
-        <div class="logo-container">
-            <img src="ton-logo.png" alt="Logo">
-        </div>
+        <div class="logo-box"><img src="ton-logo.png" alt="Logo"></div>
     </header>
-
-    <div class="products-grid">
-        <!-- Ajoute un bloc comme celui-ci pour chaque nouveau produit -->
-        <div class="product-card">
-            <div class="product-image">Image</div>
-            <div style="color:#00f3ff; font-weight:bold;">Produit 1</div>
+    
+    <div class="grid">
         </div>
-        
-        <div class="product-card">
-            <div class="product-image">Image</div>
-            <div style="color:#00f3ff; font-weight:bold;">Produit 2</div>
-        </div>
-    </div>
-
 </body>
 </html>
-
-```
