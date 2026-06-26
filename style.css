@@ -1,18 +1,8 @@
-/* Reset et Base Sombre */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
-body {
-    background-color: #000000;
-    color: #ffffff;
-    font-family: 'Segoe UI', sans-serif;
-    min-height: 100vh;
-}
+body { background-color: #000000; color: #ffffff; font-family: sans-serif; min-height: 100vh; }
 
-/* En-tête avec bandeau rouge cramoisi */
+/* En-tête : Logo occupant tout l'espace */
 .main-header {
     width: 100%;
     padding: 20px;
@@ -23,10 +13,10 @@ body {
     background-color: #050505;
 }
 
-/* Logo carré et large */
 .logo-wrapper {
-    width: 250px;
-    height: 100px;
+    width: 100%;
+    max-width: 400px; /* Largeur maximale pour le logo */
+    height: 120px;
     border: 2px solid #dc143c;
     border-radius: 8px;
     display: flex;
@@ -36,76 +26,43 @@ body {
 }
 
 .logo-image {
-    max-width: 90%;
-    max-height: 90%;
+    max-width: 95%;
+    max-height: 95%;
     object-fit: contain;
 }
 
-/* Grille et Mise en page */
-.store-content {
-    padding: 40px 20px;
-}
+/* Grille : Symétrie parfaite */
+.store-content { padding: 40px 20px; }
 
-.section-title {
-    text-align: center;
-    color: #00f3ff;
-    margin-bottom: 30px;
-    text-shadow: 0 0 10px #00f3ff;
-}
+.section-title { text-align: center; color: #00f3ff; margin-bottom: 30px; text-shadow: 0 0 10px #00f3ff; }
 
 .products-grid {
     display: grid;
-    gap: 25px;
-    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    grid-template-columns: repeat(2, 1fr); /* 2 colonnes égales */
+    width: 100%;
 }
 
 @media (min-width: 768px) {
-    .products-grid {
-        grid-template-columns: repeat(3, 1fr);
-        padding: 0 100px;
-    }
+    .products-grid { grid-template-columns: repeat(3, 1fr); max-width: 1200px; margin: 0 auto; }
 }
 
-/* Carte Produit */
+/* Carte Produit : Symétrie */
 .product-card {
     background-color: #0a0a0a;
     border: 2px solid #00f3ff;
     border-radius: 12px;
     padding: 15px;
-    transition: all 0.4s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
 }
 
-.product-card:hover {
-    box-shadow: 0 0 20px #00f3ff;
-    transform: translateY(-5px);
-}
+.product-visual { width: 100%; aspect-ratio: 1/1; background: #111; border-radius: 8px; margin-bottom: 15px; }
 
-.product-visual {
-    width: 100%;
-    aspect-ratio: 1/1;
-    background: #111;
-    border-radius: 8px;
-    margin-bottom: 15px;
-}
+.product-name { color: #ffffff; margin-bottom: 10px; font-size: 16px; }
 
-.product-name {
-    color: #ffffff;
-    margin-bottom: 10px;
-}
+.product-price { color: #00f3ff; font-weight: bold; margin-bottom: 15px; }
 
-.product-price {
-    color: #00f3ff;
-    font-weight: bold;
-    margin-bottom: 15px;
-}
-
-.buy-button {
-    width: 100%;
-    padding: 10px;
-    background: #dc143c;
-    border: none;
-    color: white;
-    font-weight: bold;
-    cursor: pointer;
-    border-radius: 5px;
-}
+.buy-button { width: 100%; padding: 10px; background: #dc143c; border: none; color: white; font-weight: bold; cursor: pointer; border-radius: 5px; }
