@@ -2,41 +2,27 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Shadow Market - Admin Pro</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shadow Market - Admin</title>
     <link rel="stylesheet" href="style.css">
 </head>
-<body style="padding: 20px; background: #000; color: #fff;">
-
-    <h1 class="section-title">Panel Admin Pro</h1>
-
-    <section class="admin-grid">
-        <div class="card"><h3>Ventes Totales</h3><p>12 500 XOF</p></div>
-        <div class="card"><h3>Top Produit</h3><p>Shadow_Clean_Premium</p></div>
-        <div class="card"><h3>Partenaires Actifs</h3><p>4</p></div>
-    </section>
-
-    <section class="admin-section">
-        <h2>Gestion des Promotions</h2>
-        <div class="promo-form">
-            <input type="text" placeholder="ID du Produit ou 'TOUT'">
-            <input type="number" placeholder="Réduction (%)">
-            <input type="date" placeholder="Date de fin">
-            <button class="buy-button">Appliquer Promo</button>
+<body>
+    <nav class="floating-nav">
+        <a href="account.html" class="nav-link">👤</a>
+        <a href="commande.html" class="nav-link">🛒</a>
+        <a href="index.html" class="nav-link active">🏠</a>
+        <a href="https://discord.gg/XUtWdTPYr" target="_blank" class="nav-link">💬</a>
+    </nav>
+    <div class="main-wrapper">
+        <h1 class="section-title">Panneau d'Administration</h1>
+        <div class="neon-box">
+            <h2 style="color:white; margin-bottom: 20px;">Commandes Récentes</h2>
+            <div class="neon-box" style="width: 100%; border: 1px solid #00f3ff;">
+                <p>Client: ID_Utilisateur_001</p>
+                <p>Produit: Shadow_Clean_Premium</p>
+                <button class="submit-btn" style="background: #00f3ff; color: #000 !important; margin-top: 10px;">VALIDER COMMANDE</button>
+            </div>
         </div>
-    </section>
-
-    <section class="admin-section">
-        <h2>Commandes & Demandes</h2>
-        <table class="admin-table">
-            <thead>
-                <tr><th>Client</th><th>Produit</th><th>Promo Appliquée</th><th>Action</th></tr>
-            </thead>
-            <tbody>
-                <tr><td>Jean D.</td><td>Shadow_Craft</td><td>-10%</td><td><button>Valider</button></td></tr>
-            </tbody>
-        </table>
-    </section>
-
+    </div>
 </body>
 </html>
-
