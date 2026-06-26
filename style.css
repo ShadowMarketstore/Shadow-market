@@ -1,48 +1,278 @@
-/* --- Réinitialisation --- */
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body { background-color: #000000; color: #ffffff; font-family: 'Segoe UI', sans-serif; min-height: 100vh; display: flex; }
-
-/* --- Sidebar (Barre latérale) --- */
-.sidebar {
-    width: 70px; height: 100vh; background: #050505; border-right: 2px solid #dc143c;
-    display: flex; flex-direction: column; align-items: center; padding-top: 20px; position: fixed; z-index: 1000;
+/* --- Réinitialisation Globale --- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
-.nav-icon {
-    width: 45px; height: 45px; margin-bottom: 20px; cursor: pointer; background: #111;
-    border: 1px solid #00f3ff; border-radius: 8px; display: flex; justify-content: center;
-    align-items: center; color: #00f3ff; transition: 0.3s;
+
+body {
+    background-color: #000000;
+    color: #ffffff;
+    font-family: 'Segoe UI', sans-serif;
+    min-height: 100vh;
+    position: relative;
 }
-.nav-icon:hover { background: #00f3ff; color: #000; }
 
-/* --- Contenu Principal --- */
-.main-content { margin-left: 70px; width: calc(100% - 70px); padding: 20px; }
+/* --- Espace pour la barre flottante --- */
+.main-content-wrapper {
+    padding-bottom: 90px;
+}
 
-/* --- Header & Logo --- */
+/* --- Header et Logo --- */
 .main-header {
-    width: 100%; padding: 20px; display: flex; justify-content: center;
-    border-bottom: 3px solid #dc143c; box-shadow: 0 0 20px #dc143c; background-color: #050505;
+    width: 100%;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    border-bottom: 3px solid #dc143c;
+    background-color: #050505;
 }
+
 .logo-wrapper {
-    width: 90%; max-width: 600px; height: 120px; border: 2px solid #dc143c;
-    border-radius: 8px; display: flex; justify-content: center; align-items: center; background: #000;
+    width: 90%;
+    max-width: 600px;
+    height: 120px;
+    border: 2px solid #dc143c;
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
-.logo-image { width: 100%; height: 100%; object-fit: contain; }
 
-/* --- Grille Produits --- */
-.store-content { padding: 20px; }
-.section-title { text-align: center; color: #00f3ff; margin-bottom: 30px; text-shadow: 0 0 10px #00f3ff; }
+.logo-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+/* --- Section Produits --- */
+.store-content {
+    padding: 20px;
+}
+
+.section-title {
+    text-align: center;
+    color: #00f3ff;
+    margin-bottom: 30px;
+    font-size: 24px;
+}
+
 .products-grid {
-    display: grid; gap: 15px; grid-template-columns: repeat(2, 1fr); min-width: 0;
+    display: grid;
+    gap: 15px;
+    grid-template-columns: repeat(2, 1fr);
+    max-width: 1200px;
+    margin: 0 auto;
 }
+
 @media (min-width: 768px) {
-    .products-grid { grid-template-columns: repeat(3, 1fr); gap: 25px; max-width: 1200px; margin: 0 auto; }
+    .products-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 25px;
+    }
 }
 
-/* --- Cartes Produits --- */
-.product-card { background-color: #0a0a0a; border: 2px solid #00f3ff; border-radius: 12px; padding: 10px; display: flex; flex-direction: column; text-align: center; min-width: 0; }
-.product-visual { width: 100%; aspect-ratio: 1/1; background: #111; border-radius: 8px; margin-bottom: 10px; }
-.buy-button { width: 100%; padding: 8px; background: #dc143c; border: none; color: white; font-weight: bold; cursor: pointer; border-radius: 5px; font-size: 11px; margin-top: auto; text-decoration: none; display: block; text-align: center; }
+/* --- Cartes de Produits --- */
+.product-card {
+    background-color: #0a0a0a;
+    border: 2px solid #00f3ff;
+    border-radius: 12px;
+    padding: 10px;
+    text-align: center;
+}
 
-/* --- Dashboard & Formulaires --- */
-.admin-table { width: 100%; border-collapse: collapse; margin-top: 20px; color: white; background: #0a0a0a; border: 1px solid #00f3ff; }
-.admin-table th, .admin-table td { padding: 15px; border: 1px solid #333; text-align: center; }
+.product-visual {
+    width: 100%;
+    aspect-ratio: 1/1;
+    background: #111;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+.buy-button {
+    width: 100%;
+    padding: 8px;
+    background: #dc143c;
+    border: none;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 5px;
+    margin-top: 10px;
+}
+
+/* --- Barre de navigation flottante (Style App) --- */
+.floating-nav-bar {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 400px;
+    height: 65px;
+    background: rgba(10, 10, 10, 0.95);
+    border: 2px solid #00f3ff;
+    border-radius: 35px;
+    box-shadow: 0 0 20px rgba(0, 243, 255, 0.4);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    z-index: 2000;
+}
+
+.nav-icon-link {
+    text-decoration: none;
+    font-size: 24px;
+    color: #fff;
+    width: 45px;
+    height: 45px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.nav-icon-link:hover {
+    background: #00f3ff;
+    color: #000;
+}
+/* --- Réinitialisation Globale --- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: #000000;
+    color: #ffffff;
+    font-family: 'Segoe UI', sans-serif;
+    min-height: 100vh;
+    position: relative;
+}
+
+/* --- Espace pour la barre flottante --- */
+.main-content-wrapper {
+    padding-bottom: 90px;
+}
+
+/* --- Header et Logo --- */
+.main-header {
+    width: 100%;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    border-bottom: 3px solid #dc143c;
+    background-color: #050505;
+}
+
+.logo-wrapper {
+    width: 90%;
+    max-width: 600px;
+    height: 120px;
+    border: 2px solid #dc143c;
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.logo-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+/* --- Section Produits --- */
+.store-content {
+    padding: 20px;
+}
+
+.section-title {
+    text-align: center;
+    color: #00f3ff;
+    margin-bottom: 30px;
+    font-size: 24px;
+}
+
+.products-grid {
+    display: grid;
+    gap: 15px;
+    grid-template-columns: repeat(2, 1fr);
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+@media (min-width: 768px) {
+    .products-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 25px;
+    }
+}
+
+/* --- Cartes de Produits --- */
+.product-card {
+    background-color: #0a0a0a;
+    border: 2px solid #00f3ff;
+    border-radius: 12px;
+    padding: 10px;
+    text-align: center;
+}
+
+.product-visual {
+    width: 100%;
+    aspect-ratio: 1/1;
+    background: #111;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+.buy-button {
+    width: 100%;
+    padding: 8px;
+    background: #dc143c;
+    border: none;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 5px;
+    margin-top: 10px;
+}
+
+/* --- Barre de navigation flottante (Style App) --- */
+.floating-nav-bar {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 400px;
+    height: 65px;
+    background: rgba(10, 10, 10, 0.95);
+    border: 2px solid #00f3ff;
+    border-radius: 35px;
+    box-shadow: 0 0 20px rgba(0, 243, 255, 0.4);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    z-index: 2000;
+}
+
+.nav-icon-link {
+    text-decoration: none;
+    font-size: 24px;
+    color: #fff;
+    width: 45px;
+    height: 45px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.nav-icon-link:hover {
+    background: #00f3ff;
+    color: #000;
+}
