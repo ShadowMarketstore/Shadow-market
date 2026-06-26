@@ -2,35 +2,23 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
+    <title>Shadow Market - Commande</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
     <nav class="floating-nav-bar">
         <a href="account.html" class="nav-icon-link">👤</a>
         <a href="commande.html" class="nav-icon-link">🛒</a>
         <a href="index.html" class="nav-icon-link">🏠</a>
-        <a href="https://discord.gg/XUtWdTPYr" target="_blank">
-            <img src="1000310106.png" class="discord-icon" alt="Discord">
-        </a>
+        <a href="https://discord.gg/XUtWdTPYr" target="_blank" class="nav-icon-link">💬</a>
     </nav>
-
-    <main class="main-content-wrapper">
+    <div class="main-content-wrapper">
         <h1 class="section-title">Passer une commande</h1>
         <form class="order-form">
-            <div class="form-group">
-                <label>Marque & Modèle</label>
-                <input type="text" placeholder="Ex: HP ProBook">
-            </div>
-            <div class="form-group">
-                <label>Système d'exploitation</label>
-                <select>
-                    <option>Windows 10</option>
-                    <option>Windows 11</option>
-                </select>
-            </div>
-            <button type="submit" class="submit-button">ENVOYER LA DEMANDE</button>
+            <label>Modèle</label> <input type="text">
+            <label>Système</label> <select><option>Windows 10</option></select>
+            <button type="submit" class="submit-button">ENVOYER</button>
         </form>
-    </main>
+    </div>
 </body>
 </html>
