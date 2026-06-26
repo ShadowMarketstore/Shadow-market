@@ -1,29 +1,44 @@
-/* Réinitialisation propre pour tout le projet */
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body { background-color: #000000; color: #ffffff; font-family: 'Segoe UI', sans-serif; min-height: 100vh; overflow-x: hidden; }
+/* --- RÉINITIALISATION TOTALE & STABILITÉ --- */
+* { margin: 0; padding: 0; box-sizing: border-box; outline: none; }
+body { background-color: #000000; color: #ffffff; font-family: 'Segoe UI', system-ui, sans-serif; min-height: 100vh; overflow-x: hidden; }
 
-/* Conteneur principal */
-.main-content-wrapper { padding-bottom: 100px; padding-top: 20px; width: 100%; display: flex; flex-direction: column; align-items: center; }
+/* --- CONTENEURS (Stables) --- */
+.main-wrapper { padding-bottom: 110px; padding-top: 20px; width: 100%; display: flex; flex-direction: column; align-items: center; }
 
-/* Conteneurs (Cards et Formulaires) */
-.product-card, .order-form { 
-    background-color: #000000; border: 2px solid #00f3ff; border-radius: 12px; 
-    padding: 20px; width: 90%; max-width: 450px; margin: 10px auto; 
+/* --- ÉLÉMENTS (Néon Cyan & Fond Noir) --- */
+.neon-box, .product-card, .order-form { 
+    background-color: #000000; border: 2px solid #00f3ff; border-radius: 15px; 
+    padding: 25px; width: 90%; max-width: 480px; margin: 15px auto; 
+    box-shadow: 0 0 15px rgba(0, 243, 255, 0.3);
 }
 
-/* Typographie : Blanc pur partout */
-h1, h2, h3, p, label, input, textarea, select, .submit-button { color: #ffffff !important; }
-.section-title { color: #00f3ff !important; text-align: center; margin-bottom: 20px; }
+/* Typographie : Blanc pur partout sauf titre */
+h1, h2, h3, p, label, input, textarea, select { color: #ffffff !important; }
+.section-title { color: #00f3ff !important; text-align: center; margin-bottom: 25px; font-size: 24px; text-transform: uppercase; letter-spacing: 1px; }
 
-/* Champs et Boutons */
-input, textarea, select { width: 100%; padding: 12px; background: #000; border: 1px solid #00f3ff; border-radius: 5px; margin-top: 5px; }
-.submit-button { width: 100%; padding: 14px; background: #dc143c; border: none; font-weight: bold; cursor: pointer; border-radius: 5px; margin-top: 15px; display: block; }
+/* Formulaires (Bordure Cyan Néon) */
+.form-group { margin-bottom: 20px; width: 100%; }
+.form-group label { display: block; margin-bottom: 8px; font-size: 14px; color: #00f3ff !important; }
+input, textarea, select { width: 100%; padding: 14px; background: #000; border: 1px solid #00f3ff; border-radius: 8px; color: #ffffff !important; font-size: 16px; }
 
-/* Navigation flottante */
-.floating-nav-bar {
+/* Boutons (Rouge Vif & Stable) */
+.submit-btn, .buy-btn { 
+    width: 100%; padding: 16px; background: #dc143c; border: none; 
+    color: white !important; font-weight: bold; font-size: 16px; 
+    cursor: pointer; border-radius: 8px; text-transform: uppercase; 
+    margin-top: 20px; display: block; text-align: center; text-decoration: none; 
+    transition: background 0.3s;
+}
+.submit-btn:hover, .buy-btn:hover { background: #b31031; }
+
+/* --- NAVIGATION FLOTTANTE (Fixée en bas) --- */
+.floating-nav {
     position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-    width: 90%; max-width: 400px; height: 65px; background: #050505;
+    width: 92%; max-width: 420px; height: 70px; background: rgba(5, 5, 5, 0.95);
     border: 2px solid #00f3ff; border-radius: 35px; display: flex;
     justify-content: space-around; align-items: center; z-index: 9999;
+    box-shadow: 0 0 20px rgba(0, 243, 255, 0.4);
 }
-.nav-icon-link { text-decoration: none; font-size: 24px; color: #fff; }
+.nav-link { text-decoration: none; font-size: 26px; color: #fff; transition: color 0.3s; }
+.nav-link:hover, .nav-link.active { color: #00f3ff; }
+.discord-icon { width: 32px; height: 32px; border-radius: 50%; }
