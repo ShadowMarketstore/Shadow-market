@@ -1,30 +1,17 @@
 <!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <title>Shadow Market</title>
-    <link rel="stylesheet" href="style.css">
-</head>
+<html>
+<head><link rel="stylesheet" href="style.css"></head>
 <body>
     <div class="main-content-wrapper">
-        <header class="logo-wrapper">
-            <h1>SHADOW MARKET</h1>
-        </header>
-        <main>
-            <h1 class="section-title">Produits Disponibles</h1>
-            <div class="products-grid">
-                <div class="product-card">
-                    <p class="product-name">Shadow_Clean</p>
-                    <p class="product-price">25.00 EUR</p>
-                    <a href="commande.html" class="buy-btn">AJOUTER</a>
-                </div>
-                <div class="product-card">
-                    <p class="product-name">Shadow_Craft</p>
-                    <p class="product-price">19.50 EUR</p>
-                    <a href="commande.html" class="buy-btn">AJOUTER</a>
-                </div>
-            </div>
-        </main>
+        <form class="order-form">
+            <div class="form-group"><label>Modèle</label><input type="text"></div>
+            <button class="buy-btn">COMMANDER</button>
+        </form>
     </div>
+    <nav class="floating-nav">
+        <a href="account.html" class="nav-link">👤</a>
+        <a href="commande.html" class="nav-link">🛒</a>
+        <a href="index.html" class="nav-link">🏠</a>
+    </nav>
 </body>
 </html>
