@@ -8,7 +8,14 @@
 </head>
 <body>
 
-    <main class="store-content">
+    <nav class="floating-nav-bar">
+        <a href="account.html" class="nav-icon-link" title="Mon Compte">👤</a>
+        <a href="commande.html" class="nav-icon-link" title="Mon Panier">🛒</a>
+        <a href="index.html" class="nav-icon-link" title="Accueil">🏠</a>
+        <a href="https://discord.gg/XUtWdTPYr" target="_blank" class="nav-icon-link" title="Discord">💬</a>
+    </nav>
+
+    <main class="main-content-wrapper">
         <h1 class="section-title">Passer une commande</h1>
         
         <form class="order-form">
@@ -29,11 +36,12 @@
             </div>
 
             <div class="form-group">
-                <label>Système d'exploitation</label>
-                <select>
-                    <option>Windows 10</option>
-                    <option>Windows 11</option>
-                    <option>Windows 8</option>
+                <label for="os">Système d'exploitation</label>
+                <select id="os" name="os" class="custom-select">
+                    <option value="win10">Windows 10</option>
+                    <option value="win11">Windows 11</option>
+                    <option value="win8">Windows 8</option>
+                    <option value="linux">Linux</option>
                 </select>
             </div>
 
@@ -53,4 +61,3 @@
 
 </body>
 </html>
-
