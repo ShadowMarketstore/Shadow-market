@@ -2,6 +2,7 @@
 
 body { background-color: #000000; color: #ffffff; font-family: 'Segoe UI', sans-serif; min-height: 100vh; }
 
+/* En-tête */
 .main-header {
     width: 100%;
     padding: 20px;
@@ -12,11 +13,10 @@ body { background-color: #000000; color: #ffffff; font-family: 'Segoe UI', sans-
     background-color: #050505;
 }
 
-/* Force le logo à occuper toute la largeur du bandeau */
 .logo-wrapper {
-    width: 100%;
-    max-width: 600px; 
-    height: 150px;
+    width: 90%;
+    max-width: 600px;
+    height: 120px;
     border: 2px solid #dc143c;
     border-radius: 8px;
     display: flex;
@@ -28,37 +28,43 @@ body { background-color: #000000; color: #ffffff; font-family: 'Segoe UI', sans-
 .logo-image { 
     width: 100%; 
     height: 100%; 
-    object-fit: contain; /* Assure que tout le logo est visible sans être coupé */
-    padding: 5px;
+    object-fit: contain; 
 }
 
-.store-content { padding: 40px 20px; }
-.section-title { text-align: center; color: #00f3ff; margin-bottom: 40px; text-shadow: 0 0 10px #00f3ff; }
+/* Grille Mobile & Desktop */
+.store-content { padding: 20px; }
+.section-title { text-align: center; color: #00f3ff; margin-bottom: 30px; text-shadow: 0 0 10px #00f3ff; }
 
-/* Grille basée sur la 1ère colonne dupliquée */
 .products-grid {
     display: grid;
-    gap: 20px;
-    grid-template-columns: repeat(2, 1fr); /* 2 colonnes identiques */
-    max-width: 1200px;
-    margin: 0 auto;
+    gap: 15px; /* Réduit pour éviter les débordements */
+    grid-template-columns: repeat(2, 1fr); /* Force 2 colonnes égales sur mobile */
+    min-width: 0; /* Empêche le contenu de déformer la colonne */
 }
 
-@media (min-width: 768px) { .products-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (min-width: 768px) {
+    .products-grid { 
+        grid-template-columns: repeat(3, 1fr); 
+        gap: 25px; 
+        max-width: 1200px; 
+        margin: 0 auto; 
+    }
+}
 
-/* Modèle unique pour toutes les cartes */
+/* Cartes symétriques */
 .product-card {
     background-color: #0a0a0a;
     border: 2px solid #00f3ff;
     border-radius: 12px;
-    padding: 15px;
+    padding: 10px;
     display: flex;
     flex-direction: column;
     text-align: center;
+    min-width: 0; /* Important pour la symétrie mobile */
 }
 
 .product-visual { width: 100%; aspect-ratio: 1/1; background: #111; border-radius: 8px; margin-bottom: 10px; }
 .card-info { flex-grow: 1; display: flex; flex-direction: column; }
-.product-name { color: #ffffff; margin-bottom: 5px; font-size: 14px; }
-.product-price { color: #00f3ff; font-weight: bold; margin-bottom: 10px; }
-.buy-button { width: 100%; padding: 10px; background: #dc143c; border: none; color: white; font-weight: bold; cursor: pointer; border-radius: 5px; margin-top: auto; }
+.product-name { color: #ffffff; margin-bottom: 5px; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.product-price { color: #00f3ff; font-weight: bold; margin-bottom: 10px; font-size: 14px; }
+.buy-button { width: 100%; padding: 8px; background: #dc143c; border: none; color: white; font-weight: bold; cursor: pointer; border-radius: 5px; font-size: 11px; margin-top: auto; }
