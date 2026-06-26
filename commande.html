@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shadow Market - Commande</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <main class="store-content">
+        <h1 class="section-title">Passer une commande</h1>
+        
+        <form class="order-form">
+            <div class="form-group">
+                <label>Marque & Modèle</label>
+                <input type="text" placeholder="Ex: HP ProBook 4440S" required>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>RAM (Go)</label>
+                    <input type="number" placeholder="8" required>
+                </div>
+                <div class="form-group">
+                    <label>Stockage</label>
+                    <input type="text" placeholder="350 Go SSD" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Système d'exploitation</label>
+                <select>
+                    <option>Windows 10</option>
+                    <option>Windows 11</option>
+                    <option>Windows 8</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Carte Graphique</label>
+                <input type="text" placeholder="Ex: Intel HD Graphics">
+            </div>
+
+            <div class="form-group">
+                <label>Message pour le support</label>
+                <textarea placeholder="Décrivez vos besoins (jeux, optimisation, etc...)"></textarea>
+            </div>
+
+            <button type="submit" class="submit-button">ENVOYER LA DEMANDE</button>
+        </form>
+    </main>
+
+</body>
+</html>
+
