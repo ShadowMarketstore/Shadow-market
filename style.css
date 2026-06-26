@@ -1,44 +1,51 @@
-/* style.css - RESTAURATION DES PROPORTIONS (PAGE PRINCIPALE) */
+/* style.css - AJUSTEMENT DES PROPORTIONS "PRIME" */
 
-/* Ciblage strict pour le logo et la grille */
-.logo-wrapper {
-    width: 80%; 
-    max-width: 280px; /* Plus étroit pour rester élégant */
-    height: 70px;
-    border: 2px solid #dc143c; 
-    border-radius: 8px;
-    margin: 15px auto 25px auto;
-    display: flex; 
-    justify-content: center; 
-    align-items: center;
-}
-
+/* Grille : Resserrement pour une allure élancée */
 .products-grid { 
     display: grid; 
     grid-template-columns: repeat(2, 1fr); 
-    gap: 10px; /* Moins d'espace pour plus de compacité */
-    padding: 0 10px; 
-    max-width: 400px; /* Limité pour éviter l'élargissement */
+    gap: 15px; /* Écart précis pour laisser respirer */
+    padding: 0 15px; 
+    max-width: 420px; /* Largeur totale plus étroite */
     margin: 0 auto;
 }
 
+/* Cartes : Proportions allongées (plus de hauteur, moins de largeur apparente) */
 .product-card { 
     background: #0a0a0a; 
     border: 1.5px solid #00f3ff; 
-    border-radius: 6px; 
-    padding: 12px; 
+    border-radius: 10px; 
+    padding: 15px 10px; /* Plus d'espace haut/bas que sur les côtés */
     text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
-.product-name { font-size: 13px; margin-bottom: 5px; color: #ffffff; }
-.product-price { color: #00f3ff; font-size: 12px; margin-bottom: 8px; }
+/* Texte : Taille adaptée pour ne pas charger visuellement */
+.product-name { font-size: 12px; margin-bottom: 8px; color: #ffffff; }
+.product-price { color: #00f3ff; font-size: 11px; margin-bottom: 10px; }
 
+/* Boutons : Plus fins */
 .buy-btn { 
-    padding: 6px 10px; 
+    padding: 6px; 
     background: #dc143c; 
+    border: none; 
     color: white; 
-    font-size: 11px; 
-    border-radius: 4px;
+    font-weight: bold; 
+    border-radius: 4px; 
+    font-size: 10px;
+    text-transform: uppercase; 
     text-decoration: none; 
     display: block;
+}
+
+/* Logo : Ajustement pour rester conforme au modèle */
+.logo-wrapper {
+    width: 80%; 
+    max-width: 260px; 
+    height: 60px;
+    border: 2px solid #dc143c; 
+    border-radius: 8px;
+    margin: 10px auto 20px auto;
 }
