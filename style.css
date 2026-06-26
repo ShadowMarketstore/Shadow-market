@@ -1,4 +1,4 @@
-/* Réinitialisation de base */
+/* Réinitialisation globale */
 * {
     margin: 0;
     padding: 0;
@@ -6,64 +6,54 @@
 }
 
 body {
-    background-color: #050505;
+    background-color: #000000; /* Noir profond */
     color: #ffffff;
     font-family: 'Segoe UI', sans-serif;
     line-height: 1.6;
 }
 
-/* Barre de navigation */
+/* En-tête avec cadre néon rouge cramoisi */
 .navbar {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
-    padding: 20px 50px;
-    border-bottom: 1px solid #00f3ff;
+    padding: 30px;
+    border-bottom: 3px solid #dc143c; /* Rouge cramoisi */
+    box-shadow: 0 0 15px #dc143c, inset 0 0 5px #dc143c;
+    margin-bottom: 20px;
 }
 
-.logo {
-    font-size: 24px;
-    font-weight: bold;
-    color: #00f3ff;
-    text-shadow: 0 0 10px #00f3ff;
+.logo img {
+    max-height: 80px; /* Ajuste selon la taille de ton image */
+    filter: drop-shadow(0 0 10px #dc143c);
 }
 
-.navbar ul {
-    display: flex;
-    list-style: none;
-    gap: 20px;
-}
-
-.navbar a {
-    color: #fff;
-    text-decoration: none;
-}
-
-/* Section principale */
-main {
-    text-align: center;
-    padding: 100px 20px;
-}
-
-/* Grille des produits */
+/* Grille des produits avec accents néon cyan */
 .grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 20px;
-    padding: 50px;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+    padding: 40px;
 }
 
-/* Cartes produits */
 .product-card {
-    background: #111;
-    border: 1px solid #333;
+    background: #0a0a0a;
+    border: 1px solid #00f3ff; /* Néon Cyan */
     padding: 20px;
-    border-radius: 8px;
-    transition: 0.3s;
+    border-radius: 12px;
+    text-align: center;
+    transition: 0.4s;
+    box-shadow: 0 0 8px rgba(0, 243, 255, 0.2);
 }
 
 .product-card:hover {
-    border-color: #00f3ff;
-    transform: translateY(-5px);
+    border-color: #fff;
+    box-shadow: 0 0 20px #00f3ff;
+    transform: scale(1.02);
 }
 
+/* Texte et boutons */
+h1, h2 {
+    color: #00f3ff;
+    text-shadow: 0 0 5px #00f3ff;
+}
