@@ -67,18 +67,10 @@
 
   document.getElementById('authForm').addEventListener('submit', function(e) {
     e.preventDefault();
-    
-    // Enregistrement des données
     localStorage.setItem('isLoggedIn', 'true');
     localStorage.setItem('userEmail', document.getElementById('email').value);
-    
-    // Redirection directe
     window.location.href = "profil.html"; 
   });
 </script>
-
-
-</script>
-
 </body>
 </html>
