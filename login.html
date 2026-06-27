@@ -65,8 +65,17 @@
   }
 
   
-  document.getElementById('authForm').addEventListener('submit', function(e) {
-  e.preventDefault();
+    document.getElementById('authForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    // On enregistre les données
+    localStorage.setItem('isLoggedIn', 'true');
+    localStorage.setItem('userEmail', document.getElementById('email').value);
+    
+    // On redirige vers la nouvelle page
+    window.location.href = "profil.html"; 
+  });
+
   
   // Simulation de stockage de connexion
   localStorage.setItem('isLoggedIn', 'true');
