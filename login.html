@@ -52,33 +52,30 @@
     document.getElementById('toggleText').innerText = isLogin ? "Pas de compte ? Créer un compte" : "Déjà un compte ? Connexion";
   }
 
-    function togglePassword() {
+  function togglePassword() {
     const passInput = document.getElementById('password');
     const eyeIcon = document.getElementById('eyeIcon');
     
-    // Si le champ est en mode 'password' (caché), on le passe en texte (visible)
     if (passInput.type === 'password') {
       passInput.type = 'text';
-      eyeIcon.innerText = '🙉'; // Singe (mot de passe visible)
+      eyeIcon.innerText = '🙉'; 
     } else {
-      // Sinon, on le remet en mode 'password' (caché)
       passInput.type = 'password';
-      eyeIcon.innerText = '🙈'; // Œil (mot de passe masqué)
+      eyeIcon.innerText = '🙈'; 
     }
   }
 
-    document.getElementById('authForm').addEventListener('submit', function(e) {
+  document.getElementById('authForm').addEventListener('submit', function(e) {
     e.preventDefault();
     
-    // On enregistre les données
+    // Enregistrement des données
     localStorage.setItem('isLoggedIn', 'true');
     localStorage.setItem('userEmail', document.getElementById('email').value);
     
-    alert("Connexion réussie ! Redirection...");
-    
-    // On redirige vers la page profil
+    // Redirection directe
     window.location.href = "profil.html"; 
   });
+</script>
 
 
 </script>
