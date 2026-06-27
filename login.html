@@ -11,6 +11,7 @@
 <main class="main-content-wrapper" style="padding-top: 50px;">
   <div class="order-form">
     <h2 id="formTitle" style="color: #00f3ff; text-align: center; margin-bottom: 20px;">CONNEXION</h2>
+        <h2 id="formTitle" style="color: #00f3ff; text-align: center; margin-bottom: 20px;">CONNEXION</h2>
     
     <form id="authForm">
       <div class="form-group">
@@ -20,14 +21,19 @@
       
       <div class="form-group">
         <label>Mot de passe</label>
-        <input type="password" id="password" required>
+        <div style="position: relative; display: flex; align-items: center;">
+          <input type="password" id="password" required style="padding-right: 40px;">
+          <span id="eyeIcon" onclick="togglePassword()" style="position: absolute; right: 10px; cursor: pointer; color: #00f3ff; user-select: none;">👁️</span>
+        </div>
       </div>
       
       <button type="submit" class="submit-btn" id="submitBtn">SE CONNECTER</button>
       
-      <p id="toggleText" class="auth-toggle" onclick="toggleMode()">
+      <p id="toggleText" class="auth-toggle" onclick="toggleMode()" style="cursor: pointer; text-align: center; margin-top: 15px; color: #fff;">
         Pas de compte ? Créer un compte
       </p>
+    </form>
+
     </form>
   </div>
 </main>
@@ -38,8 +44,6 @@
   <a href="index.html" class="nav-link">🏠</a>
   <a href="https://discord.gg/XUtWdTPYr" target="_blank" class="nav-link">💬</a>
 </nav>
-
-<script>
   let isLogin = true;
 
   function toggleMode() {
@@ -49,11 +53,22 @@
     document.getElementById('toggleText').innerText = isLogin ? "Pas de compte ? Créer un compte" : "Déjà un compte ? Connexion";
   }
 
+  function togglePassword() {
+    const passInput = document.getElementById('password');
+    const eyeIcon = document.getElementById('eyeIcon');
+    if (passInput.type === 'password') {
+      passInput.type = 'text';
+      eyeIcon.innerText = '🙈';
+    } else {
+      passInput.type = 'password';
+      eyeIcon.innerText = '👁️';
+    }
+  }
+
   document.getElementById('authForm').addEventListener('submit', function(e) {
     e.preventDefault();
     alert(isLogin ? "Connexion en cours..." : "Compte créé !");
   });
-</script>
 
-</body>
+
 </html>
