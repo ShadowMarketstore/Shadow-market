@@ -1,20 +1,36 @@
-<script>
-  document.getElementById('loginForm').addEventListener('submit', function(e) {
-    e.preventDefault(); 
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Connexion - Shadow Market</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
 
-    const email = document.getElementById('email').value.trim();
-    const password = document.getElementById('password').value.trim();
+  <div class="login-container">
+    <h2>Connexion</h2>
+    <form id="loginForm">
+      <input type="email" id="email" placeholder="Adresse email" required>
+      <input type="password" id="password" placeholder="Mot de passe" required>
+      <button type="submit">Accéder</button>
+    </form>
+  </div>
 
-    // Ton mot de passe défini pour les deux comptes
-    const motDePasse = 'Steven2008@; 
+  <script>
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+      e.preventDefault(); 
 
-    // Vérification des accès Admin pour tes deux adresses
-    if ((email === 'Support.shadowmarket@gmail.com' || email === 'Ahonsteven4@gmail.com') && password === motDePasse) {
-      window.location.href = 'admin.html'; // Accès Admin autorisé
-    } 
-    // Redirection client standard pour tous les autres
-    else {
-      window.location.href = 'account.html'; // Redirection vers espace client
-    }
-  });
-</script>
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value.trim();
+      const motDePasse = 'Steven2008@'; 
+
+      if ((email === 'Support.shadowmarket@gmail.com' || email === 'Ahonsteven4@gmail.com') && password === motDePasse) {
+        window.location.href = 'admin.html';
+      } else {
+        window.location.href = 'account.html';
+      }
+    });
+  </script>
+</body>
+</html>
