@@ -1,5 +1,5 @@
 /* ============================================================
-   SHADOW MARKET — SCRIPT CSS COMPLET ET INTÈGRAL
+   SHADOW MARKET — SCRIPT CSS COMPLET ET INTÉGRAL
    ============================================================ */
 
 * { margin: 0; padding: 0; box-sizing: border-box; outline: none; }
@@ -12,7 +12,7 @@ body {
   overflow-x: hidden;
 }
 
-/* --- Wrapper principal : Avec marge de respiration --- */
+/* --- Wrapper principal --- */
 .main-content-wrapper {
   display: flex;
   flex-direction: column;
@@ -41,13 +41,12 @@ body {
 
 /* --- Titres --- */
 .section-title {
-  color: #00f3ff !important;
+  color: #fff !important; /* Blanc Pur */
   font-size: 22px;
   text-align: center;
   text-transform: uppercase;
   letter-spacing: 2px;
   margin-bottom: 22px;
-  text-shadow: 0 0 12px rgba(0, 243, 255, 0.6);
 }
 
 /* --- GRILLE : Colonnes identiques forcées --- */
@@ -97,16 +96,19 @@ body {
   font-weight: bold; text-transform: uppercase; cursor: pointer; text-decoration: none;
 }
 
-/* --- FORMULAIRE --- */
+/* --- FORMULAIRE MODIFIÉ (Cyan Néon & Blanc Pur) --- */
 .order-form {
-  width: 92%; max-width: 480px; background: #080808;
-  border: 2px solid #00f3ff; border-radius: 15px; padding: 20px;
+  width: 92%; max-width: 480px; background: #000;
+  border: 2px solid #00f3ff; /* Encadrement Cyan Néon */
+  border-radius: 15px; padding: 20px;
 }
 .form-group { margin-bottom: 15px; }
-.form-group label { color: #00f3ff; font-size: 12px; margin-bottom: 5px; display: block; }
+.form-group label { color: #fff; font-size: 12px; margin-bottom: 5px; display: block; } /* Blanc Pur */
 .form-group input, .form-group textarea, .custom-select {
   width: 100%; padding: 12px; background: #000;
-  border: 1px solid #dc143c; color: #fff; border-radius: 8px;
+  border: 2px solid #00f3ff; /* Encadrement Cyan Néon */
+  color: #fff; /* Texte Blanc Pur */
+  border-radius: 8px;
 }
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
