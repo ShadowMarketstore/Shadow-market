@@ -2,34 +2,58 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shadow Market - Admin</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Ajouter un Produit - Shadow Market</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: sans-serif; padding: 20px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; }
+        input { width: 100%; padding: 8px; margin-top: 5px; }
+        button { margin-top: 20px; padding: 10px 20px; background: #000; color: #fff; border: none; cursor: pointer; }
+    </style>
 </head>
 <body>
-    <nav class="floating-nav">
-        <a href="login.html" class="nav-link">👤</a>
-        <a href="commande.html" class="nav-link">🛒</a>
-        <a href="index.html" class="nav-link active">🏠</a>
-        <a href="https://discord.gg/XUtWdTPYr" target="_blank" class="nav-link">💬</a>
-    </nav>
-    <div class="main-wrapper">
-        <h1 class="section-title">Panneau d'Administration</h1>
-        <div class="neon-box">
-            <h2 style="color:white; margin-bottom: 20px;">Commandes Récentes</h2>
-            <div class="neon-box" style="width: 100%; border: 1px solid #00f3ff;">
-                <p>Client: ID_Utilisateur_001</p>
-                <p>Produit: Shadow_Clean_Premium</p>
-                <button class="submit-btn" style="background: #00f3ff; color: #000 !important; margin-top: 10px;">VALIDER COMMANDE</button>
-            </div>
-        </div>
+    <h1>Ajouter un nouvel article</h1>
+    <div class="form-group">
+        <label>Nom du produit</label>
+        <input type="text" id="name">
     </div>
+    <div class="form-group">
+        <label>Prix Normal</label>
+        <input type="number" id="price">
+    </div>
+    <div class="form-group">
+        <label>Prix Promotionnel</label>
+        <input type="number" id="discount_price">
+    </div>
+    <div class="form-group">
+        <label>Stock</label>
+        <input type="number" id="stock">
+    </div>
+    <button onclick="addProduct()">Publier l'article</button>
+
+    <script>
+        const supabase = supabase.createClient(
+            'https://jsuvimxjmjiljntmgbzu.supabase.co',
+            'votre_cle_a_remplacer_ici' // Attention : utilisez votre clé publique fournie
+        );
+
+        async function addProduct() {
+            const name = document.getElementById('name').value;
+            const price = document.getElementById('price').value;
+            const discount_price = document.getElementById('discount_price').value;
+            const stock = document.getElementById('stock').value;
+
+            const { data, error } = await supabase
+                .from('products')
+                .insert([{ name, price, discount_price, stock_quantity: stock }]);
+
+            if (error) {
+                alert('Erreur : ' + error.message);
+            } else {
+                alert('Produit ajouté avec succès !');
+            }
+        }
+    </script>
 </body>
 </html>
-
-<div class="finance-header">
-  <span class="finance-label">CA GÉNÉRÉ</span>
-  <div class="finance-amount">1 250,00 EUR</div>
-  <div class="finance-trend">↑ 12.5% vs mois dernier</div>
-</div>
-
