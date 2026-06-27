@@ -52,20 +52,21 @@
     document.getElementById('toggleText').innerText = isLogin ? "Pas de compte ? Créer un compte" : "Déjà un compte ? Connexion";
   }
 
-  function togglePassword() {
+    function togglePassword() {
     const passInput = document.getElementById('password');
     const eyeIcon = document.getElementById('eyeIcon');
     
     // Si le champ est en mode 'password' (caché), on le passe en texte (visible)
     if (passInput.type === 'password') {
       passInput.type = 'text';
-      eyeIcon.innerText = '🙉'; // On affiche le singe pour dire "cacher"
+      eyeIcon.innerText = '🙉'; // Singe (mot de passe visible)
     } else {
       // Sinon, on le remet en mode 'password' (caché)
       passInput.type = 'password';
-      eyeIcon.innerText = '🙈'; // On affiche l'œil pour dire "voir"
+      eyeIcon.innerText = '🙈'; // Œil (mot de passe masqué)
     }
   }
+
     document.getElementById('authForm').addEventListener('submit', function(e) {
     e.preventDefault();
     
