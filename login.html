@@ -1,3 +1,50 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Shadow Market</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* CSS direct pour éviter les bugs d'affichage */
+    .password-container { display: flex; align-items: center; position: relative; }
+    .password-container input { width: 100%; }
+    .toggle-eye { position: absolute; right: 10px; cursor: pointer; color: #00f3ff; font-size: 20px; }
+    .auth-toggle { text-align: center; color: #00f3ff; margin-top: 15px; cursor: pointer; font-size: 14px; }
+  </style>
+</head>
+<body>
+
+<main class="main-content-wrapper">
+  <h2 id="form-title" style="color: #00f3ff; margin: 20px 0; text-align: center;">CONNEXION</h2>
+  
+  <form id="authForm" class="order-form">
+    <div class="form-group">
+      <label>Email</label>
+      <input type="email" id="email" required>
+    </div>
+    
+    <div class="form-group">
+      <label>Mot de passe</label>
+      <div class="password-container">
+        <input type="password" id="password" required>
+        <span class="toggle-eye" onclick="togglePass()">👁️</span>
+      </div>
+    </div>
+
+    <button type="submit" class="submit-btn" id="submit-btn">SE CONNECTER</button>
+    
+    <p class="auth-toggle" onclick="toggleMode()" id="toggle-text">Pas de compte ? Créer un compte</p>
+  </form>
+</main>
+
+<nav class="floating-nav">
+    <a href="login.html" class="nav-link active">👤</a>
+    <a href="commande.html" class="nav-link">🛒</a>
+    <a href="index.html" class="nav-link">🏠</a>
+    <a href="https://discord.gg/XUtWdTPYr" target="_blank" class="nav-link">💬</a>
+</nav>
+
 <script>
   let isLogin = true;
   let compteEnregistre = { email: "test@test.com", password: "123" };
@@ -25,9 +72,8 @@
         alert("Connexion réussie !");
         window.location.href = 'index.html';
       } else {
-        btn.style.background = "#dc143c";
         btn.innerText = "MOT DE PASSE INCORRECT";
-        setTimeout(() => { btn.innerText = "SE CONNECTER"; btn.style.background = ""; }, 2000);
+        setTimeout(() => { btn.innerText = "SE CONNECTER"; }, 2000);
       }
     } else {
       compteEnregistre.email = emailInput;
@@ -37,3 +83,5 @@
     }
   });
 </script>
+</body>
+</html>
