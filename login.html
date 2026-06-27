@@ -64,10 +64,20 @@
     }
   }
 
+  
   document.getElementById('authForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    alert(isLogin ? "Connexion en cours..." : "Compte créé !");
-  });
+  e.preventDefault();
+  
+  // Simulation de stockage de connexion
+  localStorage.setItem('isLoggedIn', 'true');
+  localStorage.setItem('userEmail', document.getElementById('email').value);
+  
+  alert("Connexion réussie ! Redirection...");
+  
+  // Redirection vers le profil
+  window.location.href = "profil.html"; 
+});
+
 </script>
 
 </body>
