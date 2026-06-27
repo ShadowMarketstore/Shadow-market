@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Shadow Market - Profil</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="main-content-wrapper" style="padding-top: 50px; text-align: center; color: #fff;">
+    <h1>Espace Personnel</h1>
+    <p>Bienvenue sur ton profil !</p>
+    <div id="userInfo" style="margin: 20px; padding: 20px; border: 1px solid #00f3ff; border-radius: 10px;">
+      <p>Email : <span id="displayEmail"></span></p>
+    </div>
+    <button onclick="localStorage.clear(); window.location.href='index.html';" class="submit-btn">Déconnexion</button>
+  </main>
+
+  <script>
+    // Affiche l'email stocké lors de la connexion
+    document.getElementById('displayEmail').innerText = localStorage.getItem('userEmail');
+  </script>
+</body>
+</html>
+
