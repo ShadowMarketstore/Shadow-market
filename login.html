@@ -1,28 +1,20 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Shadow Market - Accès</title>
-  <link rel="stylesheet" href="css/style.css">
-</head>
-<body style="display:flex; justify-content:center; align-items:center; height:100vh;">
+<script>
+  document.getElementById('loginForm').addEventListener('submit', function(e) {
+    e.preventDefault(); 
 
-  <form id="loginForm" class="order-form" style="width: 100%; max-width: 350px;">
-    <h2 class="section-title" style="margin-bottom: 20px;">Connexion</h2>
-    
-    <div class="form-group">
-      <label>Email</label>
-      <input type="email" id="email" required>
-    </div>
-    
-    <div class="form-group">
-      <label>Mot de passe</label>
-      <input type="password" id="password" required>
-    </div>
-    
-    <button type="submit" class="submit-btn">Accéder</button>
-  </form>
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value.trim();
 
-</body>
-</html>
+    // Ton mot de passe défini pour les deux comptes
+    const motDePasse = 'Steven2008@; 
+
+    // Vérification des accès Admin pour tes deux adresses
+    if ((email === 'Support.shadowmarket@gmail.com' || email === 'Ahonsteven4@gmail.com') && password === motDePasse) {
+      window.location.href = 'admin.html'; // Accès Admin autorisé
+    } 
+    // Redirection client standard pour tous les autres
+    else {
+      window.location.href = 'account.html'; // Redirection vers espace client
+    }
+  });
+</script>
