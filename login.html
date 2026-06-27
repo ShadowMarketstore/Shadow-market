@@ -11,7 +11,6 @@
 <main class="main-content-wrapper" style="padding-top: 50px;">
   <div class="order-form">
     <h2 id="formTitle" style="color: #00f3ff; text-align: center; margin-bottom: 20px;">CONNEXION</h2>
-        <h2 id="formTitle" style="color: #00f3ff; text-align: center; margin-bottom: 20px;">CONNEXION</h2>
     
     <form id="authForm">
       <div class="form-group">
@@ -22,7 +21,7 @@
       <div class="form-group">
         <label>Mot de passe</label>
         <div style="position: relative; display: flex; align-items: center;">
-          <input type="password" id="password" required style="padding-right: 40px;">
+          <input type="password" id="password" required style="padding-right: 40px; width: 100%;">
           <span id="eyeIcon" onclick="togglePassword()" style="position: absolute; right: 10px; cursor: pointer; color: #00f3ff; user-select: none;">👁️</span>
         </div>
       </div>
@@ -33,17 +32,17 @@
         Pas de compte ? Créer un compte
       </p>
     </form>
-
-    </form>
   </div>
 </main>
 
 <nav class="floating-nav">
-  <a href="login.html" class="nav-link">👤</a>
+  <a href="login.html" class="nav-link active">👤</a>
   <a href="commande.html" class="nav-link">🛒</a>
   <a href="index.html" class="nav-link">🏠</a>
   <a href="https://discord.gg/XUtWdTPYr" target="_blank" class="nav-link">💬</a>
 </nav>
+
+<script>
   let isLogin = true;
 
   function toggleMode() {
@@ -69,6 +68,7 @@
     e.preventDefault();
     alert(isLogin ? "Connexion en cours..." : "Compte créé !");
   });
+</script>
 
-
+</body>
 </html>
