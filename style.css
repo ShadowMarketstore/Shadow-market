@@ -12,41 +12,44 @@ body {
   overflow-x: hidden;
 }
 
-/* --- Wrapper principal --- */
+/* --- Wrapper : Padding 0 pour permettre la bannière pleine largeur --- */
 .main-content-wrapper {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 0 15px 120px 15px;
+  padding: 0 0 120px 0;
   width: 100%;
 }
 
-/* --- LOGO PLEINE LARGEUR (Rouge Néon) --- */
+/* --- LOGO PLEINE LARGEUR (Bannière Rouge Néon) --- */
 .logo-wrapper {
   width: 100%;
   max-width: none;
-  height: 120px;
+  height: 140px;
   background-color: #000;
-  border: 3px solid #dc143c;
+  border: none;
+  border-bottom: 3px solid #dc143c;
   border-radius: 0;
-  box-shadow: 0 0 20px #dc143c, inset 0 0 15px #dc143c;
+  box-shadow: 0 5px 20px #dc143c;
   display: flex;
   justify-content: center;
   align-items: center;
   margin: 0 0 30px 0;
+  padding: 10px;
   overflow: hidden;
-  position: relative;
 }
 .logo-wrapper img { width: 100%; height: 100%; object-fit: contain; }
 
 /* --- Titres --- */
 .section-title {
-  color: #fff !important; /* Blanc Pur */
+  color: #00f3ff !important;
   font-size: 22px;
   text-align: center;
   text-transform: uppercase;
   letter-spacing: 2px;
   margin-bottom: 22px;
+  text-shadow: 0 0 12px rgba(0, 243, 255, 0.6);
+  padding: 0 15px;
 }
 
 /* --- GRILLE : Colonnes identiques forcées --- */
@@ -58,6 +61,7 @@ body {
   max-width: 450px;
   margin: 0 auto;
   table-layout: fixed;
+  padding: 0 15px;
 }
 @media (min-width: 768px) {
   .products-grid { grid-template-columns: repeat(3, 1fr); max-width: 860px; }
@@ -96,19 +100,17 @@ body {
   font-weight: bold; text-transform: uppercase; cursor: pointer; text-decoration: none;
 }
 
-/* --- FORMULAIRE MODIFIÉ (Cyan Néon & Blanc Pur) --- */
+/* --- FORMULAIRE --- */
 .order-form {
-  width: 92%; max-width: 480px; background: #000;
-  border: 2px solid #00f3ff; /* Encadrement Cyan Néon */
-  border-radius: 15px; padding: 20px;
+  width: 92%; max-width: 480px; background: #080808;
+  border: 2px solid #00f3ff; border-radius: 15px; padding: 20px;
+  margin-top: 20px;
 }
 .form-group { margin-bottom: 15px; }
-.form-group label { color: #fff; font-size: 12px; margin-bottom: 5px; display: block; } /* Blanc Pur */
+.form-group label { color: #00f3ff; font-size: 12px; margin-bottom: 5px; display: block; }
 .form-group input, .form-group textarea, .custom-select {
   width: 100%; padding: 12px; background: #000;
-  border: 2px solid #00f3ff; /* Encadrement Cyan Néon */
-  color: #fff; /* Texte Blanc Pur */
-  border-radius: 8px;
+  border: 1px solid #dc143c; color: #fff; border-radius: 8px;
 }
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
@@ -121,3 +123,4 @@ body {
 }
 .nav-link { text-decoration: none; font-size: 22px; color: #fff; width: 44px; height: 44px; display: flex; justify-content: center; align-items: center; border-radius: 50%; }
 .nav-link.active { background: #00f3ff; color: #000; }
+
