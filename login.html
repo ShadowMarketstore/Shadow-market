@@ -2,25 +2,64 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Connexion - Shadow Market</title>
-  <link rel="stylesheet" href="style.css">
+  <title>Shadow Market Login</title>
+  <style>
+    body { background-color: #050505; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; font-family: sans-serif; }
+    
+    /* Le cadre néon principal */
+    .login-box {
+      border: 2px solid #00f2ff;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 0 20px #00f2ff;
+      width: 300px;
+      text-align: center;
+      background: #0a0a0a;
+    }
+
+    h2 { color: #00f2ff; text-shadow: 0 0 10px #00f2ff; margin-bottom: 20px; }
+
+    /* Inputs rouges néon */
+    input {
+      background: #1a0000;
+      border: 1px solid #ff003c;
+      color: white;
+      padding: 12px;
+      margin: 10px 0;
+      width: 90%;
+      border-radius: 8px;
+      box-shadow: 0 0 8px #ff003c;
+    }
+
+    /* Bouton rouge */
+    button {
+      background: #ff003c;
+      border: none;
+      padding: 12px 25px;
+      color: white;
+      cursor: pointer;
+      border-radius: 8px;
+      font-weight: bold;
+      width: 95%;
+      margin-top: 15px;
+      box-shadow: 0 0 10px #ff003c;
+    }
+  </style>
 </head>
 <body>
 
-  <div class="login-container">
-    <h2>Connexion</h2>
+  <div class="login-box">
+    <h2>Shadow Market Login</h2>
     <form id="loginForm">
-      <input type="email" id="email" placeholder="Adresse email" required>
-      <input type="password" id="password" placeholder="Mot de passe" required>
-      <button type="submit">Accéder</button>
+      <input type="email" id="email" placeholder="Email" required>
+      <input type="password" id="password" placeholder="Password" required>
+      <button type="submit">Login</button>
     </form>
   </div>
 
   <script>
     document.getElementById('loginForm').addEventListener('submit', function(e) {
       e.preventDefault(); 
-
       const email = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value.trim();
       const motDePasse = 'Steven2008@'; 
