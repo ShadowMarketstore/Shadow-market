@@ -2,56 +2,39 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Ajouter un Produit - Shadow Market</title>
+    <title>Shadow Market Admin</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <style>
-        body { font-family: sans-serif; padding: 20px; }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; }
-        input { width: 100%; padding: 8px; margin-top: 5px; }
-        button { margin-top: 20px; padding: 10px 20px; background: #000; color: #fff; border: none; cursor: pointer; }
-    </style>
 </head>
 <body>
-    <h1>Ajouter un nouvel article</h1>
-    <div class="form-group">
-        <label>Nom du produit</label>
-        <input type="text" id="name">
-    </div>
-    <div class="form-group">
-        <label>Prix Normal</label>
-        <input type="number" id="price">
-    </div>
-    <div class="form-group">
-        <label>Prix Promotionnel</label>
-        <input type="number" id="discount_price">
-    </div>
-    <div class="form-group">
-        <label>Stock</label>
-        <input type="number" id="stock">
-    </div>
-    <button onclick="addProduct()">Publier l'article</button>
+    <h2>Ajouter un produit</h2>
+    <input type="text" id="name" placeholder="Nom du produit"><br>
+    <input type="number" id="price" placeholder="Prix"><br>
+    <input type="number" id="stock" placeholder="Stock"><br>
+    <button onclick="saveProduct()">Ajouter le produit</button>
 
     <script>
         const supabase = supabase.createClient(
-            'https://jsuvimxjmjiljntmgbzu.supabase.co',
-            'sb_publishable_Ngm29impwbTLGhuqyCxSJA_E1jXc1DX' // Attention : utilisez votre clé publique fournie
+            'https://jsuvimxjmjiljntmgbzu.supabase.co', 
+            'sb_publishable_Ngm29impwbTLGhuqyCxSJA_E1jXc1DX'
         );
 
-        async function addProduct() {
-            const name = document.getElementById('name').value;
-            const price = document.getElementById('price').value;
-            const discount_price = document.getElementById('discount_price').value;
-            const stock = document.getElementById('stock').value;
-
-            const { data, error } = await supabase
-                .from('products')
-                .insert([{ name, price, discount_price, stock_quantity: stock }]);
+        async function saveProduct() {
+            const { data, error } = await supabase.from('products').insert([
+                { 
+                    name: document.getElementById('name').value,
+                    price: document.getElementById('price').value,
+                    stock_quantity: document.getElementById('stock').value 
+                }
+            ]);
 
             if (error) {
                 alert('Erreur : ' + error.message);
             } else {
                 alert('Produit ajouté avec succès !');
+                // Optionnel : vider les champs après ajout
+                document.getElementById('name').value = '';
+                document.getElementById('price').value = '';
+                document.getElementById('stock').value = '';
             }
         }
     </script>
