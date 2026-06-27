@@ -152,7 +152,32 @@ body {
   color: #00ff00; /* Vert pour le profit */
   font-size: 12px;
   }
-/* Correction pour éviter que les éléments débordent */
-.form-group { position: relative; width: 100%; }
-.password-container { width: 100%; display: flex; align-items: center; }
-.toggle-eye { cursor: pointer; color: #00f3ff; margin-left: -30px; z-index: 10; }
+/* --- AJOUTS POUR LE FORMULAIRE DE CONNEXION --- */
+.password-container { 
+    display: flex; 
+    align-items: center; 
+    position: relative; 
+    width: 100%; 
+}
+
+.password-container input { 
+    width: 100%; 
+}
+
+.toggle-eye { 
+    position: absolute; 
+    right: 15px; 
+    cursor: pointer; 
+    color: #00f3ff; 
+    font-size: 18px;
+    user-select: none;
+}
+
+.auth-toggle { 
+    text-align: center; 
+    color: #00f3ff; 
+    margin-top: 20px; 
+    cursor: pointer; 
+    font-size: 14px; 
+    text-decoration: underline;
+}
