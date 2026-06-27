@@ -6,6 +6,15 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <script>
+    // Vérification de sécurité : si non connecté, retour à la page de connexion
+    if (localStorage.getItem('isLoggedIn') !== 'true') {
+      window.location.href = "login.html";
+    }
+  </script>
+
+  <main class="main-content-wrapper" style="padding-top: 50px; text-align: center; color: #fff;">
+  
   <main class="main-content-wrapper" style="padding-top: 50px; text-align: center; color: #fff;">
     <h1>Espace Personnel</h1>
     <p>Bienvenue sur ton profil !</p>
