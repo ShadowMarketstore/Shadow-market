@@ -59,11 +59,11 @@
     // Si le champ est en mode 'password' (caché), on le passe en texte (visible)
     if (passInput.type === 'password') {
       passInput.type = 'text';
-      eyeIcon.innerText = '🙈'; // On affiche le singe pour dire "cacher"
+      eyeIcon.innerText = '👁️'; // On affiche le singe pour dire "cacher"
     } else {
       // Sinon, on le remet en mode 'password' (caché)
       passInput.type = 'password';
-      eyeIcon.innerText = '👁️'; // On affiche l'œil pour dire "voir"
+      eyeIcon.innerText = '🙈'; // On affiche l'œil pour dire "voir"
     }
   }
     document.getElementById('authForm').addEventListener('submit', function(e) {
