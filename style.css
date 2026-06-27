@@ -12,7 +12,7 @@ body {
   overflow-x: hidden;
 }
 
-/* --- Wrapper : Padding 0 pour permettre la bannière pleine largeur --- */
+/* --- Wrapper principal : Padding 0 pour permettre la bannière pleine largeur --- */
 .main-content-wrapper {
   display: flex;
   flex-direction: column;
@@ -24,7 +24,6 @@ body {
 /* --- LOGO PLEINE LARGEUR (Bannière Rouge Néon) --- */
 .logo-wrapper {
   width: 100%;
-  max-width: none;
   height: 140px;
   background-color: #000;
   border-bottom: 3px solid #dc143c;
@@ -62,8 +61,11 @@ body {
   table-layout: fixed;
   padding: 0 15px;
 }
+@media (min-width: 768px) {
+  .products-grid { grid-template-columns: repeat(3, 1fr); max-width: 860px; }
+}
 
-/* --- CARTE PRODUIT : Carrée et alignée avec transition --- */
+/* --- CARTE PRODUIT : Carrée et alignée --- */
 .product-card {
   background: #080808;
   border: 2px solid #00f3ff;
@@ -77,10 +79,7 @@ body {
   box-shadow: 0 0 8px rgba(0, 243, 255, 0.15);
   width: 100%;
   min-width: 0;
-  transition: all 0.3s ease; /* Effet de transition fluide */
 }
-.product-card:active { transform: scale(0.98); border-color: #fff; }
-
 .product-img {
   width: 100%;
   aspect-ratio: 1 / 1;
@@ -89,15 +88,15 @@ body {
   border-radius: 10px;
   margin-bottom: 12px;
 }
+.product-name { color: #fff; font-size: 12px; font-weight: bold; margin-bottom: 5px; }
+.product-price { color: #00f3ff; font-size: 13px; font-weight: bold; margin-bottom: 10px; }
 
-/* --- BOUTONS : Transition dynamique au clic --- */
+/* --- BOUTONS --- */
 .buy-btn, .submit-btn {
   display: block; width: 100%; background: #dc143c; color: #fff !important;
   border: none; border-radius: 6px; padding: 10px; font-size: 11px;
   font-weight: bold; text-transform: uppercase; cursor: pointer; text-decoration: none;
-  transition: all 0.3s ease;
 }
-.buy-btn:active { background: #ff1c4a; transform: translateY(2px); }
 
 /* --- FORMULAIRE --- */
 .order-form {
@@ -111,6 +110,7 @@ body {
   width: 100%; padding: 12px; background: #000;
   border: 1px solid #dc143c; color: #fff; border-radius: 8px;
 }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
 /* --- NAV FLOTTANTE --- */
 .floating-nav {
