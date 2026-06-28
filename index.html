@@ -5,6 +5,42 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Shadow Market</title>
   <link rel="stylesheet" href="style.css">
+  <style>
+    /* Petit ajout de style pour gérer les affichages de prix barrés et les rubans */
+    .price-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      margin-bottom: 10px;
+    }
+    .old-price-style {
+      color: #666;
+      text-decoration: line-line-through;
+      text-decoration: line-through;
+      font-size: 0.85em;
+    }
+    .ribbon-badge {
+      background: #00ffff;
+      color: #000;
+      font-size: 0.75em;
+      font-weight: bold;
+      padding: 2px 6px;
+      border-radius: 3px;
+      display: inline-block;
+      margin-bottom: 5px;
+      text-transform: uppercase;
+      width: max-content;
+    }
+    .stock-status {
+      font-size: 0.8em;
+      color: #888;
+      margin-bottom: 8px;
+    }
+    .out-of-stock {
+      color: #ff3333 !important;
+      font-weight: bold;
+    }
+  </style>
 </head>
 <body>
 
@@ -24,32 +60,95 @@
 
     <main>
       <h1 class="section-title">Produits Disponibles</h1>
-      <div class="products-grid">
-
-        <div class="product-card">
-          <div class="product-img"></div>
-          <h3 class="product-name">Shadow_Clean_Premium</h3>
-          <p class="product-price">25.00 EUR</p>
-          <a href="commande.html" class="buy-btn">AJOUTER AU PANIER</a>
-        </div>
-
-        <div class="product-card">
-          <div class="product-img"></div>
-          <h3 class="product-name">Shadow_Craft_Java</h3>
-          <p class="product-price">19.50 EUR</p>
-          <a href="commande.html" class="buy-btn">AJOUTER AU PANIER</a>
-        </div>
-
-        <div class="product-card">
-          <div class="product-img"></div>
-          <h3 class="product-name">Shadow_Debloat_Pro</h3>
-          <p class="product-price">15.00 EUR</p>
-          <a href="commande.html" class="buy-btn">AJOUTER AU PANIER</a>
-        </div>
-
+      
+      <div class="products-grid" id="products-container">
+        <p style="color: #00ffff; text-align: center; width: 100%;">Chargement des modules du Shadow Market...</p>
       </div>
     </main>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const supabaseUrl = 'https://jsuvimxjmjiljntmgbzu.supabase.co';
+    const apiKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzdXZpbXhqbWppbGpudG1nYnp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI0Njk0NTgsImV4cCI6MjA5ODA0NTQ1OH0.F6aDK6oTyp3Tlb9fmkqpzgn4KGAxA5-ClIKlkqzfcR4'.trim();
+    
+    const supabaseClient = supabase.createClient(supabaseUrl, apiKey);
+
+    async function loadProducts() {
+      const container = document.getElementById('products-container');
+      
+      try {
+        // On récupère les colonnes de la table products
+        const { data: products, error } = await supabaseClient
+          .from('products')
+          .select('name, price, old_price, discount, stock_quantity, description, ribbon, image_url');
+
+        if (error) throw error;
+
+        if (!products || products.length === 0) {
+          container.innerHTML = `<p style="color: #ff3333; text-align: center; width: 100%;">Aucun produit disponible en rayon pour le moment.</p>`;
+          return;
+        }
+
+        // On vide le conteneur avant d'injecter les lignes dynamiques
+        container.innerHTML = '';
+
+        products.forEach(product => {
+          // Gestion du stock
+          const stockNum = parseInt(product.stock_quantity);
+          let stockHTML = `<p class="stock-status">Stock : ${stockNum}</p>`;
+          let buyButtonHTML = `<a href="commande.html?product=${encodeURIComponent(product.name)}" class="buy-btn">AJOUTER AU PANIER</a>`;
+          
+          if (stockNum <= 0) {
+            stockHTML = `<p class="stock-status out-of-stock">RUPTURE DE STOCK</p>`;
+            buyButtonHTML = `<button class="buy-btn" disabled style="background: #222; color: #555; cursor: not-allowed; box-shadow: none;">ÉPUISÉ</button>`;
+          }
+
+          // Gestion du Ruban
+          let ribbonHTML = '';
+          if (product.ribbon && product.ribbon.trim() !== '') {
+            ribbonHTML = `<span class="ribbon-badge">${product.ribbon}</span>`;
+          }
+
+          // Gestion de l'affichage du prix (si réduction il y a)
+          let priceHTML = `<p class="product-price">${parseFloat(product.price).toFixed(2)} CFA</p>`;
+          if (product.old_price && parseFloat(product.old_price) > parseFloat(product.price)) {
+            priceHTML = `
+              <div class="price-wrapper">
+                <span class="old-price-style">${parseFloat(product.old_price).toFixed(2)} CFA</span>
+                <span class="product-price" style="margin: 0;">${parseFloat(product.price).toFixed(2)} CFA</span>
+              </div>
+            `;
+          }
+
+          // On utilise l'URL de l'image si elle existe, sinon un bloc background par défaut
+          const imageStyle = product.image_url 
+            ? `style="background-image: url('${product.image_url}'); background-size: cover; background-position: center;"` 
+            : '';
+
+          // Construction de la carte produit
+          const card = document.createElement('div');
+          card.className = 'product-card';
+          card.innerHTML = `
+            <div class="product-img" ${imageStyle}></div>
+            ${ribbonHTML}
+            <h3 class="product-name">${product.name}</h3>
+            ${stockHTML}
+            ${priceHTML}
+            ${buyButtonHTML}
+          `;
+
+          container.appendChild(card);
+        });
+
+      } catch (err) {
+        console.error("Erreur d'affichage :", err);
+        container.innerHTML = `<p style="color: #ff3333; text-align: center; width: 100%;">Erreur de synchronisation avec la base de données principal.</p>`;
+      }
+    }
+
+    // Lancement automatique du chargement dès que la page est prête
+    window.onload = loadProducts;
+  </script>
 </body>
 </html>
