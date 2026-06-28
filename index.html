@@ -6,7 +6,29 @@
   <title>Shadow Market</title>
   <link rel="stylesheet" href="style.css">
   <style>
-    /* Petit ajout de style pour gérer les affichages de prix barrés et les rubans */
+    /* Positionnement du ruban en diagonale dans le coin supérieur droit de la carte */
+    .product-card {
+      position: relative; /* Indispensable pour caler le ruban par rapport à la carte */
+      overflow: hidden;   /* Coupe tout ce qui dépasse des bordures de la carte */
+    }
+
+    .ribbon-badge {
+      position: absolute;
+      top: 14px;
+      right: -32px;
+      background: #00ffff;
+      color: #000;
+      font-size: 0.72em;
+      font-weight: bold;
+      padding: 4px 32px;
+      transform: rotate(45deg); /* Incline le ruban en diagonale */
+      box-shadow: 0 0 8px #00ffff;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      z-index: 10;
+    }
+
+    /* Styles des blocs pour les prix et états des stocks */
     .price-wrapper {
       display: flex;
       flex-direction: column;
@@ -15,21 +37,8 @@
     }
     .old-price-style {
       color: #666;
-      text-decoration: line-line-through;
       text-decoration: line-through;
       font-size: 0.85em;
-    }
-    .ribbon-badge {
-      background: #00ffff;
-      color: #000;
-      font-size: 0.75em;
-      font-weight: bold;
-      padding: 2px 6px;
-      border-radius: 3px;
-      display: inline-block;
-      margin-bottom: 5px;
-      text-transform: uppercase;
-      width: max-content;
     }
     .stock-status {
       font-size: 0.8em;
@@ -78,7 +87,7 @@
       const container = document.getElementById('products-container');
       
       try {
-        // On récupère les colonnes de la table products
+        // Lecture complète des colonnes de ta table products
         const { data: products, error } = await supabaseClient
           .from('products')
           .select('name, price, old_price, discount, stock_quantity, description, ribbon, image_url');
@@ -90,12 +99,12 @@
           return;
         }
 
-        // On vide le conteneur avant d'injecter les lignes dynamiques
+        // Nettoyage de la zone de chargement
         container.innerHTML = '';
 
         products.forEach(product => {
-          // Gestion du stock
-          const stockNum = parseInt(product.stock_quantity);
+          // 1. Calcul et affichage du stock
+          const stockNum = parseInt(product.stock_quantity) || 0;
           let stockHTML = `<p class="stock-status">Stock : ${stockNum}</p>`;
           let buyButtonHTML = `<a href="commande.html?product=${encodeURIComponent(product.name)}" class="buy-btn">AJOUTER AU PANIER</a>`;
           
@@ -104,34 +113,49 @@
             buyButtonHTML = `<button class="buy-btn" disabled style="background: #222; color: #555; cursor: not-allowed; box-shadow: none;">ÉPUISÉ</button>`;
           }
 
-          // Gestion du Ruban
+          // 2. Traitement intelligent du texte du Ruban (conversion en NEW et PROMO)
           let ribbonHTML = '';
           if (product.ribbon && product.ribbon.trim() !== '') {
-            ribbonHTML = `<span class="ribbon-badge">${product.ribbon}</span>`;
+            let txt = product.ribbon.trim().toLowerCase();
+            
+            // On filtre les textes par défaut ou vides pour ne rien afficher d'inutile
+            if (txt !== "ruban (ex: promo, nouveauté)" && txt !== "ruban (ex : promo, nouveauté)" && txt !== "none" && txt !== "null" && txt !== "") {
+              
+              // Ajustement des mots-clés demandés
+              if (txt === "nouveau" || txt === "nouveauté" || txt === "new") {
+                txt = "NEW";
+              } else if (txt === "promo" || txt === "promotion") {
+                txt = "PROMO";
+              } else {
+                txt = txt.toUpperCase(); // Reste en majuscule pour les autres cas particuliers
+              }
+              
+              ribbonHTML = `<div class="ribbon-badge">${txt}</div>`;
+            }
           }
 
-          // Gestion de l'affichage du prix (si réduction il y a)
-          let priceHTML = `<p class="product-price">${parseFloat(product.price).toFixed(2)} CFA</p>`;
+          // 3. Gestion de la Devise fixée à 100% sur l'EUR (€)
+          let priceHTML = `<p class="product-price">${parseFloat(product.price).toFixed(2)} EUR</p>`;
           if (product.old_price && parseFloat(product.old_price) > parseFloat(product.price)) {
             priceHTML = `
               <div class="price-wrapper">
-                <span class="old-price-style">${parseFloat(product.old_price).toFixed(2)} CFA</span>
-                <span class="product-price" style="margin: 0;">${parseFloat(product.price).toFixed(2)} CFA</span>
+                <span class="old-price-style">${parseFloat(product.old_price).toFixed(2)} EUR</span>
+                <span class="product-price" style="margin: 0;">${parseFloat(product.price).toFixed(2)} EUR</span>
               </div>
             `;
           }
 
-          // On utilise l'URL de l'image si elle existe, sinon un bloc background par défaut
+          // Récupération de l'image Supabase Storage
           const imageStyle = product.image_url 
             ? `style="background-image: url('${product.image_url}'); background-size: cover; background-position: center;"` 
             : '';
 
-          // Construction de la carte produit
+          // 4. Génération de la structure HTML finale de la carte produit
           const card = document.createElement('div');
           card.className = 'product-card';
           card.innerHTML = `
-            <div class="product-img" ${imageStyle}></div>
             ${ribbonHTML}
+            <div class="product-img" ${imageStyle}></div>
             <h3 class="product-name">${product.name}</h3>
             ${stockHTML}
             ${priceHTML}
@@ -142,13 +166,14 @@
         });
 
       } catch (err) {
-        console.error("Erreur d'affichage :", err);
-        container.innerHTML = `<p style="color: #ff3333; text-align: center; width: 100%;">Erreur de synchronisation avec la base de données principal.</p>`;
+        console.error("Erreur de chargement :", err);
+        container.innerHTML = `<p style="color: #ff3333; text-align: center; width: 100%;">Erreur réseau lors de l'accès aux modules du Shadow Market.</p>`;
       }
     }
 
-    // Lancement automatique du chargement dès que la page est prête
+    // Déclenchement automatique du chargement dès le démarrage de la page
     window.onload = loadProducts;
   </script>
 </body>
 </html>
+
