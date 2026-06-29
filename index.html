@@ -6,7 +6,15 @@
   <title>Shadow Market</title>
   <link rel="stylesheet" href="style.css">
   <style>
-    /* Style du compteur sur l'icône panier */
+    /* Styles spécifiques pour corriger les images et le compteur */
+    .product-img {
+        width: 100%;
+        height: 180px;
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        border-radius: 8px;
+    }
     #cart-link { position: relative; text-decoration: none; color: white; }
     #cart-count { 
         position: absolute; top: -5px; right: -5px; background: #00ffff; color: #000; 
@@ -34,7 +42,7 @@
 
     <main>
       <h1 class="section-title">Produits Disponibles</h1>
-      <div class="products-grid" id="products-container"><p>Chargement...</p></div>
+      <div class="products-grid" id="products-container"><p style="color: #00ffff; text-align: center;">Chargement...</p></div>
     </main>
   </div>
 
@@ -42,18 +50,17 @@
   <script>
     const supabaseClient = supabase.createClient('https://jsuvimxjmjiljntmgbzu.supabase.co', 'sb_publishable_Ngm29impwbTLGhuqyCxSJA_E1jXc1DX');
 
-    // Mise à jour du compteur sur l'icône 🧺
     function updateCartCounter() {
       let panier = JSON.parse(localStorage.getItem('monPanier')) || [];
       document.getElementById('cart-count').innerText = panier.length;
     }
 
+    // Ajout direct sans alerte de confirmation
     function ajouterAuPanier(nom, prix, desc, image) {
       let panier = JSON.parse(localStorage.getItem('monPanier')) || [];
       panier.push({ nom, prix, desc, image });
       localStorage.setItem('monPanier', JSON.stringify(panier));
       updateCartCounter();
-      alert(nom + " ajouté au panier !");
     }
 
     async function loadProducts() {
