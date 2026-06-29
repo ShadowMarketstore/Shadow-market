@@ -8,22 +8,22 @@
     <style>
         body { background: #050505; color: white; font-family: sans-serif; padding: 20px; }
         .item-card { border: 1px solid #00ffff; padding: 15px; margin-bottom: 10px; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; background: #111; }
-        .item-info { flex-grow: 1; margin-left: 10px; }
-        .remove-btn { color: #ff3333; font-size: 1.5em; cursor: pointer; border: none; background: none; font-weight: bold; }
-        .btn-paiement { width: 100%; padding: 15px; background: #ff3333; border: none; color: white; font-weight: bold; cursor: pointer; margin-top: 20px; }
-        .total-section { font-size: 1.2em; font-weight: bold; margin-top: 20px; }
+        .item-info { flex-grow: 1; margin-left: 15px; }
+        .remove-btn { color: #ff3333; font-size: 1.5em; cursor: pointer; border: none; background: none; font-weight: bold; padding: 0 10px; }
+        .btn-paiement { width: 100%; padding: 15px; background: #ff3333; border: none; color: white; font-weight: bold; cursor: pointer; margin-top: 20px; font-size: 1.1em; }
+        .total-section { font-size: 1.4em; font-weight: bold; margin-top: 20px; text-align: center; color: #00ffff; }
     </style>
 </head>
 <body>
 
-    <h1>Panier</h1>
+    <h1>Mon Panier</h1>
     <div id="panier-liste"></div>
     
     <div class="total-section">
         Total : <span id="total-somme">0.00</span> EUR
     </div>
 
-    <button class="btn-paiement" onclick="window.location.href='commande.html'">PASSER À LA CAISSE</button>
+    <button class="btn-paiement" onclick="versPaiement()">PASSER AU PAIEMENT</button>
 
     <script>
         function chargerPanier() {
@@ -49,9 +49,15 @@
 
         function supprimerArticle(index) {
             let panier = JSON.parse(localStorage.getItem('monPanier')) || [];
-            panier.splice(index, 1); // Retire l'article
+            panier.splice(index, 1);
             localStorage.setItem('monPanier', JSON.stringify(panier));
-            chargerPanier(); // Rafraîchit l'affichage
+            chargerPanier();
+        }
+
+        function versPaiement() {
+            let total = document.getElementById('total-somme').innerText;
+            localStorage.setItem('totalPanier', total);
+            window.location.href = 'paiement.html';
         }
 
         window.onload = chargerPanier;
