@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Choisir le mode de paiement</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body { background: #050505; color: white; padding: 20px; text-align: center; font-family: sans-serif; }
+        .method-btn { display: block; width: 100%; padding: 20px; margin: 10px 0; background: #1a1a1a; border: 1px solid #00ffff; color: white; cursor: pointer; font-size: 1.1em; }
+        .method-btn:hover { background: #00ffff; color: black; }
+    </style>
+</head>
+<body>
+
+    <h1>Mode de paiement</h1>
+    <h2 id="total-final">Total : 0 EUR</h2>
+
+    <div style="max-width: 400px; margin: auto;">
+        <button class="method-btn" onclick="choisirPaiement('Carte Bancaire')">💳 Carte Bancaire</button>
+        <button class="method-btn" onclick="choisirPaiement('Crypto')">₿ Crypto (Bitcoin/USDT)</button>
+    </div>
+
+    <script>
+        // Récupérer le total stocké ou calculé
+        let total = localStorage.getItem('totalPanier') || "0.00";
+        document.getElementById('total-final').innerText = "Total : " + total + " EUR";
+
+        function choisirPaiement(methode) {
+            alert("Vous avez choisi : " + methode + ". Redirection vers la passerelle sécurisée...");
+            // Ici, plus tard, on redirigera vers ton système de paiement réel
+        }
+    </script>
+</body>
+</html>
+
