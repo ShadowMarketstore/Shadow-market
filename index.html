@@ -48,7 +48,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     const supabaseUrl = 'https://jsuvimxjmjiljntmgbzu.supabase.co';
-    // Utilisation de la nouvelle clé Publishable
+    // Clé corrigée avec le 's' minuscule
     const apiKey = 'sb_publishable_Ngm29impwbTLGhuqyCxSJA_E1jXc1DX'; 
     
     const supabaseClient = supabase.createClient(supabaseUrl, apiKey);
@@ -61,9 +61,7 @@
           .from('products')
           .select('name, price, old_price, discount_price, stock_quantity, description, ribbon, image_url');
 
-        if (error) {
-          throw new Error(`Code: ${error.code} | Message: ${error.message}`);
-        }
+        if (error) throw new Error(`Code: ${error.code} | Message: ${error.message}`);
 
         if (!products || products.length === 0) {
           container.innerHTML = `<p style="color: #ff3333; text-align: center;">Aucun produit trouvé.</p>`;
@@ -72,15 +70,42 @@
 
         container.innerHTML = '';
         products.forEach(product => {
+          const stockNum = parseInt(product.stock_quantity) || 0;
+          let stockHTML = `<p class="stock-status">Stock : ${stockNum}</p>`;
+          let buyButtonHTML = `<a href="commande.html?product=${encodeURIComponent(product.name)}" class="buy-btn">AJOUTER AU PANIER</a>`;
+          
+          if (stockNum <= 0) {
+            stockHTML = `<p class="stock-status out-of-stock">RUPTURE DE STOCK</p>`;
+            buyButtonHTML = `<button class="buy-btn" disabled style="background: #222; color: #555; cursor: not-allowed; box-shadow: none;">ÉPUISÉ</button>`;
+          }
+
+          let ribbonHTML = '';
+          if (product.ribbon && product.ribbon.trim() !== '' && product.ribbon.toLowerCase() !== 'none') {
+            ribbonHTML = `<div class="ribbon-badge">${product.ribbon.toUpperCase()}</div>`;
+          }
+
+          let priceHTML = `<p class="product-price">${parseFloat(product.price).toFixed(2)} EUR</p>`;
+          if (product.old_price && parseFloat(product.old_price) > parseFloat(product.price)) {
+            priceHTML = `<div class="price-wrapper"><span class="old-price-style">${parseFloat(product.old_price).toFixed(2)} EUR</span><span class="product-price">${parseFloat(product.price).toFixed(2)} EUR</span></div>`;
+          }
+
+          const imageStyle = product.image_url ? `style="background-image: url('${product.image_url}'); background-size: cover; background-position: center;"` : '';
+
           const card = document.createElement('div');
           card.className = 'product-card';
-          // Ici, tu ajoutes ta logique d'affichage habituelle
-          card.innerHTML = `<h3>${product.name}</h3><p>${product.price} EUR</p>`;
+          card.innerHTML = `
+            ${ribbonHTML}
+            <div class="product-img" ${imageStyle}></div>
+            <h3 class="product-name">${product.name}</h3>
+            ${stockHTML}
+            ${priceHTML}
+            ${buyButtonHTML}
+          `;
           container.appendChild(card);
         });
 
       } catch (err) {
-        console.error("Erreur détectée :", err);
+        console.error("Erreur :", err);
         container.innerHTML = `<div class="debug-error"><strong>Erreur Supabase :</strong><br>${err.message}</div>`;
       }
     }
