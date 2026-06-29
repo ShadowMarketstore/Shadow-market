@@ -64,27 +64,30 @@
   </main>
 
   <script>
-    const SUPABASE_URL = 'https://jsuvimxjmjiljntmgbzu.supabase.co';
-    const SUPABASE_ANON_KEY = 'sb_publishable_Ngm29impwbTLGhuqyCxSJA_E1jXc1DX';
-    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const supabase = supabase.createClient(
+        'https://jsuvimxjmjiljntmgbzu.supabase.co', 
+        'sb_publishable_Ngm29impwbTLGhuqyCxSJA_E1jXc1DX'
+    );
 
     document.getElementById('orderForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       
-      const order = {
+      // On récupère exactement les mêmes champs que tu avais
+      const orderData = {
         customer_email: document.getElementById('c-email').value,
         modele: document.getElementById('modele').value,
         ram: document.getElementById('ram').value,
         stockage: document.getElementById('stockage').value,
         os: document.getElementById('os').value,
         gpu: document.getElementById('gpu').value,
-        message: document.getElementById('message').value
+        message: document.getElementById('message').value,
+        status: 'en attente' // Indispensable pour ton Admin
       };
 
-      const { error } = await supabase.from('orders').insert([order]);
+      const { error } = await supabase.from('orders').insert([orderData]);
 
       if (error) {
-        alert("Erreur : " + error.message);
+        alert("Erreur lors de l'envoi : " + error.message);
       } else {
         alert("Commande envoyée avec succès !");
         document.getElementById('orderForm').reset();
