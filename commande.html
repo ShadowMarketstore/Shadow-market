@@ -21,14 +21,13 @@
 
     <form id="orderForm" class="order-form">
       <div class="form-group">
-        <label>Ton Email (pour te contacter)</label>
+        <label>Ton Email</label>
         <input type="email" id="c-email" placeholder="email@exemple.com" required>
       </div>
       <div class="form-group">
         <label>Marque & Modèle</label>
         <input type="text" id="modele" placeholder="Ex: HP ProBook 4440S" required>
       </div>
-
       <div class="form-row">
         <div class="form-group">
           <label>RAM (Go)</label>
@@ -39,7 +38,6 @@
           <input type="text" id="stockage" placeholder="350 Go SSD" required>
         </div>
       </div>
-
       <div class="form-group">
         <label>Système d'exploitation</label>
         <select id="os" class="custom-select">
@@ -48,50 +46,57 @@
           <option value="Linux">Linux</option>
         </select>
       </div>
-
       <div class="form-group">
         <label>Carte Graphique</label>
         <input type="text" id="gpu" placeholder="Ex: Intel HD Graphics">
       </div>
-
       <div class="form-group">
         <label>Message pour le support</label>
         <textarea id="message" rows="4" placeholder="Décrivez vos besoins..."></textarea>
       </div>
 
-      <button type="submit" class="submit-btn">ENVOYER LA DEMANDE</button>
+      <button type="submit" class="submit-btn" id="submitBtn">ENVOYER LA DEMANDE</button>
     </form>
   </main>
 
   <script>
-    const supabase = supabase.createClient(
-        'https://jsuvimxjmjiljntmgbzu.supabase.co', 
-        'sb_publishable_Ngm29impwbTLGhuqyCxSJA_E1jXc1DX'
-    );
+    // Initialisation sécurisée
+    const SUPABASE_URL = 'https://jsuvimxjmjiljntmgbzu.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_Ngm29impwbTLGhuqyCxSJA_E1jXc1DX';
+    
+    // Attendre que la page soit chargée
+    window.addEventListener('load', () => {
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    document.getElementById('orderForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      
-      // On récupère exactement les mêmes champs que tu avais
-      const orderData = {
-        customer_email: document.getElementById('c-email').value,
-        modele: document.getElementById('modele').value,
-        ram: document.getElementById('ram').value,
-        stockage: document.getElementById('stockage').value,
-        os: document.getElementById('os').value,
-        gpu: document.getElementById('gpu').value,
-        message: document.getElementById('message').value,
-        status: 'en attente' // Indispensable pour ton Admin
-      };
+        document.getElementById('orderForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('submitBtn');
+            btn.innerText = "Envoi en cours...";
+            btn.disabled = true;
 
-      const { error } = await supabase.from('orders').insert([orderData]);
+            const orderData = {
+                customer_email: document.getElementById('c-email').value,
+                modele: document.getElementById('modele').value,
+                ram: document.getElementById('ram').value,
+                stockage: document.getElementById('stockage').value,
+                os: document.getElementById('os').value,
+                gpu: document.getElementById('gpu').value,
+                message: document.getElementById('message').value,
+                status: 'en attente'
+            };
 
-      if (error) {
-        alert("Erreur lors de l'envoi : " + error.message);
-      } else {
-        alert("Commande envoyée avec succès !");
-        document.getElementById('orderForm').reset();
-      }
+            const { error } = await supabaseClient.from('orders').insert([orderData]);
+
+            if (error) {
+                alert("Erreur Supabase : " + error.message);
+                console.error("Détail :", error);
+            } else {
+                alert("Commande envoyée avec succès !");
+                document.getElementById('orderForm').reset();
+            }
+            btn.innerText = "ENVOYER LA DEMANDE";
+            btn.disabled = false;
+        });
     });
   </script>
 </body>
