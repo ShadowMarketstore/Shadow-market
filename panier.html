@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Shadow Market - Votre Panier</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body { background-color: #050505; color: white; font-family: sans-serif; padding-bottom: 100px; }
+        .panier-container { max-width: 600px; margin: 20px auto; }
+        .item-card { border: 1px solid #00ffff; padding: 15px; margin-bottom: 15px; border-radius: 10px; background: #111; }
+        .details { display: none; margin-top: 10px; padding: 10px; background: #222; border-left: 3px solid #00ffff; }
+        .btn-toggle { background: #00ffff; border: none; padding: 5px 10px; cursor: pointer; font-weight: bold; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+    <div class="panier-container">
+        <h1>Votre Panier</h1>
+        <div id="liste-articles"></div>
+        <h3>Total : <span id="total-somme">0</span> EUR</h3>
+        <button onclick="window.location.href='commande.html'" style="background: #00ffff; padding: 15px; width: 100%; border: none; font-weight: bold; cursor: pointer;">PASSER À LA CAISSE</button>
+    </div>
+
+    <nav class="floating-nav">
+        <a href="login.html" class="nav-link">👤</a>
+        <a href="panier.html" class="nav-link active">🛒</a>
+        <a href="index.html" class="nav-link">🏠</a>
+        <a href="https://discord.gg/XUtWdTPYr" target="_blank" class="nav-link">💬</a>
+    </nav>
+
+    <script>
+        let panier = JSON.parse(localStorage.getItem('monPanier')) || [];
+        let liste = document.getElementById('liste-articles');
+        let total = 0;
+
+        panier.forEach((item, index) => {
+            total += parseFloat(item.prix);
+            liste.innerHTML += `
+                <div class="item-card">
+                    <img src="${item.image || 'logo.png'}" style="width: 50px;">
+                    <h3>${item.nom}</h3>
+                    <p>${item.prix} EUR</p>
+                    <button class="btn-toggle" onclick="toggleDesc(${index})">Détails</button>
+                    <div id="desc-${index}" class="details">${item.description || 'Aucune description.'}</div>
+                </div>
+            `;
+        });
+        document.getElementById('total-somme').innerText = total.toFixed(2);
+
+        function toggleDesc(id) {
+            let d = document.getElementById('desc-' + id);
+            d.style.display = (d.style.display === 'block') ? 'none' : 'block';
+        }
+    </script>
+</body>
+</html>
+
