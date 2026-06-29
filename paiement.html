@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <title>Paiement - Shadow Market</title>
-    <link rel="stylesheet" href="style.css">
     <style>
         body { background: #050505; color: #fff; font-family: sans-serif; padding: 20px; }
         .payment-container { max-width: 400px; margin: auto; background: #111; padding: 25px; border: 1px solid #00ffff; border-radius: 12px; }
@@ -11,12 +10,9 @@
         .input-field { width: 100%; margin-bottom: 15px; }
         label { display: block; font-size: 0.9em; margin-bottom: 5px; color: #aaa; }
         input { width: 100%; padding: 12px; background: #000; border: 1px solid #333; color: white; border-radius: 6px; box-sizing: border-box; }
-        .row { display: flex; gap: 10px; }
         .btn-pay { width: 100%; padding: 15px; background: #00ffff; border: none; color: #000; font-weight: bold; border-radius: 6px; cursor: pointer; margin-top: 10px; }
-        
-        /* Section Crypto */
         .crypto-section { margin-top: 30px; border-top: 1px solid #333; padding-top: 20px; text-align: center; }
-        .crypto-btn { background: #333; color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none; display: inline-block; margin-top: 10px; }
+        .crypto-btn { background: #333; color: white; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-top: 10px; }
     </style>
 </head>
 <body>
@@ -27,19 +23,9 @@
         
         <div class="input-field">
             <label>N° de carte</label>
-            <input type="text" placeholder="0000 0000 0000 0000">
+            <input type="text" id="card-num" placeholder="0000 0000 0000 0000">
         </div>
         
-        <div class="row">
-            <div class="input-field">
-                <label>Expiration</label>
-                <input type="text" placeholder="MM/AA">
-            </div>
-            <div class="input-field">
-                <label>CVV</label>
-                <input type="text" placeholder="***">
-            </div>
-        </div>
         <button class="btn-pay" onclick="validerPaiement()">Payer <span id="btn-total">0.00</span> €</button>
 
         <div class="crypto-section">
@@ -49,16 +35,62 @@
     </div>
 
     <script>
-        let total = localStorage.getItem('totalPanier') || "0.00";
+        // Configuration Initiale
+        const API_KEY = '70856b4a-2c08-4829-bada-878ba1da0a53';
+        const total = localStorage.getItem('totalPanier') || "0.00";
         document.getElementById('total-val').innerText = total + " €";
         document.getElementById('btn-total').innerText = total;
 
+        // Validation Carte Bancaire
         function validerPaiement() {
-            alert("Traitement carte bancaire...");
+            const cardNum = document.getElementById('card-num').value;
+            if(cardNum.replace(/\s/g, '').length < 16) {
+                alert("Erreur : Veuillez entrer un numéro de carte valide.");
+                return;
+            }
+            alert("Traitement sécurisé en cours...");
+            // Logique de validation ici
         }
 
-        function afficherCrypto() {
-            alert("Veuillez envoyer " + total + " € en BTC ou USDT sur notre adresse wallet. Contactez le support pour obtenir l'adresse.");
+        // Logic complète de Paiement Crypto
+        async function afficherCrypto() {
+            const payload = {
+                price_amount: parseFloat(total),
+                price_currency: "eur",
+                pay_currency: "btc",
+                order_id: "SHADOW_" + Date.now(),
+                order_description: "Shadow Market Digital Product"
+            };
+
+            try {
+                const response = await fetch("https://api-sandbox.nowpayments.io/v1/payment", {
+                    method: 'POST',
+                    headers: { 
+                        'x-api-key': API_KEY, 
+                        'Content-Type': 'application/json' 
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+
+                if (result.pay_address) {
+                    // Confirmation visuelle et logique de suivi
+                    let confirmMessage = `Paiement initialisé !\n\n`;
+                    confirmMessage += `Montant : ${result.pay_amount} BTC\n`;
+                    confirmMessage += `Adresse : ${result.pay_address}\n\n`;
+                    confirmMessage += `Veuillez copier cette adresse pour effectuer le virement.`;
+                    
+                    alert(confirmMessage);
+                    
+                    // Stockage local pour suivi
+                    localStorage.setItem('pending_order', result.order_id);
+                } else {
+                    throw new Error("Réponse API invalide");
+                }
+            } catch (error) {
+                alert("Erreur de connexion au système de paiement. Veuillez réessayer.");
+            }
         }
     </script>
 </body>
