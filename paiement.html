@@ -2,52 +2,85 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Paiement Crypto - Shadow Market</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shadow Market - Paiement</title>
     <style>
-        body { background: #050505; color: #fff; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; }
-        .payment-box { background: #111; padding: 40px; border: 1px solid #00ffff; border-radius: 12px; text-align: center; }
-        h2 { color: #00ffff; }
-        .btn-crypto { background: #00ffff; border: none; padding: 15px 30px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 1.2em; }
+        /* CSS Responsive : S'adapte automatiquement à la largeur */
+        body { 
+            background: #050505; color: #fff; font-family: 'Segoe UI', sans-serif; 
+            margin: 0; display: flex; justify-content: center; align-items: center; 
+            min-height: 100vh; padding: 10px; box-sizing: border-box;
+        }
+        .payment-container { 
+            background: #111; padding: 30px; border: 1px solid #00ffff; 
+            border-radius: 12px; text-align: center; width: 100%; max-width: 450px; 
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.1);
+        }
+        h2 { color: #00ffff; margin-bottom: 25px; }
+        .total-display { font-size: 2em; margin-bottom: 30px; font-weight: bold; }
+        .btn-pay { 
+            background: #00ffff; border: none; padding: 18px; width: 100%; 
+            border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 1.1em; 
+            transition: transform 0.2s;
+        }
+        .btn-pay:hover { transform: scale(1.02); }
+        p { color: #888; font-size: 0.9em; margin-top: 20px; }
     </style>
 </head>
 <body>
 
-    <div class="payment-box">
-        <h2>Total à payer : <span id="total-val">0.00</span> €</h2>
-        <p style="color: #aaa;">Paiement sécurisé par NOWPayments</p>
-        <button class="btn-crypto" onclick="payerCrypto()">Payer en Crypto (BTC/USDT)</button>
+    <div class="payment-container">
+        <h2>Paiement Sécurisé</h2>
+        <div class="total-display"><span id="total-val">0.00</span> €</div>
+        <button class="btn-pay" onclick="payerCrypto()">Payer en Crypto (BTC/USDT)</button>
+        <p>Traitement via NOWPayments (Sécurisé)</p>
     </div>
 
     <script>
+        // --- SCRIPT COMPLET ---
         const API_KEY = '70856b4a-2c08-4829-bada-878ba1da0a53';
+        
+        // Récupération sécurisée du montant
         const total = localStorage.getItem('totalPanier') || "0.00";
         document.getElementById('total-val').innerText = total;
 
+        // Fonction de paiement
         async function payerCrypto() {
+            // Sécurité : Vérification du montant
+            if (parseFloat(total) <= 0) {
+                alert("Erreur : Montant invalide.");
+                return;
+            }
+
             const payload = {
                 price_amount: parseFloat(total),
                 price_currency: "eur",
                 pay_currency: "btc",
-                order_id: "SHADOW_" + Date.now()
+                order_id: "SHADOW_" + Date.now(),
+                order_description: "Achat Shadow Market"
             };
 
             try {
                 const response = await fetch("https://api-sandbox.nowpayments.io/v1/payment", {
                     method: 'POST',
-                    headers: { 'x-api-key': API_KEY, 'Content-Type': 'application/json' },
+                    headers: { 
+                        'x-api-key': API_KEY, 
+                        'Content-Type': 'application/json' 
+                    },
                     body: JSON.stringify(payload)
                 });
 
                 const result = await response.json();
                 
-                // Redirection automatique vers la page de paiement officielle
+                // Redirection vers la page de paiement générée
                 if (result.invoice_url) {
                     window.location.href = result.invoice_url;
                 } else {
-                    alert("Erreur lors de la création de la facture.");
+                    alert("Erreur de l'API : " + (result.message || "Impossible de générer le paiement."));
                 }
             } catch (error) {
-                alert("Problème de connexion au serveur.");
+                console.error(error);
+                alert("Erreur critique : Impossible de joindre le système de paiement.");
             }
         }
     </script>
