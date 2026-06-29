@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Shadow Market - Commande</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -18,46 +19,77 @@
   <main class="main-content-wrapper">
     <h1 class="section-title">Passer une commande</h1>
 
-    <form class="order-form">
+    <form id="orderForm" class="order-form">
+      <div class="form-group">
+        <label>Ton Email (pour te contacter)</label>
+        <input type="email" id="c-email" placeholder="email@exemple.com" required>
+      </div>
       <div class="form-group">
         <label>Marque & Modèle</label>
-        <input type="text" placeholder="Ex: HP ProBook 4440S" required>
+        <input type="text" id="modele" placeholder="Ex: HP ProBook 4440S" required>
       </div>
 
       <div class="form-row">
         <div class="form-group">
           <label>RAM (Go)</label>
-          <input type="number" placeholder="8" required>
+          <input type="number" id="ram" placeholder="8" required>
         </div>
         <div class="form-group">
           <label>Stockage</label>
-          <input type="text" placeholder="350 Go SSD" required>
+          <input type="text" id="stockage" placeholder="350 Go SSD" required>
         </div>
       </div>
 
       <div class="form-group">
         <label>Système d'exploitation</label>
-        <select class="custom-select">
-          <option value="win10">Windows 10</option>
-          <option value="win11">Windows 11</option>
-          <option value="win8">Windows 8</option>
-          <option value="linux">Linux</option>
+        <select id="os" class="custom-select">
+          <option value="Windows 10">Windows 10</option>
+          <option value="Windows 11">Windows 11</option>
+          <option value="Linux">Linux</option>
         </select>
       </div>
 
       <div class="form-group">
         <label>Carte Graphique</label>
-        <input type="text" placeholder="Ex: Intel HD Graphics">
+        <input type="text" id="gpu" placeholder="Ex: Intel HD Graphics">
       </div>
 
       <div class="form-group">
         <label>Message pour le support</label>
-        <textarea rows="4" placeholder="Décrivez vos besoins (jeux, optimisation, etc...)"></textarea>
+        <textarea id="message" rows="4" placeholder="Décrivez vos besoins..."></textarea>
       </div>
 
       <button type="submit" class="submit-btn">ENVOYER LA DEMANDE</button>
     </form>
   </main>
 
+  <script>
+    const SUPABASE_URL = 'https://jsuvimxjmjiljntmgbzu.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_Ngm29impwbTLGhuqyCxSJA_E1jXc1DX';
+    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    document.getElementById('orderForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const order = {
+        customer_email: document.getElementById('c-email').value,
+        modele: document.getElementById('modele').value,
+        ram: document.getElementById('ram').value,
+        stockage: document.getElementById('stockage').value,
+        os: document.getElementById('os').value,
+        gpu: document.getElementById('gpu').value,
+        message: document.getElementById('message').value
+      };
+
+      const { error } = await supabase.from('orders').insert([order]);
+
+      if (error) {
+        alert("Erreur : " + error.message);
+      } else {
+        alert("Commande envoyée avec succès !");
+        document.getElementById('orderForm').reset();
+      }
+    });
+  </script>
 </body>
 </html>
