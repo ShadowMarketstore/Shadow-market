@@ -17,7 +17,6 @@
     .old-price-style { color: #666; text-decoration: line-through; font-size: 0.85em; }
     .stock-status { font-size: 0.8em; color: #888; margin-bottom: 8px; }
     .out-of-stock { color: #ff3333 !important; font-weight: bold; }
-    /* Style pour le message d'erreur détaillé */
     .debug-error { color: #ff0000; background: #222; padding: 15px; border: 1px solid #ff0000; border-radius: 5px; margin: 20px; font-family: monospace; }
   </style>
 </head>
@@ -49,7 +48,8 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     const supabaseUrl = 'https://jsuvimxjmjiljntmgbzu.supabase.co';
-    const apiKey = 'Sb_publishable_Ngm29impwbTLGhuqyCxSJA_E1jXc1DX';
+    // Utilisation de la nouvelle clé Publishable
+    const apiKey = 'Sb_publishable_Ngm29impwbTLGhuqyCxSJA_E1jXc1DX'; 
     
     const supabaseClient = supabase.createClient(supabaseUrl, apiKey);
 
@@ -57,15 +57,12 @@
       const container = document.getElementById('products-container');
       
       try {
-        console.log("Tentative de connexion à Supabase...");
-        
         const { data: products, error } = await supabaseClient
           .from('products')
           .select('name, price, old_price, discount_price, stock_quantity, description, ribbon, image_url');
 
         if (error) {
-          // ICI : Le débogueur qui nous dira exactement ce qui ne va pas
-          throw new Error(`Code: ${error.code} | Message: ${error.message} | Détails: ${JSON.stringify(error.details)}`);
+          throw new Error(`Code: ${error.code} | Message: ${error.message}`);
         }
 
         if (!products || products.length === 0) {
@@ -75,16 +72,15 @@
 
         container.innerHTML = '';
         products.forEach(product => {
-          // (Ton code d'affichage reste identique ici)
           const card = document.createElement('div');
           card.className = 'product-card';
-          card.innerHTML = `<h3>${product.name}</h3>`; // Exemple simplifié
+          // Ici, tu ajoutes ta logique d'affichage habituelle
+          card.innerHTML = `<h3>${product.name}</h3><p>${product.price} EUR</p>`;
           container.appendChild(card);
         });
 
       } catch (err) {
         console.error("Erreur détectée :", err);
-        // Affiche l'erreur en rouge sur la page pour qu'on puisse la lire
         container.innerHTML = `<div class="debug-error"><strong>Erreur Supabase :</strong><br>${err.message}</div>`;
       }
     }
@@ -93,4 +89,3 @@
   </script>
 </body>
 </html>
-
