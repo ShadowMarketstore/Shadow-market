@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shadow Market - Paiement</title>
     <style>
-        /* CSS Responsive : S'adapte automatiquement à la largeur */
         body { 
             background: #050505; color: #fff; font-family: 'Segoe UI', sans-serif; 
             margin: 0; display: flex; justify-content: center; align-items: center; 
@@ -38,7 +37,6 @@
 
     <script>
         // --- SCRIPT COMPLET ---
-        // Clé API mise à jour pour le compte réel
         const API_KEY = 'KVBEJY8-3JF4R6T-KASREV2-R7BDGYA';
         
         // Récupération sécurisée du montant
@@ -47,7 +45,6 @@
 
         // Fonction de paiement
         async function payerCrypto() {
-            // Sécurité : Vérification du montant
             if (parseFloat(total) <= 0) {
                 alert("Erreur : Montant invalide.");
                 return;
@@ -62,7 +59,7 @@
             };
 
             try {
-                // Utilisation de l'URL réelle (sans le -sandbox)
+                // Utilisation de l'API réelle
                 const response = await fetch("https://api.nowpayments.io/v1/payment", {
                     method: 'POST',
                     headers: { 
@@ -74,14 +71,14 @@
 
                 const result = await response.json();
                 
-                // Redirection vers la page de paiement générée
                 if (result.invoice_url) {
                     window.location.href = result.invoice_url;
                 } else {
+                    console.error("Détails API :", result);
                     alert("Erreur de l'API : " + (result.message || "Impossible de générer le paiement."));
                 }
             } catch (error) {
-                console.error(error);
+                console.error("Erreur critique :", error);
                 alert("Erreur critique : Impossible de joindre le système de paiement.");
             }
         }
