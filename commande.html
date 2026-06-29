@@ -6,6 +6,11 @@
   <title>Shadow Market - Commande</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="stylesheet" href="style.css">
+  <style>
+    /* Style pour le Pop-up de succès */
+    #successPopup { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:9999; align-items:center; justify-content:center; }
+    #successPopup > div { background:#28a745; padding:40px; border-radius:20px; text-align:center; color:#fff; border:3px solid #fff; box-shadow: 0 0 20px rgba(40,167,69,0.5); }
+  </style>
 </head>
 <body>
 
@@ -59,12 +64,18 @@
     </form>
   </main>
 
+  <div id="successPopup">
+    <div>
+        <div style="font-size: 60px;">✅</div>
+        <h2 style="margin-top:10px;">COMMANDE VALIDÉE</h2>
+        <p>Nous avons bien reçu votre demande.</p>
+    </div>
+  </div>
+
   <script>
-    // Initialisation sécurisée
     const SUPABASE_URL = 'https://jsuvimxjmjiljntmgbzu.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_Ngm29impwbTLGhuqyCxSJA_E1jXc1DX';
     
-    // Attendre que la page soit chargée
     window.addEventListener('load', () => {
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -89,24 +100,23 @@
 
             if (error) {
                 alert("Erreur Supabase : " + error.message);
-                console.error("Détail :", error);
+                btn.disabled = false;
+                btn.innerText = "ENVOYER LA DEMANDE";
             } else {
-                alert("Commande envoyée avec succès !");
-                document.getElementById('orderForm').reset();
+                // Succès : Affiche le pop-up
+                const popup = document.getElementById('successPopup');
+                popup.style.display = 'flex';
+                
+                setTimeout(() => {
+                    popup.style.display = 'none';
+                    document.getElementById('orderForm').reset();
+                    btn.innerText = "ENVOYER LA DEMANDE";
+                    btn.disabled = false;
+                }, 3000);
             }
-            btn.innerText = "ENVOYER LA DEMANDE";
-            btn.disabled = false;
         });
     });
   </script>
-  
-  <div id="successPopup" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:9999; align-items:center; justify-content:center;">
-    <div style="background:#28a745; padding:40px; border-radius:20px; text-align:center; color:#fff; border:3px solid #fff;">
-        <div style="font-size: 60px;">✅</div>
-        <h2 style="margin-top:10px;">COMMANDE VALIDÉE</h2>
-        <p>Nous avons bien reçu votre demande.</p>
-    </div>
-</div>
-
 </body>
 </html>
+
