@@ -10,9 +10,10 @@
         .input-field { width: 100%; margin-bottom: 15px; }
         label { display: block; font-size: 0.9em; margin-bottom: 5px; color: #aaa; }
         input { width: 100%; padding: 12px; background: #000; border: 1px solid #333; color: white; border-radius: 6px; box-sizing: border-box; }
+        .row { display: flex; gap: 10px; }
         .btn-pay { width: 100%; padding: 15px; background: #00ffff; border: none; color: #000; font-weight: bold; border-radius: 6px; cursor: pointer; margin-top: 10px; }
         .crypto-section { margin-top: 30px; border-top: 1px solid #333; padding-top: 20px; text-align: center; }
-        .crypto-btn { background: #333; color: white; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-top: 10px; }
+        .crypto-btn { background: #333; color: white; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-top: 10px; border: none; }
     </style>
 </head>
 <body>
@@ -26,6 +27,17 @@
             <input type="text" id="card-num" placeholder="0000 0000 0000 0000">
         </div>
         
+        <div class="row">
+            <div class="input-field">
+                <label>Expiration</label>
+                <input type="text" placeholder="MM/AA">
+            </div>
+            <div class="input-field">
+                <label>CVV</label>
+                <input type="text" placeholder="***">
+            </div>
+        </div>
+
         <button class="btn-pay" onclick="validerPaiement()">Payer <span id="btn-total">0.00</span> €</button>
 
         <div class="crypto-section">
@@ -35,24 +47,20 @@
     </div>
 
     <script>
-        // Configuration Initiale
         const API_KEY = '70856b4a-2c08-4829-bada-878ba1da0a53';
         const total = localStorage.getItem('totalPanier') || "0.00";
         document.getElementById('total-val').innerText = total + " €";
         document.getElementById('btn-total').innerText = total;
 
-        // Validation Carte Bancaire
         function validerPaiement() {
             const cardNum = document.getElementById('card-num').value;
             if(cardNum.replace(/\s/g, '').length < 16) {
                 alert("Erreur : Veuillez entrer un numéro de carte valide.");
                 return;
             }
-            alert("Traitement sécurisé en cours...");
-            // Logique de validation ici
+            alert("Traitement sécurisé de la carte en cours...");
         }
 
-        // Logic complète de Paiement Crypto
         async function afficherCrypto() {
             const payload = {
                 price_amount: parseFloat(total),
@@ -73,23 +81,13 @@
                 });
 
                 const result = await response.json();
-
                 if (result.pay_address) {
-                    // Confirmation visuelle et logique de suivi
-                    let confirmMessage = `Paiement initialisé !\n\n`;
-                    confirmMessage += `Montant : ${result.pay_amount} BTC\n`;
-                    confirmMessage += `Adresse : ${result.pay_address}\n\n`;
-                    confirmMessage += `Veuillez copier cette adresse pour effectuer le virement.`;
-                    
-                    alert(confirmMessage);
-                    
-                    // Stockage local pour suivi
-                    localStorage.setItem('pending_order', result.order_id);
+                    alert(`Paiement initialisé !\n\nMontant : ${result.pay_amount} BTC\nAdresse : ${result.pay_address}\n\nVeuillez copier cette adresse pour effectuer le virement.`);
                 } else {
-                    throw new Error("Réponse API invalide");
+                    alert("Erreur serveur : Impossible de générer le paiement.");
                 }
             } catch (error) {
-                alert("Erreur de connexion au système de paiement. Veuillez réessayer.");
+                alert("Erreur de connexion au système de paiement.");
             }
         }
     </script>
