@@ -2,34 +2,60 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Choisir le mode de paiement</title>
+    <title>Paiement Sécurisé - Shadow Market</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        body { background: #050505; color: white; padding: 20px; text-align: center; font-family: sans-serif; }
-        .method-btn { display: block; width: 100%; padding: 20px; margin: 10px 0; background: #1a1a1a; border: 1px solid #00ffff; color: white; cursor: pointer; font-size: 1.1em; }
-        .method-btn:hover { background: #00ffff; color: black; }
+        body { background: #050505; color: #fff; font-family: sans-serif; padding: 20px; }
+        .payment-container { max-width: 400px; margin: auto; background: #111; padding: 25px; border: 1px solid #00ffff; border-radius: 12px; }
+        h2 { text-align: center; color: #00ffff; margin-bottom: 20px; }
+        .input-field { width: 100%; margin-bottom: 15px; }
+        label { display: block; font-size: 0.9em; margin-bottom: 5px; color: #aaa; }
+        input { width: 100%; padding: 12px; background: #000; border: 1px solid #333; color: white; border-radius: 6px; box-sizing: border-box; }
+        .row { display: flex; gap: 10px; }
+        .btn-pay { width: 100%; padding: 15px; background: #00ffff; border: none; color: #000; font-weight: bold; border-radius: 6px; cursor: pointer; margin-top: 10px; }
+        .total-display { text-align: center; font-size: 1.5em; margin-bottom: 20px; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <h1>Mode de paiement</h1>
-    <h2 id="total-final">Total : 0 EUR</h2>
+    <div class="payment-container">
+        <h2>Payez en ligne</h2>
+        <div class="total-display" id="total-val">0.00 €</div>
+        
+        <div class="input-field">
+            <label>Nom sur la carte</label>
+            <input type="text" placeholder="Nom complet">
+        </div>
+        
+        <div class="input-field">
+            <label>N° de carte</label>
+            <input type="text" placeholder="0000 0000 0000 0000">
+        </div>
+        
+        <div class="row">
+            <div class="input-field">
+                <label>Expiration</label>
+                <input type="text" placeholder="MM/AA">
+            </div>
+            <div class="input-field">
+                <label>CVV</label>
+                <input type="text" placeholder="***">
+            </div>
+        </div>
 
-    <div style="max-width: 400px; margin: auto;">
-        <button class="method-btn" onclick="choisirPaiement('Carte Bancaire')">💳 Carte Bancaire</button>
-        <button class="method-btn" onclick="choisirPaiement('Crypto')">₿ Crypto (Bitcoin/USDT)</button>
+        <button class="btn-pay" onclick="validerPaiement()">Payer <span id="btn-total">0.00</span> €</button>
     </div>
 
     <script>
-        // Récupérer le total stocké ou calculé
+        // Récupère le total stocké précédemment
         let total = localStorage.getItem('totalPanier') || "0.00";
-        document.getElementById('total-final').innerText = "Total : " + total + " EUR";
+        document.getElementById('total-val').innerText = total + " €";
+        document.getElementById('btn-total').innerText = total;
 
-        function choisirPaiement(methode) {
-            alert("Vous avez choisi : " + methode + ". Redirection vers la passerelle sécurisée...");
-            // Ici, plus tard, on redirigera vers ton système de paiement réel
+        function validerPaiement() {
+            alert("Traitement de votre paiement en cours...");
+            // Ici, tu ajouteras plus tard l'appel à ton API de paiement
         }
     </script>
 </body>
 </html>
-
