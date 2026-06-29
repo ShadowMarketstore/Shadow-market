@@ -6,41 +6,35 @@
   <title>Shadow Market</title>
   <link rel="stylesheet" href="style.css">
   <style>
-    /* Styles pour la grille et les éléments */
+    /* Style du compteur sur l'icône panier */
+    #cart-link { position: relative; text-decoration: none; color: white; }
+    #cart-count { 
+        position: absolute; top: -5px; right: -5px; background: #00ffff; color: #000; 
+        border-radius: 50%; padding: 2px 5px; font-size: 0.6em; font-weight: bold; 
+    }
     .product-card { position: relative; overflow: hidden; }
     .ribbon-badge { position: absolute; top: 14px; right: -32px; background: #00ffff; color: #000; font-size: 0.72em; font-weight: bold; padding: 4px 32px; transform: rotate(45deg); box-shadow: 0 0 8px #00ffff; text-transform: uppercase; letter-spacing: 1px; z-index: 10; }
-    .price-wrapper { display: flex; flex-direction: column; gap: 2px; margin-bottom: 10px; }
-    .old-price-style { color: #666; text-decoration: line-through; font-size: 0.85em; }
-    .stock-status { font-size: 0.8em; color: #888; margin-bottom: 8px; }
-    .out-of-stock { color: #ff3333 !important; font-weight: bold; }
     .debug-error { color: #ff0000; background: #222; padding: 15px; border: 1px solid #ff0000; border-radius: 5px; margin: 20px; font-family: monospace; }
-    
-    /* Style du compteur de panier */
-    #cart-link { position: relative; text-decoration: none; color: white; }
-    #cart-count { position: absolute; top: -10px; right: -10px; background: #00ffff; color: #000; border-radius: 50%; padding: 2px 6px; font-size: 0.7em; font-weight: bold; }
   </style>
 </head>
 <body>
 
   <nav class="floating-nav">
     <a href="login.html" class="nav-link">👤</a>
-    <a href="panier.html" id="cart-link" class="nav-link">🛒 <span id="cart-count">0</span></a>
+    <a href="panier.html" id="cart-link" class="nav-link">🧺 <span id="cart-count">0</span></a>
+    <a href="commande.html" class="nav-link">🛒</a>
     <a href="index.html" class="nav-link active">🏠</a>
     <a href="https://discord.gg/XUtWdTPYr" target="_blank" class="nav-link">💬</a>
   </nav>
 
   <div class="main-content-wrapper">
     <header>
-      <div class="logo-wrapper">
-        <img src="logo.png" alt="Shadow Market Logo">
-      </div>
+      <div class="logo-wrapper"><img src="logo.png" alt="Shadow Market Logo"></div>
     </header>
 
     <main>
       <h1 class="section-title">Produits Disponibles</h1>
-      <div class="products-grid" id="products-container">
-        <p style="color: #00ffff; text-align: center; width: 100%;">Chargement des modules...</p>
-      </div>
+      <div class="products-grid" id="products-container"><p>Chargement...</p></div>
     </main>
   </div>
 
@@ -48,13 +42,12 @@
   <script>
     const supabaseClient = supabase.createClient('https://jsuvimxjmjiljntmgbzu.supabase.co', 'sb_publishable_Ngm29impwbTLGhuqyCxSJA_E1jXc1DX');
 
-    // Mise à jour du compteur visuel
+    // Mise à jour du compteur sur l'icône 🧺
     function updateCartCounter() {
       let panier = JSON.parse(localStorage.getItem('monPanier')) || [];
       document.getElementById('cart-count').innerText = panier.length;
     }
 
-    // Ajout produit avec toutes les infos nécessaires pour la page panier
     function ajouterAuPanier(nom, prix, desc, image) {
       let panier = JSON.parse(localStorage.getItem('monPanier')) || [];
       panier.push({ nom, prix, desc, image });
@@ -67,26 +60,18 @@
       const container = document.getElementById('products-container');
       try {
         const { data: products, error } = await supabaseClient.from('products').select('*');
-        if (error) throw new Error(`Code: ${error.code} | Message: ${error.message}`);
+        if (error) throw new Error(error.message);
         
         container.innerHTML = '';
         products.forEach(p => {
-          const stockNum = parseInt(p.stock_quantity) || 0;
-          let buyButtonHTML = `<button class="buy-btn" onclick="ajouterAuPanier('${p.name}', ${p.price}, '${p.description}', '${p.image_url}')">AJOUTER AU PANIER</button>`;
-          
-          if (stockNum <= 0) {
-            buyButtonHTML = `<button class="buy-btn" disabled style="background: #222; color: #555; cursor: not-allowed; box-shadow: none;">ÉPUISÉ</button>`;
-          }
-
           const card = document.createElement('div');
           card.className = 'product-card';
           card.innerHTML = `
             ${(p.ribbon && p.ribbon !== 'none') ? `<div class="ribbon-badge">${p.ribbon.toUpperCase()}</div>` : ''}
-            <div class="product-img" style="background-image: url('${p.image_url}');"></div>
-            <h3 class="product-name">${p.name}</h3>
-            <p class="stock-status">Stock : ${stockNum}</p>
-            <p class="product-price">${parseFloat(p.price).toFixed(2)} EUR</p>
-            ${buyButtonHTML}
+            <div class="product-img" style="background-image: url('${p.image_url}')"></div>
+            <h3>${p.name}</h3>
+            <p>${p.price} EUR</p>
+            <button class="buy-btn" onclick="ajouterAuPanier('${p.name}', ${p.price}, '${p.description}', '${p.image_url}')">AJOUTER AU PANIER</button>
           `;
           container.appendChild(card);
         });
