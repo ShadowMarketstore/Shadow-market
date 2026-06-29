@@ -19,7 +19,29 @@
     <script>
         // C'est ici qu'on mettra la logique pour récupérer les produits
         // et envoyer la demande de paiement à NOWPayments plus tard.
-    </script>
+    <script>
+    // 1. On récupère le panier depuis la mémoire du navigateur
+    let panier = JSON.parse(localStorage.getItem('monPanier')) || [];
+    let recapContainer = document.getElementById('recapitulatif');
+    let totalElement = document.getElementById('total-prix');
+    let total = 0;
+
+    // 2. On affiche chaque produit
+    if (panier.length === 0) {
+        recapContainer.innerHTML = "<p>Votre panier est vide.</p>";
+    } else {
+        panier.forEach(item => {
+            let itemDiv = document.createElement('div');
+            itemDiv.innerHTML = `${item.nom} - ${item.prix} €`;
+            recapContainer.appendChild(itemDiv);
+            total += parseFloat(item.prix);
+        });
+        
+        // 3. On affiche le total
+        totalElement.innerText = total + " €";
+    }
+</script>
+
 </body>
 </html>
 
