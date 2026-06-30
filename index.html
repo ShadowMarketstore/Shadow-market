@@ -8,9 +8,9 @@
     /* Design Global */
     body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: #000; color: #fff; margin: 0; padding: 0; }
     
-    /* Header Dynamique (Pleine largeur) */
-    #dynamic-header { width: 100%; margin-bottom: 20px; }
-    #main-logo { width: 100%; height: auto; display: block; }
+    /* Zone Logo Prédéfinie */
+    #dynamic-header { width: 100%; padding: 20px 0; display: flex; justify-content: center; background: #0a0a0a; border-bottom: 1px solid #00ffff; }
+    #main-logo { max-width: 80%; max-height: 150px; object-fit: contain; }
 
     /* Grille et Cartes */
     .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; padding: 10px; }
@@ -20,23 +20,14 @@
         justify-content: space-between; min-height: 350px;
     }
 
-    /* Images */
     .product-img { width: 100%; height: 160px; background-size: contain; background-position: center; background-repeat: no-repeat; border-radius: 8px; background-color: #000; }
-
-    /* Typographie */
     h3 { font-size: 0.95em; margin: 5px 0; min-height: 2.4em; }
     .price-wrapper { margin: 5px 0; }
     .old-price { text-decoration: line-through; color: #777; font-size: 0.85em; display: block; }
     .current-price { color: #fff; font-weight: bold; font-size: 1.2em; display: block; }
-    
     .out-of-stock-text { color: #ff0000; font-weight: bold; margin: 10px 0; display: block; }
-    
     .buy-btn { width: 100%; background: #ff0033; color: white; border: none; padding: 10px; font-weight: bold; cursor: pointer; border-radius: 5px; margin-top: auto; }
     .buy-btn:disabled { background: #333; color: #777; cursor: not-allowed; }
-
-    /* Badges */
-    .discount-badge { position: absolute; top: 15px; left: 15px; background: #000; color: #00ffff; border: 1px solid #00ffff; padding: 3px 8px; border-radius: 5px; font-weight: bold; font-size: 0.8em; z-index: 20; }
-    .ribbon-badge { position: absolute; top: 14px; right: -32px; background: #00ffff; color: #000; font-size: 0.7em; font-weight: bold; padding: 4px 32px; transform: rotate(45deg); z-index: 10; }
 
     /* Navigation */
     .floating-nav { position: fixed; bottom: 20px; left: 10%; right: 10%; background: #111; padding: 15px; border-radius: 30px; border: 1px solid #00ffff; display: flex; justify-content: space-around; z-index: 100; }
@@ -47,9 +38,7 @@
 <body>
 
   <header id="dynamic-header">
-    <a href="index.html" id="logo-link">
-      <img id="main-logo" src="logo.png" alt="Shadow Market Logo">
-    </a>
+    <img id="main-logo" src="" alt="Shadow Market Logo" onerror="this.style.display='none'">
   </header>
 
   <nav class="floating-nav">
@@ -61,17 +50,21 @@
   </nav>
 
   <main>
-    <div class="products-grid" id="products-container"><p style="text-align: center;">Chargement...</p></div>
+    <div class="products-grid" id="products-container"><p style="text-align: center;">Chargement des produits...</p></div>
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    const supabaseClient = supabase.createClient('https://jsuvimxjmjiljntmgbzu.supabase.co', 'sb_publishable_Ngm29impwbTLGhuqyCxSJA_E1jXc1DX');
+    // Configuration
+    const SUPABASE_URL = 'https://jsuvimxjmjiljntmgbzu.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzdXZpbXhqbWppbGpudG1nYnp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI0Njk0NTgsImV4cCI6MjA5ODA0NTQ1OH0.F6aDK6oTyp3Tlb9fmkqpzgn4KGAxA5-ClIKlkqzfcR4';
+    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // Charger le logo dynamique
-    async function loadLogo() {
-      const { data } = await supabaseClient.from('settings').select('value').eq('key', 'header_logo').single();
-      if (data) document.getElementById('main-logo').src = data.value;
+    // Fonction pour charger le logo dynamiquement depuis le bucket
+    function loadLogo() {
+      const logoImg = document.getElementById('main-logo');
+      const timestamp = new Date().getTime(); // Force le rafraîchissement
+      logoImg.src = `${SUPABASE_URL}/storage/v1/object/public/logos/site-logo.png?t=${timestamp}`;
     }
 
     function updateCartCounter() {
@@ -79,42 +72,30 @@
       document.getElementById('cart-count').innerText = panier.length;
     }
 
-    function ajouterAuPanier(nom, prix, desc, image) {
-      let panier = JSON.parse(localStorage.getItem('monPanier')) || [];
-      panier.push({ nom, prix, desc, image });
-      localStorage.setItem('monPanier', JSON.stringify(panier));
-      updateCartCounter();
-    }
-
     async function loadProducts() {
+      loadLogo(); // On charge le logo au démarrage
+      updateCartCounter();
+
       const container = document.getElementById('products-container');
-      const { data: products } = await supabaseClient.from('products').select('*');
+      const { data: products } = await supabase.from('products').select('*');
       
       container.innerHTML = '';
-      products.forEach(p => {
-        const isOutOfStock = p.stock <= 0;
-        let discountHtml = (p.old_price > p.price) ? `<div class="discount-badge">-${Math.round(((p.old_price - p.price) / p.old_price) * 100)}%</div>` : '';
-        
-        const card = document.createElement('div');
-        card.className = 'product-card';
-        card.innerHTML = `
-          ${discountHtml}
-          ${(p.is_new) ? `<div class="ribbon-badge">NEW</div>` : ''}
-          <div class="product-img" style="background-image: url('${p.image_url}')"></div>
-          <h3>${p.name}</h3>
-          ${isOutOfStock 
-            ? `<span class="out-of-stock-text">RUPTURE DE STOCK</span>` 
-            : `<div class="price-wrapper"><span class="old-price">${p.old_price} EUR</span><span class="current-price">${p.price} EUR</span></div>`
-          }
-          <button class="buy-btn" ${isOutOfStock ? 'disabled' : ''} onclick="ajouterAuPanier('${p.name}', ${p.price}, '${p.description}', '${p.image_url}')">
-            ${isOutOfStock ? 'ÉPUISÉ' : 'AJOUTER AU PANIER'}
-          </button>
-        `;
-        container.appendChild(card);
-      });
-      loadLogo();
-      updateCartCounter();
+      if (products) {
+          products.forEach(p => {
+            const isOutOfStock = p.stock <= 0;
+            const card = document.createElement('div');
+            card.className = 'product-card';
+            card.innerHTML = `
+              <div class="product-img" style="background-image: url('${p.image_url}')"></div>
+              <h3>${p.name}</h3>
+              ${isOutOfStock ? `<span class="out-of-stock-text">RUPTURE</span>` : `<div class="price-wrapper"><span class="current-price">${p.price} EUR</span></div>`}
+              <button class="buy-btn" ${isOutOfStock ? 'disabled' : ''}>${isOutOfStock ? 'ÉPUISÉ' : 'AJOUTER'}</button>
+            `;
+            container.appendChild(card);
+          });
+      }
     }
+    
     window.onload = loadProducts;
   </script>
 </body>
