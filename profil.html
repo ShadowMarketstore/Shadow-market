@@ -4,9 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Shadow Market - Profil</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     body { background: #000; color: #fff; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; }
-    
     .menu-btn { position: fixed; top: 20px; left: 20px; z-index: 2000; cursor: pointer; font-size: 30px; color: #00ffff; }
     
     .sidebar { position: fixed; left: -250px; top: 0; width: 250px; height: 100%; background: #111; border-right: 2px solid #00ffff; transition: 0.3s; z-index: 1500; padding-top: 80px; }
@@ -59,15 +59,28 @@
     </div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    // Initialisation
-    const supabaseClient = supabase.createClient('https://jsuvimxjmjiljntmgbzu.supabase.co', 'sb_publishable_Ngm29impwbTLGhuqyCxSJA_E1jXc1DX');
+    // Initialisation Supabase
+    const supabase = supabase.createClient('https://jsuvimxjmjiljntmgbzu.supabase.co', 'sb_publishable_Ngm29impwbTLGhuqyCxSJA_E1jXc1DX');
 
-    // 1. SÉCURITÉ : Vérification de connexion obligatoire
-    if (localStorage.getItem('isLoggedIn') !== 'true') {
-        window.location.href = "login.html";
-    }
+    // SÉCURITÉ : Vérification de session au chargement
+    window.onload = async () => {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) { 
+            window.location.href = "login.html"; 
+            return; 
+        }
+        
+        // Charger les données utilisateur
+        const email = session.user.email;
+        document.getElementById('displayEmail').innerText = email;
+
+        const { data } = await supabase.from('users').select('points').eq('email', email).single();
+        if (data) { 
+            document.getElementById('user-points').innerText = data.points; 
+            document.getElementById('user-points-display').innerText = data.points; 
+        }
+    };
 
     // Fonctions Menu et Modale
     function toggleMenu() { document.getElementById('sidebar').classList.toggle('active'); }
@@ -78,36 +91,27 @@
     async function generateCode() {
         const pts = parseInt(document.getElementById('ptsInput').value);
         const currentPts = parseInt(document.getElementById('user-points').innerText);
+        const email = document.getElementById('displayEmail').innerText;
         
         if (pts > currentPts || pts <= 0) { alert("Points insuffisants ou invalides"); return; }
         
         const code = "SHADOW-" + Math.random().toString(36).substr(2, 6).toUpperCase();
         
-        await supabaseClient.from('discounts').insert([{ code, discount_percent: pts, used: false, owner_email: localStorage.getItem('userEmail') }]);
-        await supabaseClient.from('users').update({ points: currentPts - pts }).eq('email', localStorage.getItem('userEmail'));
+        // Sauvegarde dans Supabase
+        await supabase.from('discounts').insert([{ code, discount_percent: pts, used: false, owner_email: email }]);
+        await supabase.from('users').update({ points: currentPts - pts }).eq('email', email);
         
         document.getElementById('resultCode').innerText = "Code : " + code;
         document.getElementById('user-points').innerText = currentPts - pts;
         document.getElementById('user-points-display').innerText = currentPts - pts;
     }
 
-    // 2. DÉCONNEXION : Nettoyage complet
-    function logout() { 
-        localStorage.clear(); 
-        window.location.href = 'login.html'; 
-    }
-    
-    // Chargement au démarrage
-    window.onload = async () => {
-        const email = localStorage.getItem('userEmail');
-        document.getElementById('displayEmail').innerText = email;
-
-        const { data } = await supabaseClient.from('users').select('points').eq('email', email).single();
-        if (data) { 
-            document.getElementById('user-points').innerText = data.points; 
-            document.getElementById('user-points-display').innerText = data.points; 
-        }
+    // DÉCONNEXION
+    async function logout() { 
+        await supabase.auth.signOut();
+        window.location.href = 'index.html'; 
     }
   </script>
 </body>
 </html>
+
