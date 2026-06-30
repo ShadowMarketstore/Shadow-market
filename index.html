@@ -7,7 +7,6 @@
   <style>
     body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: #000; color: #fff; margin: 0; padding: 0; padding-bottom: 120px; }
     
-    /* Logo agrandi et zone élargie */
     #dynamic-header { width: 100%; padding: 60px 0; display: flex; justify-content: center; background: #0a0a0a; border-bottom: 2px solid #00ffff; margin-bottom: 25px; }
     #main-logo { width: 85%; max-height: 450px; object-fit: contain; }
 
@@ -61,7 +60,6 @@
       container.innerHTML = '';
       if (products) {
         products.forEach(p => {
-          // Utilisation de stock_quantity
           const stockVal = p.stock_quantity !== undefined ? p.stock_quantity : 0;
           const isOutOfStock = stockVal <= 0;
           const discount = p.old_price > p.price ? Math.round(((p.old_price - p.price) / p.old_price) * 100) : 0;
@@ -78,7 +76,7 @@
                 ${p.old_price > p.price ? `<span class="old-price">${p.old_price} EUR</span>` : ''}
                 <span class="current-price">${p.price} EUR</span>
             </div>
-            <button class="buy-btn" ${isOutOfStock ? 'disabled' : ''} onclick="processPurchase(${p.id}, ${stockVal})">
+            <button class="buy-btn" ${isOutOfStock ? 'disabled' : ''} onclick="handlePurchase('${encodeURIComponent(JSON.stringify(p))}', ${stockVal})">
                 ${isOutOfStock ? 'ÉPUISÉ' : 'AJOUTER AU PANIER'}
             </button>
           `;
@@ -88,20 +86,23 @@
       updateCartCount();
     }
 
-    async function processPurchase(productId, currentStock) {
+    async function handlePurchase(encodedProduct, currentStock) {
       if (currentStock > 0) {
-        // Mise à jour de la colonne stock_quantity
-        const { error } = await supabaseClient
+        // 1. Ajout au LocalStorage sans confirmation
+        const product = JSON.parse(decodeURIComponent(encodedProduct));
+        let panier = JSON.parse(localStorage.getItem('monPanier')) || [];
+        panier.push(product);
+        localStorage.setItem('monPanier', JSON.stringify(panier));
+        updateCartCount();
+
+        // 2. Mise à jour automatique en base de données
+        await supabaseClient
           .from('products')
           .update({ stock_quantity: currentStock - 1 })
-          .eq('id', productId);
+          .eq('id', product.id);
 
-        if (!error) {
-          alert("Produit ajouté !");
-          loadData(); 
-        } else {
-          alert("Erreur lors de la mise à jour.");
-        }
+        // 3. Rafraîchissement silencieux de l'affichage
+        loadData();
       }
     }
 
@@ -114,3 +115,4 @@
   </script>
 </body>
 </html>
+
