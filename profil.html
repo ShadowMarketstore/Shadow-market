@@ -21,6 +21,7 @@
     .modal-content { background: #111; padding: 30px; border: 2px solid #00ffff; border-radius: 20px; text-align: center; width: 300px; }
     input { background: #000; border: 1px solid #00ffff; color: #fff; padding: 10px; width: 80%; margin: 10px 0; border-radius: 5px; text-align: center; }
     .btn { background: #00ffff; color: #000; border: none; padding: 10px 20px; border-radius: 5px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
   </style>
 </head>
 <body>
@@ -49,59 +50,87 @@
       <h3>Convertir mes points</h3>
       <input type="number" id="ptsInput" placeholder="Nombre de points">
       <br>
-      <button class="btn" onclick="generateCode()">Générer le code</button>
+      <button class="btn" id="genCodeBtn" onclick="generateCode()">Générer le code</button>
       <button class="btn" style="background:#444;" onclick="closeModal()">Fermer</button>
       <p id="resultCode" style="margin-top:20px; color:#00ffff; font-weight:bold;"></p>
     </div>
   </div>
 
   <script>
-    const supabase = supabase.createClient('https://jsuvimxjmjiljntmgbzu.supabase.co', 'sb_publishable_Ngm29impwbTLGhuqyCxSJA_E1jXc1DX');
+    // Renommé en "db" pour éviter la collision avec l'objet global "supabase" du CDN
+    const db = supabase.createClient(
+      'https://jsuvimxjmjiljntmgbzu.supabase.co',
+      'sb_publishable_Ngm29impwbTLGhuqyCxSJA_E1jXc1DX'
+    );
+
+    let currentEmail = null;
 
     // SÉCURITÉ : Vérification de session au démarrage
     window.onload = async () => {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (!session) { 
-            window.location.href = "login.html"; 
-            return; 
+        const { data: { session } } = await db.auth.getSession();
+        if (!session) {
+            window.location.href = "login.html";
+            return;
         }
-        
-        const email = session.user.email;
-        document.getElementById('displayEmail').innerText = email;
 
-        const { data } = await supabase.from('users').select('points').eq('email', email).single();
-        if (data) { 
-            document.getElementById('user-points').innerText = data.points; 
-            document.getElementById('user-points-display').innerText = data.points; 
-        }
+        currentEmail = session.user.email;
+        document.getElementById('displayEmail').innerText = currentEmail;
+
+        await refreshPoints();
     };
+
+    // Recharge les points depuis Supabase (évite de se fier au DOM comme source de vérité)
+    async function refreshPoints() {
+        const { data, error } = await db.from('users').select('points').eq('email', currentEmail).single();
+        if (!error && data) {
+            document.getElementById('user-points').innerText = data.points;
+            document.getElementById('user-points-display').innerText = data.points;
+        }
+    }
 
     function toggleMenu() { document.getElementById('sidebar').classList.toggle('active'); }
     function openModal() { document.getElementById('modal').style.display = 'flex'; }
     function closeModal() { document.getElementById('modal').style.display = 'none'; }
 
     async function generateCode() {
+        const btn = document.getElementById('genCodeBtn');
         const pts = parseInt(document.getElementById('ptsInput').value);
         const currentPts = parseInt(document.getElementById('user-points').innerText);
-        const email = document.getElementById('displayEmail').innerText;
-        
-        if (pts > currentPts || pts <= 0) { alert("Points insuffisants ou invalides"); return; }
-        
-        const code = "SHADOW-" + Math.random().toString(36).substr(2, 6).toUpperCase();
-        
-        await supabase.from('discounts').insert([{ code, discount_percent: pts, used: false, owner_email: email }]);
-        await supabase.from('users').update({ points: currentPts - pts }).eq('email', email);
-        
-        document.getElementById('resultCode').innerText = "Code : " + code;
-        document.getElementById('user-points').innerText = currentPts - pts;
-        document.getElementById('user-points-display').innerText = currentPts - pts;
+
+        if (!pts || pts > currentPts || pts <= 0) {
+            alert("Points insuffisants ou invalides");
+            return;
+        }
+
+        btn.disabled = true;
+
+        try {
+            const code = "SHADOW-" + Math.random().toString(36).substr(2, 6).toUpperCase();
+
+            const { error: insertError } = await db.from('discounts').insert([
+                { code, discount_percent: pts, used: false, owner_email: currentEmail }
+            ]);
+            if (insertError) throw insertError;
+
+            const { error: updateError } = await db.from('users')
+                .update({ points: currentPts - pts })
+                .eq('email', currentEmail);
+            if (updateError) throw updateError;
+
+            document.getElementById('resultCode').innerText = "Code : " + code;
+            await refreshPoints(); // resynchronise avec la BDD plutôt que de calculer en local
+            document.getElementById('ptsInput').value = '';
+        } catch (err) {
+            alert("Erreur : " + err.message);
+        } finally {
+            btn.disabled = false;
+        }
     }
 
-    async function logout() { 
-        await supabase.auth.signOut();
-        window.location.href = 'index.html'; 
+    async function logout() {
+        await db.auth.signOut();
+        window.location.href = 'index.html';
     }
   </script>
 </body>
 </html>
-
