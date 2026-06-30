@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mon Panier - Shadow Market</title>
-    <link rel="stylesheet" href="style.css">
     <style>
         body { background: #050505; color: white; font-family: sans-serif; padding: 20px; }
         .item-card { border: 1px solid #00ffff; padding: 15px; margin-bottom: 10px; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; background: #111; }
@@ -33,12 +32,15 @@
             liste.innerHTML = '';
 
             panier.forEach((p, index) => {
-                total += parseFloat(p.prix);
+                // Utilisation des bons noms de propriétés : p.price et p.name
+                const prix = parseFloat(p.price) || 0;
+                total += prix;
+                
                 liste.innerHTML += `
                     <div class="item-card">
-                        <img src="${p.image}" width="50" style="border-radius: 4px;">
+                        <img src="${p.image_url || ''}" width="50" style="border-radius: 4px;">
                         <div class="item-info">
-                            <strong>${p.nom}</strong><br>${p.prix} EUR
+                            <strong>${p.name || 'Produit inconnu'}</strong><br>${prix.toFixed(2)} EUR
                         </div>
                         <button class="remove-btn" onclick="supprimerArticle(${index})">X</button>
                     </div>
