@@ -128,21 +128,28 @@
     const email = document.getElementById('email').value.trim();
     const password = document.getElementById('password').value;
 
-    const { data, error } = isLogin
-      ? await db.auth.signInWithPassword({ email, password })
-      : await db.auth.signUp({ email, password });
-
-    if (error) {
-      alert("Erreur : " + error.message);
-      submitBtn.disabled = false;
-      return;
-    }
-
-    if (data?.session) {
+    if (isLogin) {
+      const { error } = await db.auth.signInWithPassword({ email, password });
+      if (error) {
+        alert("Erreur : " + error.message);
+        submitBtn.disabled = false;
+        return;
+      }
       window.location.href = "profil.html";
-    } else if (!isLogin) {
-      alert("Compte créé. Vérifie ta boîte mail pour confirmer.");
-      submitBtn.disabled = false;
+    } else {
+      const { error } = await db.auth.signUp({ email, password });
+      if (error) {
+        alert("Erreur : " + error.message);
+        submitBtn.disabled = false;
+        return;
+      }
+      const { error: loginError } = await db.auth.signInWithPassword({ email, password });
+      if (loginError) {
+        alert("Erreur de connexion automatique : " + loginError.message);
+        submitBtn.disabled = false;
+        return;
+      }
+      window.location.href = "profil.html";
     }
   });
 </script>
