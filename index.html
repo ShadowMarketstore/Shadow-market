@@ -7,31 +7,35 @@
   <style>
     body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: #000; color: #fff; margin: 0; padding: 0; padding-bottom: 100px; }
     
-    /* Zone Logo Fixe */
-    #dynamic-header { width: 100%; padding: 20px 0; display: flex; justify-content: center; background: #0a0a0a; border-bottom: 1px solid #00ffff; margin-bottom: 20px; }
-    #main-logo { max-width: 80%; max-height: 120px; object-fit: contain; }
+    /* Zone Logo Améliorée */
+    #dynamic-header { width: 100%; padding: 15px 0; display: flex; justify-content: center; background: #0a0a0a; border-bottom: 1px solid #00ffff; margin-bottom: 15px; }
+    #main-logo { width: 90%; max-height: 150px; object-fit: contain; }
 
     /* Grille Produits */
     .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; padding: 10px; }
     .product-card { position: relative; border: 2px solid #00ffff; border-radius: 15px; padding: 10px; background: #111; display: flex; flex-direction: column; min-height: 350px; }
     .product-img { width: 100%; height: 160px; background-size: contain; background-position: center; background-repeat: no-repeat; border-radius: 8px; background-color: #000; }
+    
+    h3 { font-size: 0.95em; margin: 5px 0; min-height: 2.4em; }
+    .price-wrapper { margin: 5px 0; }
+    .old-price { text-decoration: line-through; color: #777; font-size: 0.85em; display: block; }
+    .current-price { color: #fff; font-weight: bold; font-size: 1.2em; display: block; }
+    .out-of-stock-text { color: #ff0000; font-weight: bold; margin: 10px 0; display: block; }
+    .buy-btn { width: 100%; background: #ff0033; color: white; border: none; padding: 10px; font-weight: bold; cursor: pointer; border-radius: 5px; margin-top: auto; }
+    
+    .discount-badge { position: absolute; top: 15px; left: 15px; background: #000; color: #00ffff; border: 1px solid #00ffff; padding: 3px 8px; border-radius: 5px; font-weight: bold; font-size: 0.8em; z-index: 20; }
+    .ribbon-badge { position: absolute; top: 14px; right: -32px; background: #00ffff; color: #000; font-size: 0.7em; font-weight: bold; padding: 4px 32px; transform: rotate(45deg); z-index: 10; }
 
-    /* Menu Flottant (Corrigé à la taille standard) */
-    .floating-nav { 
-        position: fixed; bottom: 20px; left: 5%; right: 5%; 
-        background: #111; padding: 15px 25px; 
-        border-radius: 40px; border: 1px solid #00ffff; 
-        display: flex; justify-content: space-between; align-items: center; 
-        z-index: 1000; box-shadow: 0 4px 15px rgba(0, 255, 255, 0.2);
-    }
-    .nav-link { text-decoration: none; color: white; font-size: 24px; padding: 5px; }
+    /* Menu Flottant (Standard) */
+    .floating-nav { position: fixed; bottom: 20px; left: 5%; right: 5%; background: #111; padding: 15px 25px; border-radius: 40px; border: 1px solid #00ffff; display: flex; justify-content: space-between; align-items: center; z-index: 1000; }
+    .nav-link { text-decoration: none; color: white; font-size: 24px; }
     #cart-count { background: #00ffff; color: #000; border-radius: 50%; padding: 2px 8px; font-size: 0.7em; font-weight: bold; }
   </style>
 </head>
 <body>
 
   <header id="dynamic-header">
-    <img id="main-logo" src="logo.png" alt="Shadow Market Logo">
+    <img id="main-logo" src="" alt="Shadow Market">
   </header>
 
   <main>
@@ -42,7 +46,7 @@
     <a href="login.html" class="nav-link">👤</a>
     <a href="panier.html" class="nav-link">🧺 <span id="cart-count">0</span></a>
     <a href="commande.html" class="nav-link">🛒</a>
-    <a href="index.html" class="nav-link active">🏠</a>
+    <a href="index.html" class="nav-link">🏠</a>
     <a href="https://discord.gg/XUtWdTPYr" target="_blank" class="nav-link">💬</a>
   </nav>
 
@@ -51,21 +55,33 @@
     const supabaseClient = supabase.createClient('https://jsuvimxjmjiljntmgbzu.supabase.co', 'sb_publishable_Ngm29impwbTLGhuqyCxSJA_E1jXc1DX');
 
     async function loadData() {
-      // Charger Produits
+      // 1. Logo
+      document.getElementById('main-logo').src = 'https://jsuvimxjmjiljntmgbzu.supabase.co/storage/v1/object/public/logos/site-logo.png?t=' + new Date().getTime();
+
+      // 2. Produits
       const container = document.getElementById('products-container');
       const { data: products } = await supabaseClient.from('products').select('*');
       
       container.innerHTML = '';
       if (products) {
         products.forEach(p => {
+          const isOutOfStock = p.stock <= 0;
+          let discountHtml = (p.old_price > p.price) ? `<div class="discount-badge">-${Math.round(((p.old_price - p.price) / p.old_price) * 100)}%</div>` : '';
+          
           const card = document.createElement('div');
           card.className = 'product-card';
-          card.innerHTML = `<div class="product-img" style="background-image: url('${p.image_url}')"></div><h3>${p.name}</h3><p>${p.price} EUR</p>`;
+          card.innerHTML = `
+            ${discountHtml}
+            ${p.is_new ? '<div class="ribbon-badge">NEW</div>' : ''}
+            <div class="product-img" style="background-image: url('${p.image_url}')"></div>
+            <h3>${p.name}</h3>
+            ${isOutOfStock ? '<span class="out-of-stock-text">RUPTURE</span>' : `<div class="price-wrapper"><span class="old-price">${p.old_price} EUR</span><span class="current-price">${p.price} EUR</span></div>`}
+            <button class="buy-btn" ${isOutOfStock ? 'disabled' : ''}>${isOutOfStock ? 'ÉPUISÉ' : 'AJOUTER AU PANIER'}</button>
+          `;
           container.appendChild(card);
         });
       }
-      
-      // Mise à jour panier
+      // Panier
       let panier = JSON.parse(localStorage.getItem('monPanier')) || [];
       document.getElementById('cart-count').innerText = panier.length;
     }
@@ -73,4 +89,3 @@
   </script>
 </body>
 </html>
-
