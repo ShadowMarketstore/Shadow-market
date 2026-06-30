@@ -4,52 +4,53 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Shadow Market</title>
-  <link rel="stylesheet" href="style.css">
   <style>
-    /* Structure de base et police */
+    /* Design Global */
     body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: #000; color: #fff; margin: 0; padding: 0; }
     
+    /* Header Dynamique (Pleine largeur) */
+    #dynamic-header { width: 100%; margin-bottom: 20px; }
+    #main-logo { width: 100%; height: auto; display: block; }
+
+    /* Grille et Cartes */
+    .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; padding: 10px; }
     .product-card { 
-        border: 2px solid #00ffff; border-radius: 15px; padding: 15px; margin: 15px;
-        position: relative; overflow: hidden; background: #111;
+        position: relative; border: 2px solid #00ffff; border-radius: 15px; 
+        padding: 10px; background: #111; display: flex; flex-direction: column; 
+        justify-content: space-between; min-height: 350px;
     }
 
-    /* Correction cadrage image : 'contain' pour éviter la déformation */
-    .product-img { 
-        width: 100%; height: 180px; background-size: contain; 
-        background-position: center; background-repeat: no-repeat; 
-        background-color: #000; border-radius: 8px; margin-bottom: 10px;
-    }
-    
+    /* Images */
+    .product-img { width: 100%; height: 160px; background-size: contain; background-position: center; background-repeat: no-repeat; border-radius: 8px; background-color: #000; }
+
     /* Typographie */
-    h3 { font-size: 1em; margin: 10px 0; white-space: normal; }
+    h3 { font-size: 0.95em; margin: 5px 0; min-height: 2.4em; }
+    .price-wrapper { margin: 5px 0; }
+    .old-price { text-decoration: line-through; color: #777; font-size: 0.85em; display: block; }
+    .current-price { color: #fff; font-weight: bold; font-size: 1.2em; display: block; }
     
-    /* Prix et Badge */
-    .price-wrapper { margin: 10px 0; }
-    .old-price { text-decoration: line-through; color: #777; font-size: 0.9em; display: block; }
-    .current-price { color: #fff; font-weight: bold; font-size: 1.2em; display: block; margin-top: 2px; }
-
-    .discount-badge {
-        position: absolute; top: 15px; left: 15px; background: #000; color: #00ffff;
-        border: 1px solid #00ffff; padding: 4px 8px; border-radius: 5px; font-weight: bold;
-        z-index: 20; box-shadow: 0 0 5px #00ffff; font-size: 0.8em;
-    }
-
-    .ribbon-badge { 
-        position: absolute; top: 14px; right: -32px; background: #00ffff; color: #000; 
-        font-size: 0.72em; font-weight: bold; padding: 4px 32px; transform: rotate(45deg); 
-        box-shadow: 0 0 8px #00ffff; text-transform: uppercase; z-index: 10; 
-    }
-
-    .buy-btn { width: 100%; background: #ff0033; color: white; border: none; padding: 10px; font-weight: bold; cursor: pointer; border-radius: 5px; margin-top: 10px; }
+    .out-of-stock-text { color: #ff0000; font-weight: bold; margin: 10px 0; display: block; }
     
-    /* Navigation flottante */
+    .buy-btn { width: 100%; background: #ff0033; color: white; border: none; padding: 10px; font-weight: bold; cursor: pointer; border-radius: 5px; margin-top: auto; }
+    .buy-btn:disabled { background: #333; color: #777; cursor: not-allowed; }
+
+    /* Badges */
+    .discount-badge { position: absolute; top: 15px; left: 15px; background: #000; color: #00ffff; border: 1px solid #00ffff; padding: 3px 8px; border-radius: 5px; font-weight: bold; font-size: 0.8em; z-index: 20; }
+    .ribbon-badge { position: absolute; top: 14px; right: -32px; background: #00ffff; color: #000; font-size: 0.7em; font-weight: bold; padding: 4px 32px; transform: rotate(45deg); z-index: 10; }
+
+    /* Navigation */
     .floating-nav { position: fixed; bottom: 20px; left: 10%; right: 10%; background: #111; padding: 15px; border-radius: 30px; border: 1px solid #00ffff; display: flex; justify-content: space-around; z-index: 100; }
     .nav-link { text-decoration: none; color: white; }
     #cart-count { background: #00ffff; color: #000; border-radius: 50%; padding: 2px 6px; font-size: 0.7em; }
   </style>
 </head>
 <body>
+
+  <header id="dynamic-header">
+    <a href="index.html" id="logo-link">
+      <img id="main-logo" src="logo.png" alt="Shadow Market Logo">
+    </a>
+  </header>
 
   <nav class="floating-nav">
     <a href="login.html" class="nav-link">👤</a>
@@ -59,20 +60,19 @@
     <a href="https://discord.gg/XUtWdTPYr" target="_blank" class="nav-link">💬</a>
   </nav>
 
-  <div class="main-content-wrapper">
-    <header>
-      <div class="logo-wrapper"><img src="logo.png" alt="Shadow Market Logo"></div>
-    </header>
-
-    <main>
-      <h1 class="section-title">Produits Disponibles</h1>
-      <div class="products-grid" id="products-container"><p style="text-align: center;">Chargement...</p></div>
-    </main>
-  </div>
+  <main>
+    <div class="products-grid" id="products-container"><p style="text-align: center;">Chargement...</p></div>
+  </main>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     const supabaseClient = supabase.createClient('https://jsuvimxjmjiljntmgbzu.supabase.co', 'sb_publishable_Ngm29impwbTLGhuqyCxSJA_E1jXc1DX');
+
+    // Charger le logo dynamique
+    async function loadLogo() {
+      const { data } = await supabaseClient.from('settings').select('value').eq('key', 'header_logo').single();
+      if (data) document.getElementById('main-logo').src = data.value;
+    }
 
     function updateCartCounter() {
       let panier = JSON.parse(localStorage.getItem('monPanier')) || [];
@@ -88,37 +88,31 @@
 
     async function loadProducts() {
       const container = document.getElementById('products-container');
-      try {
-        const { data: products, error } = await supabaseClient.from('products').select('*');
-        if (error) throw new Error(error.message);
+      const { data: products } = await supabaseClient.from('products').select('*');
+      
+      container.innerHTML = '';
+      products.forEach(p => {
+        const isOutOfStock = p.stock <= 0;
+        let discountHtml = (p.old_price > p.price) ? `<div class="discount-badge">-${Math.round(((p.old_price - p.price) / p.old_price) * 100)}%</div>` : '';
         
-        container.innerHTML = '';
-        products.forEach(p => {
-          // Calcul dynamique de la réduction
-          let discountHtml = '';
-          if (p.old_price && p.price && p.old_price > p.price) {
-            const reduction = Math.round(((p.old_price - p.price) / p.old_price) * 100);
-            discountHtml = `<div class="discount-badge">-${reduction}%</div>`;
+        const card = document.createElement('div');
+        card.className = 'product-card';
+        card.innerHTML = `
+          ${discountHtml}
+          ${(p.is_new) ? `<div class="ribbon-badge">NEW</div>` : ''}
+          <div class="product-img" style="background-image: url('${p.image_url}')"></div>
+          <h3>${p.name}</h3>
+          ${isOutOfStock 
+            ? `<span class="out-of-stock-text">RUPTURE DE STOCK</span>` 
+            : `<div class="price-wrapper"><span class="old-price">${p.old_price} EUR</span><span class="current-price">${p.price} EUR</span></div>`
           }
-
-          const card = document.createElement('div');
-          card.className = 'product-card';
-          card.innerHTML = `
-            ${discountHtml}
-            ${(p.is_new) ? `<div class="ribbon-badge">NEW</div>` : ''}
-            <div class="product-img" style="background-image: url('${p.image_url}')"></div>
-            <h3>${p.name}</h3>
-            <div class="price-wrapper">
-              ${p.old_price ? `<span class="old-price">${p.old_price} EUR</span>` : ''}
-              <span class="current-price">${p.price} EUR</span>
-            </div>
-            <button class="buy-btn" onclick="ajouterAuPanier('${p.name}', ${p.price}, '${p.description}', '${p.image_url}')">AJOUTER AU PANIER</button>
-          `;
-          container.appendChild(card);
-        });
-      } catch (err) {
-        container.innerHTML = `<div class="debug-error">Erreur: ${err.message}</div>`;
-      }
+          <button class="buy-btn" ${isOutOfStock ? 'disabled' : ''} onclick="ajouterAuPanier('${p.name}', ${p.price}, '${p.description}', '${p.image_url}')">
+            ${isOutOfStock ? 'ÉPUISÉ' : 'AJOUTER AU PANIER'}
+          </button>
+        `;
+        container.appendChild(card);
+      });
+      loadLogo();
       updateCartCounter();
     }
     window.onload = loadProducts;
