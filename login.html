@@ -2,8 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Shadow Market - Auth</title>
+  <title>Shadow Market - Connexion</title>
   <link rel="stylesheet" href="style.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -25,24 +24,19 @@
         </div>
       </div>
       <button type="submit" class="submit-btn" id="submitBtn">SE CONNECTER</button>
-      <p id="toggleText" class="auth-toggle" onclick="toggleMode()" style="cursor: pointer; text-align: center; margin-top: 15px; color: #fff;">Pas de compte ? Créer un compte</p>
+      <p id="toggleText" onclick="toggleMode()" style="cursor: pointer; text-align: center; margin-top: 15px; color: #fff;">Pas de compte ? Créer un compte</p>
     </form>
   </div>
 </main>
-
-<nav class="floating-nav">
-  <a href="login.html" class="nav-link active">👤</a>
-  <a href="commande.html" class="nav-link">🛒</a>
-  <a href="index.html" class="nav-link">🏠</a>
-  <a href="https://discord.gg/XUtWdTPYr" target="_blank" class="nav-link">💬</a>
-</nav>
 
 <script>
   const supabase = supabase.createClient('https://jsuvimxjmjiljntmgbzu.supabase.co', 'sb_publishable_Ngm29impwbTLGhuqyCxSJA_E1jXc1DX');
   let isLogin = true;
 
-  // Redirection si déjà connecté
-  supabase.auth.getSession().then(({ data: { session } }) => { if (session) window.location.href = "profil.html"; });
+  // Redirection immédiate si déjà connecté
+  supabase.auth.getSession().then(({ data: { session } }) => {
+    if (session) window.location.href = "profil.html";
+  });
 
   function toggleMode() {
     isLogin = !isLogin;
@@ -52,21 +46,22 @@
   }
 
   function togglePassword() {
-    const passInput = document.getElementById('password');
-    const eyeIcon = document.getElementById('eyeIcon');
-    passInput.type = (passInput.type === 'password') ? 'text' : 'password';
-    eyeIcon.innerText = (passInput.type === 'password') ? '🙉' : '🙈';
+    const p = document.getElementById('password');
+    const i = document.getElementById('eyeIcon');
+    if (p.type === 'password') { p.type = 'text'; i.innerText = '🙉'; }
+    else { p.type = 'password'; i.innerText = '🙈'; }
   }
 
   document.getElementById('authForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
-    const { data, error } = isLogin ? 
+
+    const { error } = isLogin ? 
       await supabase.auth.signInWithPassword({ email, password }) : 
       await supabase.auth.signUp({ email, password });
 
-    if (error) { alert("Erreur : " + error.message); } 
+    if (error) { alert("Erreur : " + error.message); }
     else { window.location.href = "profil.html"; }
   });
 </script>
