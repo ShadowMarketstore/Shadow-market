@@ -7,6 +7,7 @@
   <style>
     body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: #000; color: #fff; margin: 0; padding: 0; padding-bottom: 120px; }
     
+    /* En-tête avec logo agrandi */
     #dynamic-header { width: 100%; padding: 60px 0; display: flex; justify-content: center; background: #0a0a0a; border-bottom: 2px solid #00ffff; margin-bottom: 25px; }
     #main-logo { width: 85%; max-height: 450px; object-fit: contain; }
 
@@ -67,6 +68,9 @@
           const card = document.createElement('div');
           card.className = 'product-card';
           
+          // Encodage du produit pour le passage en paramètre
+          const productParam = encodeURIComponent(JSON.stringify(p));
+          
           card.innerHTML = `
             ${discount > 0 ? `<div class="discount-badge">-${discount}%</div>` : ''}
             <div class="product-img" style="background-image: url('${p.image_url}')"></div>
@@ -76,7 +80,7 @@
                 ${p.old_price > p.price ? `<span class="old-price">${p.old_price} EUR</span>` : ''}
                 <span class="current-price">${p.price} EUR</span>
             </div>
-            <button class="buy-btn" ${isOutOfStock ? 'disabled' : ''} onclick="handlePurchase('${encodeURIComponent(JSON.stringify(p))}', ${stockVal})">
+            <button class="buy-btn" ${isOutOfStock ? 'disabled' : ''} onclick="handlePurchase('${productParam}', ${stockVal})">
                 ${isOutOfStock ? 'ÉPUISÉ' : 'AJOUTER AU PANIER'}
             </button>
           `;
@@ -88,20 +92,21 @@
 
     async function handlePurchase(encodedProduct, currentStock) {
       if (currentStock > 0) {
-        // 1. Ajout au LocalStorage sans confirmation
         const product = JSON.parse(decodeURIComponent(encodedProduct));
-        let panier = JSON.parse(localStorage.getItem('monPanier')) || [];
-        panier.push(product);
-        localStorage.setItem('monPanier', JSON.stringify(panier));
-        updateCartCount();
-
-        // 2. Mise à jour automatique en base de données
+        
+        // 1. Mise à jour de la base de données
         await supabaseClient
           .from('products')
           .update({ stock_quantity: currentStock - 1 })
           .eq('id', product.id);
 
-        // 3. Rafraîchissement silencieux de l'affichage
+        // 2. Ajout au LocalStorage sans confirmation
+        let panier = JSON.parse(localStorage.getItem('monPanier')) || [];
+        panier.push(product);
+        localStorage.setItem('monPanier', JSON.stringify(panier));
+        
+        // 3. Mise à jour instantanée
+        updateCartCount();
         loadData();
       }
     }
