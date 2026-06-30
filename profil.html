@@ -21,7 +21,6 @@
     .loyalty-value { font-size: 2.5em; font-weight: bold; color: #fff; text-shadow: 0 0 10px #00ffff; }
     .info-msg { color: #00ffff; font-size: 0.9em; margin-top: 10px; font-style: italic; }
 
-    /* Fenêtre modale */
     .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 3000; justify-content: center; align-items: center; }
     .modal-content { background: #111; padding: 30px; border: 2px solid #00ffff; border-radius: 20px; text-align: center; width: 300px; }
     input { background: #000; border: 1px solid #00ffff; color: #fff; padding: 10px; width: 80%; margin: 10px 0; border-radius: 5px; text-align: center; }
@@ -62,12 +61,20 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
+    // Initialisation
     const supabaseClient = supabase.createClient('https://jsuvimxjmjiljntmgbzu.supabase.co', 'sb_publishable_Ngm29impwbTLGhuqyCxSJA_E1jXc1DX');
 
+    // 1. SÉCURITÉ : Vérification de connexion obligatoire
+    if (localStorage.getItem('isLoggedIn') !== 'true') {
+        window.location.href = "login.html";
+    }
+
+    // Fonctions Menu et Modale
     function toggleMenu() { document.getElementById('sidebar').classList.toggle('active'); }
     function openModal() { document.getElementById('modal').style.display = 'flex'; }
     function closeModal() { document.getElementById('modal').style.display = 'none'; }
 
+    // Logique de conversion
     async function generateCode() {
         const pts = parseInt(document.getElementById('ptsInput').value);
         const currentPts = parseInt(document.getElementById('user-points').innerText);
@@ -76,7 +83,6 @@
         
         const code = "SHADOW-" + Math.random().toString(36).substr(2, 6).toUpperCase();
         
-        // Sauvegarde dans Supabase
         await supabaseClient.from('discounts').insert([{ code, discount_percent: pts, used: false, owner_email: localStorage.getItem('userEmail') }]);
         await supabaseClient.from('users').update({ points: currentPts - pts }).eq('email', localStorage.getItem('userEmail'));
         
@@ -85,11 +91,18 @@
         document.getElementById('user-points-display').innerText = currentPts - pts;
     }
 
-    function logout() { localStorage.clear(); window.location.href = 'index.html'; }
+    // 2. DÉCONNEXION : Nettoyage complet
+    function logout() { 
+        localStorage.clear(); 
+        window.location.href = 'login.html'; 
+    }
     
-    // Charger points au démarrage
+    // Chargement au démarrage
     window.onload = async () => {
-        const { data } = await supabaseClient.from('users').select('points').eq('email', localStorage.getItem('userEmail')).single();
+        const email = localStorage.getItem('userEmail');
+        document.getElementById('displayEmail').innerText = email;
+
+        const { data } = await supabaseClient.from('users').select('points').eq('email', email).single();
         if (data) { 
             document.getElementById('user-points').innerText = data.points; 
             document.getElementById('user-points-display').innerText = data.points; 
