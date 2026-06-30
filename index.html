@@ -20,8 +20,30 @@
         position: absolute; top: -5px; right: -5px; background: #00ffff; color: #000; 
         border-radius: 50%; padding: 2px 5px; font-size: 0.6em; font-weight: bold; 
     }
-    .product-card { position: relative; overflow: hidden; }
+    .product-card { position: relative; overflow: hidden; padding-bottom: 10px; }
+    
+    /* Nouveau badge de réduction 3D */
+    .discount-badge {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        background: #000;
+        color: #fff;
+        border: 1px solid #00ffff;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.75em;
+        font-weight: bold;
+        z-index: 15;
+        box-shadow: 0 0 5px #00ffff;
+    }
+
     .ribbon-badge { position: absolute; top: 14px; right: -32px; background: #00ffff; color: #000; font-size: 0.72em; font-weight: bold; padding: 4px 32px; transform: rotate(45deg); box-shadow: 0 0 8px #00ffff; text-transform: uppercase; letter-spacing: 1px; z-index: 10; }
+    
+    /* Style prix */
+    .old-price { text-decoration: line-through; color: #888; font-size: 0.85em; margin-right: 5px; }
+    .current-price { color: #fff; font-weight: bold; }
+
     .debug-error { color: #ff0000; background: #222; padding: 15px; border: 1px solid #ff0000; border-radius: 5px; margin: 20px; font-family: monospace; }
   </style>
 </head>
@@ -55,7 +77,6 @@
       document.getElementById('cart-count').innerText = panier.length;
     }
 
-    // Ajout direct sans alerte de confirmation
     function ajouterAuPanier(nom, prix, desc, image) {
       let panier = JSON.parse(localStorage.getItem('monPanier')) || [];
       panier.push({ nom, prix, desc, image });
@@ -73,11 +94,17 @@
         products.forEach(p => {
           const card = document.createElement('div');
           card.className = 'product-card';
+          
+          // Logique pour badge réduction et prix barré
+          const oldPriceHtml = p.old_price ? `<span class="old-price">${p.old_price}</span>` : '';
+          const discountHtml = p.discount_percent ? `<div class="discount-badge">${p.discount_percent}%</div>` : '';
+
           card.innerHTML = `
+            ${discountHtml}
             ${(p.ribbon && p.ribbon !== 'none') ? `<div class="ribbon-badge">${p.ribbon.toUpperCase()}</div>` : ''}
             <div class="product-img" style="background-image: url('${p.image_url}')"></div>
             <h3>${p.name}</h3>
-            <p>${p.price} EUR</p>
+            <p>${oldPriceHtml} <span class="current-price">${p.price} EUR</span></p>
             <button class="buy-btn" onclick="ajouterAuPanier('${p.name}', ${p.price}, '${p.description}', '${p.image_url}')">AJOUTER AU PANIER</button>
           `;
           container.appendChild(card);
