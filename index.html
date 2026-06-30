@@ -6,35 +6,34 @@
   <title>Shadow Market</title>
   <link rel="stylesheet" href="style.css">
   <style>
-    /* Structure de base et police */
-    body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: #000; color: #fff; margin: 0; padding: 0; }
+    /* Structure et police conservées pour une lisibilité maximale */
+    .product-img { width: 100%; height: 180px; background-size: cover; background-position: center; background-repeat: no-repeat; border-radius: 8px; }
     
     .product-card { 
-        border: 2px solid #00ffff; border-radius: 15px; padding: 10px; margin: 15px;
-        position: relative; overflow: hidden; background: #111;
-    }
-    .product-img { width: 100%; height: 180px; background-size: cover; background-position: center; border-radius: 8px; }
-    
-    /* Typographie */
-    h3 { font-size: 1em; margin: 10px 0; white-space: normal; }
-    
-    /* Prix et Badge */
-    .price-container { display: flex; align-items: baseline; gap: 8px; margin: 10px 0; }
-    .old-price { text-decoration: line-through; color: #777; font-size: 0.85em; }
-    .current-price { color: #fff; font-weight: bold; font-size: 1.1em; }
-
-    .discount-badge {
-        position: absolute; top: 15px; left: 15px; background: #000; color: #00ffff;
-        border: 1px solid #00ffff; padding: 3px 8px; border-radius: 5px; font-weight: bold;
-        z-index: 20; box-shadow: 0 0 5px #00ffff;
+        position: relative; overflow: hidden; padding: 15px; border: 2px solid #00ffff; 
+        border-radius: 15px; margin-bottom: 20px; background: #111;
     }
 
-    .buy-btn { width: 100%; background: #ff0033; color: white; border: none; padding: 10px; font-weight: bold; cursor: pointer; border-radius: 5px; }
-    
-    /* Navigation flottante */
-    .floating-nav { position: fixed; bottom: 20px; left: 10%; right: 10%; background: #111; padding: 15px; border-radius: 30px; border: 1px solid #00ffff; display: flex; justify-content: space-around; z-index: 100; }
-    .nav-link { text-decoration: none; color: white; }
-    #cart-count { background: #00ffff; color: #000; border-radius: 50%; padding: 2px 6px; font-size: 0.7em; }
+    /* Badge de réduction dynamique */
+    .discount-badge { 
+        position: absolute; top: 15px; left: 15px; background: #000; color: #00ffff; 
+        border: 1px solid #00ffff; padding: 4px 8px; border-radius: 5px; font-weight: bold; 
+        z-index: 20; box-shadow: 0 0 5px #00ffff; font-size: 0.8em;
+    }
+
+    /* Badge "NEW" */
+    .ribbon-badge { 
+        position: absolute; top: 14px; right: -32px; background: #00ffff; color: #000; 
+        font-size: 0.72em; font-weight: bold; padding: 4px 32px; transform: rotate(45deg); 
+        box-shadow: 0 0 8px #00ffff; text-transform: uppercase; z-index: 10; 
+    }
+
+    /* Gestion des prix propre */
+    .price-wrapper { margin: 10px 0; }
+    .old-price { text-decoration: line-through; color: #777; font-size: 0.9em; display: block; }
+    .current-price { color: #fff; font-weight: bold; font-size: 1.2em; display: block; margin-top: 2px; }
+
+    .buy-btn { width: 100%; background: #ff0033; color: white; border: none; padding: 10px; font-weight: bold; cursor: pointer; border-radius: 5px; margin-top: 10px; }
   </style>
 </head>
 <body>
@@ -54,7 +53,7 @@
 
     <main>
       <h1 class="section-title">Produits Disponibles</h1>
-      <div class="products-grid" id="products-container"><p style="text-align: center;">Chargement...</p></div>
+      <div class="products-grid" id="products-container"><p style="color: #00ffff; text-align: center;">Chargement...</p></div>
     </main>
   </div>
 
@@ -67,13 +66,6 @@
       document.getElementById('cart-count').innerText = panier.length;
     }
 
-    function ajouterAuPanier(nom, prix, desc, image) {
-      let panier = JSON.parse(localStorage.getItem('monPanier')) || [];
-      panier.push({ nom, prix, desc, image });
-      localStorage.setItem('monPanier', JSON.stringify(panier));
-      updateCartCounter();
-    }
-
     async function loadProducts() {
       const container = document.getElementById('products-container');
       try {
@@ -82,9 +74,9 @@
         
         container.innerHTML = '';
         products.forEach(p => {
-          // Logique calcul réduction dynamique
+          // Logique calcul réduction
           let discountHtml = '';
-          if (p.old_price > p.price) {
+          if (p.old_price && p.price && p.old_price > p.price) {
             const reduction = Math.round(((p.old_price - p.price) / p.old_price) * 100);
             discountHtml = `<div class="discount-badge">-${reduction}%</div>`;
           }
@@ -93,9 +85,10 @@
           card.className = 'product-card';
           card.innerHTML = `
             ${discountHtml}
+            ${(p.is_new) ? `<div class="ribbon-badge">NEW</div>` : ''}
             <div class="product-img" style="background-image: url('${p.image_url}')"></div>
             <h3>${p.name}</h3>
-            <div class="price-container">
+            <div class="price-wrapper">
               ${p.old_price ? `<span class="old-price">${p.old_price} EUR</span>` : ''}
               <span class="current-price">${p.price} EUR</span>
             </div>
@@ -104,7 +97,7 @@
           container.appendChild(card);
         });
       } catch (err) {
-        container.innerHTML = `<div class="debug-error">Erreur: ${err.message}</div>`;
+        container.innerHTML = `<p style="color:red">Erreur chargement</p>`;
       }
       updateCartCounter();
     }
@@ -112,3 +105,4 @@
   </script>
 </body>
 </html>
+
