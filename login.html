@@ -15,14 +15,15 @@
     <form id="authForm" autocomplete="off">
       <div class="form-group">
         <label>Email</label>
-        <input type="email" id="email" required autocomplete="new-password">
+        <input type="email" id="email" required>
       </div>
       
       <div class="form-group">
         <label>Mot de passe</label>
         <div style="position: relative; display: flex; align-items: center;">
-          <input type="password" id="password" required style="padding-right: 40px; width: 100%;" autocomplete="new-password">
-          <span id="eyeIcon" onclick="togglePassword()" style="position: absolute; right: 10px; cursor: pointer; color: #00f3ff; user-select: none;">👁️</span>
+          <input type="password" id="password" required style="padding-right: 40px; width: 100%;">
+          <!-- Thème singe appliqué ici -->
+          <span id="eyeIcon" onclick="togglePassword()" style="position: absolute; right: 10px; cursor: pointer; color: #00f3ff; user-select: none;">🐵</span>
         </div>
       </div>
       
@@ -35,14 +36,9 @@
   </div>
 </main>
 
-<nav class="floating-nav">
-  <a href="login.html" class="nav-link active">👤</a>
-  <a href="commande.html" class="nav-link">🛒</a>
-  <a href="index.html" class="nav-link">🏠</a>
-  <a href="https://discord.gg/XUtWdTPYr" target="_blank" class="nav-link">💬</a>
-</nav>
-
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+  const supabase = supabase.createClient('https://jsuvimxjmjiljntmgbzu.supabase.co', 'sb_publishable_Ngm29impwbTLGhuqyCxSJA_E1jXc1DX');
   let isLogin = true;
 
   function toggleMode() {
@@ -55,7 +51,7 @@
   function togglePassword() {
     const passInput = document.getElementById('password');
     const eyeIcon = document.getElementById('eyeIcon');
-    
+    // Changement d'icône pour rester dans le thème singe
     if (passInput.type === 'password') {
       passInput.type = 'text';
       eyeIcon.innerText = '🙉'; 
@@ -65,11 +61,24 @@
     }
   }
 
-  document.getElementById('authForm').addEventListener('submit', function(e) {
+  document.getElementById('authForm').addEventListener('submit', async function(e) {
     e.preventDefault();
-    localStorage.setItem('isLoggedIn', 'true');
-    localStorage.setItem('userEmail', document.getElementById('email').value);
-    window.location.href = "profil.html"; 
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+
+    let response;
+    if (isLogin) {
+      response = await supabase.auth.signInWithPassword({ email, password });
+    } else {
+      response = await supabase.auth.signUp({ email, password });
+    }
+
+    if (response.error) {
+      alert("Erreur : " + response.error.message);
+    } else {
+      localStorage.setItem('userEmail', email);
+      window.location.href = "profil.html";
+    }
   });
 </script>
 
