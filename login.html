@@ -2,13 +2,47 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Shadow Market - Connexion</title>
-  <link rel="stylesheet" href="style.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    body { 
+      background: #000; color: #fff; font-family: 'Segoe UI', sans-serif; 
+      margin: 0; padding: 20px; 
+      display: flex; justify-content: center; align-items: center; min-height: 100vh;
+    }
+    
+    .order-form { 
+      width: 100%; 
+      max-width: 400px; 
+      background: #111; 
+      padding: 25px; 
+      border: 2px solid #00ffff; 
+      border-radius: 15px; 
+      box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+    }
+
+    .form-group { margin-bottom: 15px; }
+    
+    label { display: block; margin-bottom: 5px; color: #00ffff; }
+    
+    input { 
+      background: #000; border: 1px solid #00ffff; color: #fff; 
+      padding: 12px; width: 100%; box-sizing: border-box; 
+      border-radius: 5px;
+    }
+
+    .submit-btn { 
+      width: 100%; padding: 12px; background: #ff0040; color: white; 
+      border: none; border-radius: 5px; font-weight: bold; cursor: pointer; margin-top: 10px;
+    }
+    
+    #eyeIcon { cursor: pointer; color: #00f3ff; user-select: none; }
+  </style>
 </head>
 <body>
 
-<main class="main-content-wrapper" style="padding-top: 50px;">
+<main class="main-content-wrapper">
   <div class="order-form">
     <h2 id="formTitle" style="color: #00f3ff; text-align: center; margin-bottom: 20px;">CONNEXION</h2>
     <form id="authForm" autocomplete="off">
@@ -19,8 +53,8 @@
       <div class="form-group">
         <label>Mot de passe</label>
         <div style="position: relative; display: flex; align-items: center;">
-          <input type="password" id="password" required style="padding-right: 40px; width: 100%;">
-          <span id="eyeIcon" onclick="togglePassword()" style="position: absolute; right: 10px; cursor: pointer; color: #00f3ff; user-select: none;">🙈</span>
+          <input type="password" id="password" required style="padding-right: 40px;">
+          <span id="eyeIcon" onclick="togglePassword()" style="position: absolute; right: 10px;">🙈</span>
         </div>
       </div>
       <button type="submit" class="submit-btn" id="submitBtn">SE CONNECTER</button>
@@ -30,7 +64,6 @@
 </main>
 
 <script>
-  // Renommé en "db" pour éviter la collision avec l'objet global "supabase" du CDN
   const db = supabase.createClient(
     'https://jsuvimxjmjiljntmgbzu.supabase.co',
     'sb_publishable_Ngm29impwbTLGhuqyCxSJA_E1jXc1DX'
@@ -38,7 +71,6 @@
 
   let isLogin = true;
 
-  // Redirection immédiate si une session valide existe déjà
   db.auth.getSession().then(({ data: { session } }) => {
     if (session) window.location.href = "profil.html";
   });
@@ -64,33 +96,26 @@
 
   document.getElementById('authForm').addEventListener('submit', async (e) => {
     e.preventDefault();
-
     const submitBtn = document.getElementById('submitBtn');
     submitBtn.disabled = true;
 
     const email = document.getElementById('email').value.trim();
     const password = document.getElementById('password').value;
 
-    try {
-      const { data, error } = isLogin
-        ? await db.auth.signInWithPassword({ email, password })
-        : await db.auth.signUp({ email, password });
+    const { data, error } = isLogin
+      ? await db.auth.signInWithPassword({ email, password })
+      : await db.auth.signUp({ email, password });
 
-      if (error) {
-        alert("Erreur : " + error.message);
-        return;
-      }
+    if (error) {
+      alert("Erreur : " + error.message);
+      submitBtn.disabled = false;
+      return;
+    }
 
-      // Sécurité : on ne redirige que si une session valide existe réellement
-      if (data?.session) {
-        window.location.href = "profil.html";
-      } else if (!isLogin) {
-        // Cas signUp avec confirmation email activée : pas de session immédiate
-        alert("Compte créé. Vérifie ta boîte mail pour confirmer ton inscription.");
-      }
-    } catch (err) {
-      alert("Erreur réseau ou serveur : " + err.message);
-    } finally {
+    if (data?.session) {
+      window.location.href = "profil.html";
+    } else if (!isLogin) {
+      alert("Compte créé. Vérifie ta boîte mail pour confirmer.");
       submitBtn.disabled = false;
     }
   });
