@@ -22,7 +22,7 @@
         <label>Mot de passe</label>
         <div style="position: relative; display: flex; align-items: center;">
           <input type="password" id="password" required style="padding-right: 40px; width: 100%;" autocomplete="new-password">
-          <span id="eyeIcon" onclick="togglePassword()" style="position: absolute; right: 10px; cursor: pointer; color: #00f3ff; user-select: none;">👁️</span>
+          <span id="eyeIcon" onclick="togglePassword()" style="position: absolute; right: 10px; cursor: pointer; color: #00f3ff; user-select: none;">🐵</span>
         </div>
       </div>
       
@@ -43,6 +43,11 @@
 </nav>
 
 <script>
+  // 1. Vérification automatique au chargement de la page
+  if (localStorage.getItem('isLoggedIn') === 'true') {
+    window.location.href = "profil.html";
+  }
+
   let isLogin = true;
 
   function toggleMode() {
@@ -58,17 +63,20 @@
     
     if (passInput.type === 'password') {
       passInput.type = 'text';
-      eyeIcon.innerText = '🙉'; 
+      eyeIcon.innerText = '🐒'; // Thème singe
     } else {
       passInput.type = 'password';
-      eyeIcon.innerText = '🙈'; 
+      eyeIcon.innerText = '🐵'; // Thème singe
     }
   }
 
   document.getElementById('authForm').addEventListener('submit', function(e) {
     e.preventDefault();
+    // Simulation de connexion
     localStorage.setItem('isLoggedIn', 'true');
     localStorage.setItem('userEmail', document.getElementById('email').value);
+    
+    // Redirection après connexion
     window.location.href = "profil.html"; 
   });
 </script>
