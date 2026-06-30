@@ -7,42 +7,68 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     body { 
-      background: #000; color: #fff; font-family: 'Segoe UI', sans-serif; 
-      margin: 0; padding: 20px; 
-      display: flex; justify-content: center; align-items: center; min-height: 100vh;
+      background: #000; 
+      color: #fff; 
+      font-family: 'Segoe UI', sans-serif; 
+      margin: 0; 
+      padding: 20px; 
+      display: flex; 
+      justify-content: center; 
+      align-items: center; 
+      min-height: 100vh;
+      box-sizing: border-box;
     }
     
     .order-form { 
       width: 100%; 
       max-width: 400px; 
       background: #111; 
-      padding: 25px; 
+      padding: 30px; 
       border: 2px solid #00ffff; 
-      border-radius: 15px; 
+      border-radius: 20px; 
       box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+      box-sizing: border-box;
     }
 
-    .form-group { margin-bottom: 15px; }
+    .form-group { margin-bottom: 20px; }
     
     label { display: block; margin-bottom: 5px; color: #00ffff; }
     
     input { 
-      background: #000; border: 1px solid #00ffff; color: #fff; 
-      padding: 12px; width: 100%; box-sizing: border-box; 
+      background: #000; 
+      border: 1px solid #00ffff; 
+      color: #fff; 
+      padding: 12px; 
+      width: 100%; 
+      box-sizing: border-box; 
       border-radius: 5px;
+      margin-top: 5px;
     }
 
     .submit-btn { 
-      width: 100%; padding: 12px; background: #ff0040; color: white; 
-      border: none; border-radius: 5px; font-weight: bold; cursor: pointer; margin-top: 10px;
+      width: 100%; 
+      padding: 12px; 
+      background: #ff0040; 
+      color: white; 
+      border: none; 
+      border-radius: 5px; 
+      font-weight: bold; 
+      cursor: pointer; 
+      margin-top: 10px;
     }
     
-    #eyeIcon { cursor: pointer; color: #00f3ff; user-select: none; }
+    #eyeIcon { 
+      cursor: pointer; 
+      color: #00f3ff; 
+      user-select: none; 
+      position: absolute; 
+      right: 15px; 
+    }
   </style>
 </head>
 <body>
 
-<main class="main-content-wrapper">
+<main class="main-content-wrapper" style="width: 100%; display: flex; justify-content: center;">
   <div class="order-form">
     <h2 id="formTitle" style="color: #00f3ff; text-align: center; margin-bottom: 20px;">CONNEXION</h2>
     <form id="authForm" autocomplete="off">
@@ -53,8 +79,8 @@
       <div class="form-group">
         <label>Mot de passe</label>
         <div style="position: relative; display: flex; align-items: center;">
-          <input type="password" id="password" required style="padding-right: 40px;">
-          <span id="eyeIcon" onclick="togglePassword()" style="position: absolute; right: 10px;">🙈</span>
+          <input type="password" id="password" required style="padding-right: 45px;">
+          <span id="eyeIcon" onclick="togglePassword()">🙈</span>
         </div>
       </div>
       <button type="submit" class="submit-btn" id="submitBtn">SE CONNECTER</button>
@@ -122,3 +148,4 @@
 </script>
 </body>
 </html>
+
