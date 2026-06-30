@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Shadow Market - Auth</title>
   <link rel="stylesheet" href="style.css">
+  <!-- Chargement de la bibliothèque Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
@@ -22,7 +24,7 @@
         <label>Mot de passe</label>
         <div style="position: relative; display: flex; align-items: center;">
           <input type="password" id="password" required style="padding-right: 40px; width: 100%;">
-          <!-- Thème singe appliqué ici -->
+          <!-- L'icône singe est ici -->
           <span id="eyeIcon" onclick="togglePassword()" style="position: absolute; right: 10px; cursor: pointer; color: #00f3ff; user-select: none;">🐵</span>
         </div>
       </div>
@@ -36,11 +38,12 @@
   </div>
 </main>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+  // Initialisation Supabase
   const supabase = supabase.createClient('https://jsuvimxjmjiljntmgbzu.supabase.co', 'sb_publishable_Ngm29impwbTLGhuqyCxSJA_E1jXc1DX');
   let isLogin = true;
 
+  // Gestion du mode Connexion/Inscription
   function toggleMode() {
     isLogin = !isLogin;
     document.getElementById('formTitle').innerText = isLogin ? "CONNEXION" : "CRÉER UN COMPTE";
@@ -48,10 +51,11 @@
     document.getElementById('toggleText').innerText = isLogin ? "Pas de compte ? Créer un compte" : "Déjà un compte ? Connexion";
   }
 
+  // Gestion du thème singe (affichage mot de passe)
   function togglePassword() {
     const passInput = document.getElementById('password');
     const eyeIcon = document.getElementById('eyeIcon');
-    // Changement d'icône pour rester dans le thème singe
+    
     if (passInput.type === 'password') {
       passInput.type = 'text';
       eyeIcon.innerText = '🙉'; 
@@ -61,6 +65,7 @@
     }
   }
 
+  // Soumission du formulaire
   document.getElementById('authForm').addEventListener('submit', async function(e) {
     e.preventDefault();
     const email = document.getElementById('email').value;
@@ -76,6 +81,7 @@
     if (response.error) {
       alert("Erreur : " + response.error.message);
     } else {
+      // Stockage simple pour l'affichage profil et redirection
       localStorage.setItem('userEmail', email);
       window.location.href = "profil.html";
     }
