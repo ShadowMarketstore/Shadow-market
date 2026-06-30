@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Shadow Market - Profil</title>
+  <title>Shadow Market - Espace Personnel</title>
   <style>
     body { background: #000; color: #fff; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; }
     
@@ -19,7 +19,14 @@
     /* Contenu Principal */
     .main-content-wrapper { max-width: 500px; margin: 80px auto 0 auto; background: #111; padding: 30px; border: 2px solid #00ffff; border-radius: 20px; box-shadow: 0 0 15px rgba(0, 255, 255, 0.3); text-align: center; }
     h1 { color: #00ffff; text-transform: uppercase; letter-spacing: 2px; }
-    #userInfo { margin: 25px 0; padding: 20px; border: 1px solid #00ffff; border-radius: 10px; background: #0a0a0a; box-shadow: inset 0 0 10px rgba(0, 255, 255, 0.2); }
+    
+    /* Carte de Fidélité */
+    .loyalty-card { background: linear-gradient(135deg, #0a0a0a, #1a1a1a); border: 2px solid #00ffff; border-radius: 15px; padding: 20px; margin: 20px auto; box-shadow: 0 0 20px rgba(0, 255, 255, 0.2); }
+    .loyalty-header { color: #00ffff; font-size: 0.8em; letter-spacing: 2px; margin-bottom: 10px; }
+    .loyalty-value { font-size: 2.5em; font-weight: bold; color: #fff; text-shadow: 0 0 10px #00ffff; }
+    .loyalty-footer { color: #777; font-size: 0.75em; margin-top: 10px; }
+
+    #userInfo { margin: 25px 0; padding: 15px; border: 1px solid #00ffff; border-radius: 10px; background: #0a0a0a; }
   </style>
 </head>
 <body>
@@ -36,29 +43,49 @@
 
   <main class="main-content-wrapper">
     <h1>Espace Personnel</h1>
-    <p>Bienvenue sur ton profil !</p>
+    
+    <div class="loyalty-card">
+        <div class="loyalty-header">SOLDE DE POINTS</div>
+        <div class="loyalty-value">💎 <span id="user-points-display">0</span></div>
+        <div class="loyalty-footer">2€ = 1 point | Vidéo = 1 point</div>
+    </div>
     
     <div id="userInfo">
       <p>Email : <strong id="displayEmail"></strong></p>
     </div>
   </main>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    // Toggle Menu
-    function toggleMenu() { document.getElementById('sidebar').classList.toggle('active'); }
-    
-    // Vérification session
-    if (localStorage.getItem('isLoggedIn') !== 'true') {
-      window.location.href = "login.html";
-    }
+    const supabaseClient = supabase.createClient('https://jsuvimxjmjiljntmgbzu.supabase.co', 'sb_publishable_Ngm29impwbTLGhuqyCxSJA_E1jXc1DX');
 
-    // Affichage info
-    document.getElementById('displayEmail').innerText = localStorage.getItem('userEmail') || 'Non défini';
+    function toggleMenu() { document.getElementById('sidebar').classList.toggle('active'); }
+
+    async function loadUserData() {
+      const email = localStorage.getItem('userEmail');
+      if (!email) window.location.href = "login.html";
+      
+      document.getElementById('displayEmail').innerText = email;
+
+      // Récupération des points depuis Supabase
+      const { data, error } = await supabaseClient
+        .from('users')
+        .select('points')
+        .eq('email', email)
+        .single();
+        
+      if (data) {
+        document.getElementById('user-points-display').innerText = data.points;
+        document.getElementById('user-points').innerText = data.points;
+      }
+    }
 
     function logout() {
       localStorage.clear();
       window.location.href = 'index.html';
     }
+
+    window.onload = loadUserData;
   </script>
 </body>
 </html>
