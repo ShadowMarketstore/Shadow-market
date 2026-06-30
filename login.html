@@ -20,7 +20,7 @@
         <label>Mot de passe</label>
         <div style="position: relative; display: flex; align-items: center;">
           <input type="password" id="password" required style="padding-right: 40px; width: 100%;">
-          <span id="eyeIcon" onclick="togglePassword()" style="position: absolute; right: 10px; cursor: pointer; color: #00f3ff; user-select: none;">🐵</span>
+          <span id="eyeIcon" onclick="togglePassword()" style="position: absolute; right: 10px; cursor: pointer; color: #00f3ff; user-select: none;">🙈</span>
         </div>
       </div>
       <button type="submit" class="submit-btn" id="submitBtn">SE CONNECTER</button>
@@ -30,11 +30,16 @@
 </main>
 
 <script>
-  const supabase = supabase.createClient('https://jsuvimxjmjiljntmgbzu.supabase.co', 'sb_publishable_Ngm29impwbTLGhuqyCxSJA_E1jXc1DX');
+  // Renommé en "db" pour éviter la collision avec l'objet global "supabase" du CDN
+  const db = supabase.createClient(
+    'https://jsuvimxjmjiljntmgbzu.supabase.co',
+    'sb_publishable_Ngm29impwbTLGhuqyCxSJA_E1jXc1DX'
+  );
+
   let isLogin = true;
 
-  // Redirection immédiate si déjà connecté
-  supabase.auth.getSession().then(({ data: { session } }) => {
+  // Redirection immédiate si une session valide existe déjà
+  db.auth.getSession().then(({ data: { session } }) => {
     if (session) window.location.href = "profil.html";
   });
 
@@ -48,21 +53,46 @@
   function togglePassword() {
     const p = document.getElementById('password');
     const i = document.getElementById('eyeIcon');
-    if (p.type === 'password') { p.type = 'text'; i.innerText = '🙉'; }
-    else { p.type = 'password'; i.innerText = '🙈'; }
+    if (p.type === 'password') {
+      p.type = 'text';
+      i.innerText = '🙉';
+    } else {
+      p.type = 'password';
+      i.innerText = '🙈';
+    }
   }
 
   document.getElementById('authForm').addEventListener('submit', async (e) => {
     e.preventDefault();
-    const email = document.getElementById('email').value;
+
+    const submitBtn = document.getElementById('submitBtn');
+    submitBtn.disabled = true;
+
+    const email = document.getElementById('email').value.trim();
     const password = document.getElementById('password').value;
 
-    const { error } = isLogin ? 
-      await supabase.auth.signInWithPassword({ email, password }) : 
-      await supabase.auth.signUp({ email, password });
+    try {
+      const { data, error } = isLogin
+        ? await db.auth.signInWithPassword({ email, password })
+        : await db.auth.signUp({ email, password });
 
-    if (error) { alert("Erreur : " + error.message); }
-    else { window.location.href = "profil.html"; }
+      if (error) {
+        alert("Erreur : " + error.message);
+        return;
+      }
+
+      // Sécurité : on ne redirige que si une session valide existe réellement
+      if (data?.session) {
+        window.location.href = "profil.html";
+      } else if (!isLogin) {
+        // Cas signUp avec confirmation email activée : pas de session immédiate
+        alert("Compte créé. Vérifie ta boîte mail pour confirmer ton inscription.");
+      }
+    } catch (err) {
+      alert("Erreur réseau ou serveur : " + err.message);
+    } finally {
+      submitBtn.disabled = false;
+    }
   });
 </script>
 </body>
