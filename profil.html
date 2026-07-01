@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mon Espace - Shadow Market</title>
-    <!-- SDK Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
@@ -19,20 +18,54 @@
             background-color: var(--bg-color);
             color: #fff;
             font-family: sans-serif;
-            padding: 20px;
             margin: 0;
+            padding: 0;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Barre latérale (Sidebar) d'origine */
+        .sidebar {
+            width: 60px;
+            background: #000;
+            border-right: 1px solid #111;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 20px;
+            gap: 20px;
+        }
+
+        .menu-toggle {
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            width: 25px;
+        }
+
+        .menu-toggle span {
+            display: block;
+            height: 3px;
+            width: 100%;
+            background: var(--cyan-neon);
+            border-radius: 2px;
+            transition: 0.3s;
+        }
+
+        /* Conteneur Principal */
+        .main-content {
+            flex: 1;
             display: flex;
             justify-content: center;
+            padding: 20px;
+            box-sizing: border-box;
         }
 
         .container {
             width: 100%;
             max-width: 450px;
-            border: 2px solid var(--cyan-neon);
-            border-radius: 12px;
-            padding: 20px;
-            background: #000;
-            box-shadow: 0 0 15px rgba(0, 255, 255, 0.1);
+            margin-top: 20px;
         }
 
         /* En-tête du solde */
@@ -43,6 +76,7 @@
             text-align: center;
             margin-bottom: 25px;
             background: var(--panel-bg);
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.1);
         }
 
         .diamond-counter {
@@ -78,6 +112,9 @@
             letter-spacing: 1px;
             margin-top: 0;
             margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         h3 {
@@ -88,7 +125,7 @@
             font-weight: 600;
         }
 
-        /* Formulaires et Boutons alignés proprement pour éviter les décalages */
+        /* Formulaires et Boutons alignés */
         .flex-row {
             display: flex;
             gap: 10px;
@@ -105,7 +142,7 @@
             border-radius: 6px;
             font-size: 1rem;
             outline: none;
-            min-width: 0; /* Évite que l'input pousse les boutons hors de l'écran */
+            min-width: 0;
             box-sizing: border-box;
         }
 
@@ -147,54 +184,59 @@
 </head>
 <body>
 
-    <div class="container">
-
-        <!-- Zone d'affichage des points -->
-        <div class="points-header-box">
-            <div class="diamond-counter">
-                💎 <span id="user-points-display">0</span>
-            </div>
-            <div class="hint-text">
-                💡 Échangez vos points contre des codes ou fusionnez-les !
-            </div>
+    <div class="sidebar">
+        <div class="menu-toggle">
+            <span></span>
+            <span></span>
+            <span></span>
         </div>
+    </div>
 
-        <!-- Section Boutique & Fusion -->
-        <div class="panel">
-            <h2>💎 Boutique de points & Fusion</h2>
+    <div class="main-content">
+        <div class="container">
 
-            <!-- 1. Convertir les points -->
-            <h3>1. Convertir mes points en code promo</h3>
-            <div class="flex-row">
-                <select id="select-points-tier">
-                    <option value="2">2 Points</option>
-                    <option value="5">5 Points</option>
-                    <option value="10">10 Points</option>
-                    <option value="25">25 Points</option>
-                    <option value="50">50 Points</option>
-                    <option value="100">100 Points</option>
-                </select>
-                <button class="btn btn-cyan" id="btn-exchange" onclick="exchangePointsForCode()">Échanger</button>
+            <div class="points-header-box">
+                <div class="diamond-counter">
+                    💎 <span id="user-points-display">0</span>
+                </div>
+                <div class="hint-text">
+                    💡 Échangez vos points contre des codes ou fusionnez-les !
+                </div>
             </div>
 
-            <div class="separator"></div>
+            <div class="panel">
+                <h2>💎 Boutique de points & Fusion</h2>
 
-            <!-- 2. Fusionner un code -->
-            <h3>2. Reconvertir un code en points (Fusion)</h3>
-            <div class="flex-row">
-                <input type="text" id="input-fusion-code" placeholder="Ex: SHADOW-PT-X...">
-                <button class="btn btn-crimson" id="btn-fusion" onclick="fusionCodeToPoints()">Fusionner</button>
+                <h3>1. Convertir mes points en code promo</h3>
+                <div class="flex-row">
+                    <select id="select-points-tier">
+                        <option value="2">2 Points</option>
+                        <option value="5">5 Points</option>
+                        <option value="10">10 Points</option>
+                        <option value="25">25 Points</option>
+                        <option value="50">50 Points</option>
+                        <option value="100">100 Points</option>
+                    </select>
+                    <button class="btn btn-cyan" id="btn-exchange" onclick="exchangePointsForCode()">Échanger</button>
+                </div>
+
+                <div class="separator"></div>
+
+                <h3>2. Reconvertir un code en points (Fusion)</h3>
+                <div class="flex-row">
+                    <input type="text" id="input-fusion-code" placeholder="Ex: SHADOW-PT-X...">
+                    <button class="btn btn-crimson" id="btn-fusion" onclick="fusionCodeToPoints()">Fusionner</button>
+                </div>
             </div>
+
+            <div class="panel">
+                <h2>📦 Mes commandes</h2>
+                <div class="orders-empty-text">
+                    Vos produits achetés et clés d'activation s'afficheront ici.
+                </div>
+            </div>
+
         </div>
-
-        <!-- Section Mes Commandes -->
-        <div class="panel">
-            <h2>📦 Mes commandes</h2>
-            <div class="orders-empty-text">
-                Vos produits achetés et clés d'activation s'afficheront ici.
-            </div>
-        </div>
-
     </div>
 
     <script>
@@ -206,15 +248,15 @@
 
         let userId = null;
 
-        // Sécurité et récupération de la session en direct
+        // Récupération automatique de la session de l'utilisateur connecté au chargement
         window.onload = async () => {
             const { data: { session } } = await db.auth.getSession();
             if (!session) {
-                window.location.href = "login.html"; // Redirige si pas connecté
+                window.location.href = "login.html"; 
                 return;
             }
 
-            userId = session.user.id; // Récupère ton VRAI id de session
+            userId = session.user.id; 
             await refreshPoints();
         };
 
@@ -227,7 +269,7 @@
             return result;
         }
 
-        // Récupère tes points "give" depuis la colonne 'loyalty_points'
+        // Récupère tes points depuis la colonne exacte 'loyalty_points'
         async function refreshPoints() {
             if (!userId) return 0;
             try {
@@ -240,7 +282,8 @@
                 if (error) throw error;
 
                 if (data) {
-                    document.getElementById('user-points-display').innerText = data.loyalty_points;
+                    const display = document.getElementById('user-points-display');
+                    if (display) display.innerText = data.loyalty_points;
                     return data.loyalty_points;
                 }
             } catch (err) {
@@ -249,23 +292,24 @@
             }
         }
 
-        // Action 1 : Convertir points -> Code
+        // Action 1 : Convertir points -> Code Promo
         async function exchangePointsForCode() {
             const pointsToSpend = parseInt(document.getElementById('select-points-tier').value);
             const btn = document.getElementById('btn-exchange');
 
-            btn.disabled = true;
+            if (btn) btn.disabled = true;
             const currentPts = await refreshPoints();
 
             if (currentPts < pointsToSpend) {
                 alert("❌ Solde de points insuffisant pour ce palier.");
-                btn.disabled = false;
+                if (btn) btn.disabled = false;
                 return;
             }
 
             const generatedCode = "SHADOW-PT-" + makeRandomString(6);
 
             try {
+                // Déduction des points
                 const { error: updateError } = await db
                     .from('profiles')
                     .update({ loyalty_points: currentPts - pointsToSpend })
@@ -273,6 +317,7 @@
 
                 if (updateError) throw updateError;
 
+                // Création du code promo
                 const { error: insertError } = await db
                     .from('codes_points')
                     .insert([
@@ -288,11 +333,11 @@
                 console.error(err);
                 alert("Une erreur est survenue lors de l'échange.");
             } finally {
-                btn.disabled = false;
+                if (btn) btn.disabled = false;
             }
         }
 
-        // Action 2 : Fusionner
+        // Action 2 : Fusionner un code promo en points
         async function fusionCodeToPoints() {
             const codeSaisi = document.getElementById('input-fusion-code').value.trim();
             const btn = document.getElementById('btn-fusion');
@@ -302,9 +347,10 @@
                 return;
             }
 
-            btn.disabled = true;
+            if (btn) btn.disabled = true;
 
             try {
+                // Vérifier si le code existe et n'est pas expiré/utilisé
                 const { data: codeData, error: codeError } = await db
                     .from('codes_points')
                     .select('*')
@@ -314,12 +360,13 @@
 
                 if (codeError || !codeData) {
                     alert("❌ Ce code est invalide, inexistant ou a déjà été consommé.");
-                    btn.disabled = false;
+                    if (btn) btn.disabled = false;
                     return;
                 }
 
                 const currentPts = await refreshPoints();
 
+                // Désactivation du code
                 const { error: disableError } = await db
                     .from('codes_points')
                     .update({ used: true })
@@ -327,6 +374,7 @@
 
                 if (disableError) throw disableError;
 
+                // Crédit des points sur le profil
                 const { error: profileUpdateError } = await db
                     .from('profiles')
                     .update({ loyalty_points: currentPts + codeData.points })
@@ -342,7 +390,7 @@
                 console.error(err);
                 alert("Une erreur technique s'est produite lors de la fusion.");
             } finally {
-                btn.disabled = false;
+                if (btn) btn.disabled = false;
             }
         }
     </script>
