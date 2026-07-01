@@ -10,8 +10,7 @@
         .item-info { flex-grow: 1; margin-left: 15px; }
         .remove-btn { color: #ff3333; font-size: 1.5em; cursor: pointer; border: none; background: none; font-weight: bold; padding: 0 10px; }
         
-        /* Style Code Promo */
-        .promo-section { margin-top: 20px; border-top: 1px solid #333; padding-top: 20px; }
+        .promo-section { margin-top: 15px; display: flex; gap: 5px; }
         input[type="text"] { padding: 10px; background: #222; border: 1px solid #00ffff; color: white; border-radius: 4px; width: 60%; }
         .btn-promo { padding: 10px; background: #00ffff; color: #000; border: none; cursor: pointer; font-weight: bold; border-radius: 4px; }
         
@@ -24,12 +23,19 @@
     <h1>Mon Panier</h1>
     <div id="panier-liste"></div>
     
-    <!-- Zone Code Promo -->
+    <!-- Code Créateur -->
     <div class="promo-section">
-        <input type="text" id="code-promo-input" placeholder="Code créateur...">
-        <button class="btn-promo" onclick="appliquerPromo()">Appliquer</button>
-        <p id="msg-promo" style="font-size: 0.9em; margin-top: 5px;"></p>
+        <input type="text" id="code-createur-input" placeholder="Code créateur...">
+        <button class="btn-promo" onclick="appliquerCreateur()">Appliquer</button>
     </div>
+    <p id="msg-createur" style="font-size: 0.8em; margin-top: 5px;"></p>
+
+    <!-- Code Points -->
+    <div class="promo-section">
+        <input type="text" id="code-points-input" placeholder="Code points...">
+        <button class="btn-promo" onclick="appliquerPoints()">Appliquer</button>
+    </div>
+    <p id="msg-points" style="font-size: 0.8em; margin-top: 5px;"></p>
 
     <div class="total-section">
         Total : <span id="total-somme">0.00</span> EUR
@@ -39,13 +45,11 @@
 
     <script>
         let prixBaseTotal = 0;
-        let remise = 0;
+        let tauxCreateur = 0;
+        let remisePoints = 0;
 
-        // Base de données simulée (plus tard, tu pourras charger ça via une API)
-        const codesValides = {
-            "SHADOW10": 0.10, // 10%
-            "NINJA20": 0.20   // 20%
-        };
+        const codesCreateurs = { "SHADOW10": 0.10, "NINJA20": 0.20 };
+        const codesPoints = { "POINT500": 5.00 }; 
 
         function chargerPanier() {
             let panier = JSON.parse(localStorage.getItem('monPanier')) || [];
@@ -56,12 +60,11 @@
             panier.forEach((p, index) => {
                 const prix = parseFloat(p.price) || 0;
                 prixBaseTotal += prix;
-                
                 liste.innerHTML += `
                     <div class="item-card">
                         <img src="${p.image_url || ''}" width="50" style="border-radius: 4px;">
                         <div class="item-info">
-                            <strong>${p.name || 'Produit inconnu'}</strong><br>${prix.toFixed(2)} EUR
+                            <strong>${p.name || 'Produit'}</strong><br>${prix.toFixed(2)} EUR
                         </div>
                         <button class="remove-btn" onclick="supprimerArticle(${index})">X</button>
                     </div>
@@ -70,25 +73,27 @@
             calculerTotal();
         }
 
-        function appliquerPromo() {
-            const code = document.getElementById('code-promo-input').value.toUpperCase();
-            const msg = document.getElementById('msg-promo');
-            
-            if (codesValides[code]) {
-                remise = prixBaseTotal * codesValides[code];
-                msg.style.color = "#00ff00";
-                msg.innerText = "Code appliqué ! Réduction de " + (codesValides[code]*100) + "%";
-            } else {
-                remise = 0;
-                msg.style.color = "#ff3333";
-                msg.innerText = "Code invalide";
-            }
+        function appliquerCreateur() {
+            const code = document.getElementById('code-createur-input').value.toUpperCase();
+            const msg = document.getElementById('msg-createur');
+            tauxCreateur = codesCreateurs[code] || 0;
+            msg.innerText = tauxCreateur > 0 ? "Code appliqué !" : "Code invalide";
+            msg.style.color = tauxCreateur > 0 ? "#00ff00" : "#ff3333";
+            calculerTotal();
+        }
+
+        function appliquerPoints() {
+            const code = document.getElementById('code-points-input').value.toUpperCase();
+            const msg = document.getElementById('msg-points');
+            remisePoints = codesPoints[code] || 0;
+            msg.innerText = remisePoints > 0 ? "Code points appliqué !" : "Code invalide";
+            msg.style.color = remisePoints > 0 ? "#00ff00" : "#ff3333";
             calculerTotal();
         }
 
         function calculerTotal() {
-            let totalFinal = prixBaseTotal - remise;
-            document.getElementById('total-somme').innerText = totalFinal.toFixed(2);
+            let totalFinal = prixBaseTotal - (prixBaseTotal * tauxCreateur) - remisePoints;
+            document.getElementById('total-somme').innerText = Math.max(totalFinal, 0).toFixed(2);
         }
 
         function supprimerArticle(index) {
@@ -99,9 +104,7 @@
         }
 
         function versPaiement() {
-            // On enregistre le total final pour la page paiement
-            let totalFinal = document.getElementById('total-somme').innerText;
-            localStorage.setItem('totalPanier', totalFinal);
+            localStorage.setItem('totalPanier', document.getElementById('total-somme').innerText);
             window.location.href = 'paiement.html';
         }
 
@@ -109,3 +112,4 @@
     </script>
 </body>
 </html>
+
