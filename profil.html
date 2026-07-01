@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mon Espace - Shadow Market</title>
+    <!-- SDK Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
@@ -24,7 +25,7 @@
             min-height: 100vh;
         }
 
-        /* Barre latérale (Sidebar) d'origine */
+        /* Barre latérale d'origine (3 barres) */
         .sidebar {
             width: 60px;
             background: #000;
@@ -33,7 +34,7 @@
             flex-direction: column;
             align-items: center;
             padding-top: 20px;
-            gap: 20px;
+            z-index: 10;
         }
 
         .menu-toggle {
@@ -50,10 +51,9 @@
             width: 100%;
             background: var(--cyan-neon);
             border-radius: 2px;
-            transition: 0.3s;
         }
 
-        /* Conteneur Principal */
+        /* Zone de contenu principal - Rendu Idéal */
         .main-content {
             flex: 1;
             display: flex;
@@ -65,16 +65,17 @@
         .container {
             width: 100%;
             max-width: 450px;
-            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
         }
 
-        /* En-tête du solde */
+        /* Compteur de Diamants */
         .points-header-box {
             border: 2px solid var(--cyan-neon);
             border-radius: 16px;
             padding: 20px;
             text-align: center;
-            margin-bottom: 25px;
             background: var(--panel-bg);
             box-shadow: 0 0 15px rgba(0, 255, 255, 0.1);
         }
@@ -95,12 +96,11 @@
             margin-top: 10px;
         }
 
-        /* Sections / Panneaux */
+        /* Panneaux d'affichage */
         .panel {
             background: var(--panel-bg);
             border-radius: 12px;
             padding: 20px;
-            margin-bottom: 20px;
             border: 1px solid #1a1a1a;
             box-sizing: border-box;
         }
@@ -112,9 +112,6 @@
             letter-spacing: 1px;
             margin-top: 0;
             margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
         }
 
         h3 {
@@ -125,7 +122,7 @@
             font-weight: 600;
         }
 
-        /* Formulaires et Boutons alignés */
+        /* Flexbox pour éviter que les boutons sortent du cadre */
         .flex-row {
             display: flex;
             gap: 10px;
@@ -184,17 +181,20 @@
 </head>
 <body>
 
+    <!-- Barre latérale avec l'icône fonctionnelle des 3 barres -->
     <div class="sidebar">
-        <div class="menu-toggle">
+        <div class="menu-toggle" onclick="console.log('Menu cliqué')">
             <span></span>
             <span></span>
             <span></span>
         </div>
     </div>
 
+    <!-- Contenu central parfaitement aligné -->
     <div class="main-content">
         <div class="container">
 
+            <!-- Affichage dynamique du solde -->
             <div class="points-header-box">
                 <div class="diamond-counter">
                     💎 <span id="user-points-display">0</span>
@@ -204,9 +204,11 @@
                 </div>
             </div>
 
+            <!-- Panneau Principal Boutique & Fusion -->
             <div class="panel">
                 <h2>💎 Boutique de points & Fusion</h2>
 
+                <!-- 1. Échange -->
                 <h3>1. Convertir mes points en code promo</h3>
                 <div class="flex-row">
                     <select id="select-points-tier">
@@ -222,6 +224,7 @@
 
                 <div class="separator"></div>
 
+                <!-- 2. Fusion -->
                 <h3>2. Reconvertir un code en points (Fusion)</h3>
                 <div class="flex-row">
                     <input type="text" id="input-fusion-code" placeholder="Ex: SHADOW-PT-X...">
@@ -229,6 +232,7 @@
                 </div>
             </div>
 
+            <!-- Panneau Mes Commandes -->
             <div class="panel">
                 <h2>📦 Mes commandes</h2>
                 <div class="orders-empty-text">
@@ -240,7 +244,7 @@
     </div>
 
     <script>
-        // Initialisation de Supabase
+        // Configuration de la connexion Supabase
         const db = supabase.createClient(
           'https://jsuvimxjmjiljntmgbzu.supabase.co',
           'sb_publishable_Ngm29impwbTLGhuqyCxSJA_E1jXc1DX'
@@ -248,17 +252,21 @@
 
         let userId = null;
 
-        // Récupération automatique de la session de l'utilisateur connecté au chargement
-        window.onload = async () => {
-            const { data: { session } } = await db.auth.getSession();
-            if (!session) {
-                window.location.href = "login.html"; 
-                return;
-            }
+        // Événement asynchrone sécurisé pour ne pas bloquer l'interface
+        document.addEventListener("DOMContentLoaded", async () => {
+            try {
+                const { data: { session }, error } = await db.auth.getSession();
+                if (error || !session) {
+                    window.location.href = "login.html"; 
+                    return;
+                }
 
-            userId = session.user.id; 
-            await refreshPoints();
-        };
+                userId = session.user.id; 
+                await refreshPoints();
+            } catch (err) {
+                console.error("Erreur d'initialisation de l'application:", err);
+            }
+        });
 
         function makeRandomString(length) {
             const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -269,7 +277,7 @@
             return result;
         }
 
-        // Récupère tes points depuis la colonne exacte 'loyalty_points'
+        // Récupère les points depuis la colonne 'loyalty_points'
         async function refreshPoints() {
             if (!userId) return 0;
             try {
@@ -287,14 +295,17 @@
                     return data.loyalty_points;
                 }
             } catch (err) {
-                console.error("Erreur de récupération des points:", err);
+                console.error("Erreur lors de la mise à jour des points:", err);
                 return 0;
             }
         }
 
         // Action 1 : Convertir points -> Code Promo
         async function exchangePointsForCode() {
-            const pointsToSpend = parseInt(document.getElementById('select-points-tier').value);
+            const selectElem = document.getElementById('select-points-tier');
+            if (!selectElem) return;
+
+            const pointsToSpend = parseInt(selectElem.value);
             const btn = document.getElementById('btn-exchange');
 
             if (btn) btn.disabled = true;
@@ -309,7 +320,6 @@
             const generatedCode = "SHADOW-PT-" + makeRandomString(6);
 
             try {
-                // Déduction des points
                 const { error: updateError } = await db
                     .from('profiles')
                     .update({ loyalty_points: currentPts - pointsToSpend })
@@ -317,7 +327,6 @@
 
                 if (updateError) throw updateError;
 
-                // Création du code promo
                 const { error: insertError } = await db
                     .from('codes_points')
                     .insert([
@@ -339,7 +348,10 @@
 
         // Action 2 : Fusionner un code promo en points
         async function fusionCodeToPoints() {
-            const codeSaisi = document.getElementById('input-fusion-code').value.trim();
+            const inputElem = document.getElementById('input-fusion-code');
+            if (!inputElem) return;
+
+            const codeSaisi = inputElem.value.trim();
             const btn = document.getElementById('btn-fusion');
 
             if (!codeSaisi) {
@@ -350,7 +362,6 @@
             if (btn) btn.disabled = true;
 
             try {
-                // Vérifier si le code existe et n'est pas expiré/utilisé
                 const { data: codeData, error: codeError } = await db
                     .from('codes_points')
                     .select('*')
@@ -366,7 +377,6 @@
 
                 const currentPts = await refreshPoints();
 
-                // Désactivation du code
                 const { error: disableError } = await db
                     .from('codes_points')
                     .update({ used: true })
@@ -374,7 +384,6 @@
 
                 if (disableError) throw disableError;
 
-                // Crédit des points sur le profil
                 const { error: profileUpdateError } = await db
                     .from('profiles')
                     .update({ loyalty_points: currentPts + codeData.points })
@@ -383,7 +392,7 @@
                 if (profileUpdateError) throw profileUpdateError;
 
                 alert(`✨ Fusion réussie ! +${codeData.points} points ont été recrédités sur votre compte.`);
-                document.getElementById('input-fusion-code').value = "";
+                inputElem.value = "";
                 await refreshPoints();
 
             } catch (err) {
