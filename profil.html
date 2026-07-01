@@ -52,10 +52,8 @@
 </head>
 <body>
 
-  <!-- Bouton des 3 barres d'origine (☰) -->
   <div class="menu-btn" onclick="toggleMenu()">☰</div>
 
-  <!-- Barre latérale d'origine rétablie et fonctionnelle -->
   <div class="sidebar" id="sidebar">
     <a href="index.html">🏠 Accueil</a>
     <a href="#">📚 Bibliothèque</a>
@@ -69,17 +67,14 @@
     <h1>Espace Personnel</h1>
     <p style="margin: 0;">Email : <strong id="displayEmail">...</strong></p>
     
-    <!-- Carte de fidélité globale -->
     <div class="loyalty-card">
         <div class="loyalty-value">💎 <span id="user-points-display">0</span></div>
         <div class="info-msg">💡 Échangez vos points contre des codes ou fusionnez-les !</div>
     </div>
 
-    <!-- SECTION : BOUTIQUE DE POINTS AUTOMATIQUE & FUSION -->
     <div class="panel" id="points-section">
         <h3>💎 Boutique de Points & Fusion</h3>
         
-        <!-- ÉTAPE 1 : Convertir points -> Code -->
         <div class="form-group">
             <label>1. Convertir mes points en Code Promo</label>
             <div class="code-input-container">
@@ -102,7 +97,6 @@
 
         <hr>
 
-        <!-- ÉTAPE 2 : Reconvertir Code -> Points (Fusion) -->
         <div class="form-group">
             <label for="code-to-reconvert">2. Reconvertir un code en points (Fusion)</label>
             <div class="code-input-container">
@@ -112,7 +106,6 @@
         </div>
     </div>
 
-    <!-- SECTION MES COMMANDES (STRUCTURE) -->
     <div class="panel" id="orders-section">
         <h3>📦 Mes Commandes</h3>
         <p style="font-size: 13px; color: var(--text-muted);">Vos produits achetés et clés d'activation s'afficheront ici.</p>
@@ -129,7 +122,6 @@
     let userId = null;
     let currentEmail = null;
 
-    // Vérification de session au démarrage
     window.onload = async () => {
         const { data: { session } } = await db.auth.getSession();
         if (!session) {
@@ -144,18 +136,18 @@
         await refreshPoints();
     };
 
-    // Récupération sécurisée du solde (try/catch complet)
+    // CORRIGÉ : Sélectionne 'loyalty_points' au lieu de 'points'
     async function refreshPoints() {
         try {
             const { data, error } = await db
                 .from('profiles')
-                .select('points')
+                .select('loyalty_points')
                 .eq('id', userId)
                 .single();
 
             if (error) throw error;
 
-            const pts = data?.points ?? 0;
+            const pts = data?.loyalty_points ?? 0;
             document.getElementById('user-points').innerText = pts;
             document.getElementById('user-points-display').innerText = pts;
             return pts;
@@ -165,12 +157,11 @@
         }
     }
 
-    // Gestion de l'ouverture/fermeture du menu latéral
     function toggleMenu() { 
         document.getElementById('sidebar').classList.toggle('active'); 
     }
 
-    // ÉTAPE 1 : Échanger points -> code (Gestion de rollback en cas de soucis)
+    // CORRIGÉ : Met à jour 'loyalty_points' lors de la conversion
     document.getElementById('btn-convert-to-code').addEventListener('click', async () => {
         const btn = document.getElementById('btn-convert-to-code');
         const pointsToSpend = parseInt(document.getElementById('points-tier-select').value);
@@ -178,15 +169,14 @@
         btn.disabled = true;
 
         try {
-            // Lecture du solde directement dans la BDD pour éviter la triche
             const { data: profileData, error: profileError } = await db
                 .from('profiles')
-                .select('points')
+                .select('loyalty_points')
                 .eq('id', userId)
                 .single();
 
             if (profileError) throw profileError;
-            const currentPts = profileData.points;
+            const currentPts = profileData.loyalty_points;
 
             if (currentPts < pointsToSpend) {
                 alert(`Points insuffisants ! Il vous faut au moins ${pointsToSpend} points.`);
@@ -195,7 +185,6 @@
 
             const uniqueCode = "SHADOW-PT-" + Math.random().toString(36).substring(2, 8).toUpperCase();
 
-            // Création du code unique
             const { error: insertError } = await db
                 .from('codes_points')
                 .insert([{
@@ -206,14 +195,12 @@
 
             if (insertError) throw insertError;
 
-            // Déduction des points sur le profil
             const { error: updateError } = await db
                 .from('profiles')
-                .update({ points: currentPts - pointsToSpend })
+                .update({ loyalty_points: currentPts - pointsToSpend })
                 .eq('id', userId);
 
             if (updateError) {
-                // Rollback : suppression du code si la déduction échoue
                 await db.from('codes_points').delete().eq('code', uniqueCode);
                 throw updateError;
             }
@@ -227,7 +214,6 @@
         }
     });
 
-    // ÉTAPE 2 : Reconvertir code -> points (Appel de la fonction RPC sécurisée et corrigée)
     document.getElementById('btn-reconvert-to-points').addEventListener('click', async () => {
         const btn = document.getElementById('btn-reconvert-to-points');
         const inputCode = document.getElementById('code-to-reconvert').value.trim().toUpperCase();
@@ -240,7 +226,6 @@
         btn.disabled = true;
 
         try {
-            // Appel de la fonction SQL atomique stockée sur Supabase
             const { data: pointsCredited, error } = await db.rpc('fusion_code_secure', {
                 user_id_param: userId,
                 input_code_param: inputCode
