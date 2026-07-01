@@ -9,6 +9,12 @@
         .item-card { border: 1px solid #00ffff; padding: 15px; margin-bottom: 10px; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; background: #111; }
         .item-info { flex-grow: 1; margin-left: 15px; }
         .remove-btn { color: #ff3333; font-size: 1.5em; cursor: pointer; border: none; background: none; font-weight: bold; padding: 0 10px; }
+        
+        /* Style Code Promo */
+        .promo-section { margin-top: 20px; border-top: 1px solid #333; padding-top: 20px; }
+        input[type="text"] { padding: 10px; background: #222; border: 1px solid #00ffff; color: white; border-radius: 4px; width: 60%; }
+        .btn-promo { padding: 10px; background: #00ffff; color: #000; border: none; cursor: pointer; font-weight: bold; border-radius: 4px; }
+        
         .btn-paiement { width: 100%; padding: 15px; background: #ff3333; border: none; color: white; font-weight: bold; cursor: pointer; margin-top: 20px; font-size: 1.1em; }
         .total-section { font-size: 1.4em; font-weight: bold; margin-top: 20px; text-align: center; color: #00ffff; }
     </style>
@@ -18,6 +24,13 @@
     <h1>Mon Panier</h1>
     <div id="panier-liste"></div>
     
+    <!-- Zone Code Promo -->
+    <div class="promo-section">
+        <input type="text" id="code-promo-input" placeholder="Code créateur...">
+        <button class="btn-promo" onclick="appliquerPromo()">Appliquer</button>
+        <p id="msg-promo" style="font-size: 0.9em; margin-top: 5px;"></p>
+    </div>
+
     <div class="total-section">
         Total : <span id="total-somme">0.00</span> EUR
     </div>
@@ -25,16 +38,24 @@
     <button class="btn-paiement" onclick="versPaiement()">PASSER AU PAIEMENT</button>
 
     <script>
+        let prixBaseTotal = 0;
+        let remise = 0;
+
+        // Base de données simulée (plus tard, tu pourras charger ça via une API)
+        const codesValides = {
+            "SHADOW10": 0.10, // 10%
+            "NINJA20": 0.20   // 20%
+        };
+
         function chargerPanier() {
             let panier = JSON.parse(localStorage.getItem('monPanier')) || [];
             let liste = document.getElementById('panier-liste');
-            let total = 0;
+            prixBaseTotal = 0;
             liste.innerHTML = '';
 
             panier.forEach((p, index) => {
-                // Utilisation des bons noms de propriétés : p.price et p.name
                 const prix = parseFloat(p.price) || 0;
-                total += prix;
+                prixBaseTotal += prix;
                 
                 liste.innerHTML += `
                     <div class="item-card">
@@ -46,7 +67,28 @@
                     </div>
                 `;
             });
-            document.getElementById('total-somme').innerText = total.toFixed(2);
+            calculerTotal();
+        }
+
+        function appliquerPromo() {
+            const code = document.getElementById('code-promo-input').value.toUpperCase();
+            const msg = document.getElementById('msg-promo');
+            
+            if (codesValides[code]) {
+                remise = prixBaseTotal * codesValides[code];
+                msg.style.color = "#00ff00";
+                msg.innerText = "Code appliqué ! Réduction de " + (codesValides[code]*100) + "%";
+            } else {
+                remise = 0;
+                msg.style.color = "#ff3333";
+                msg.innerText = "Code invalide";
+            }
+            calculerTotal();
+        }
+
+        function calculerTotal() {
+            let totalFinal = prixBaseTotal - remise;
+            document.getElementById('total-somme').innerText = totalFinal.toFixed(2);
         }
 
         function supprimerArticle(index) {
@@ -57,8 +99,9 @@
         }
 
         function versPaiement() {
-            let total = document.getElementById('total-somme').innerText;
-            localStorage.setItem('totalPanier', total);
+            // On enregistre le total final pour la page paiement
+            let totalFinal = document.getElementById('total-somme').innerText;
+            localStorage.setItem('totalPanier', totalFinal);
             window.location.href = 'paiement.html';
         }
 
