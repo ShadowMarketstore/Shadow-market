@@ -57,12 +57,12 @@
   </div>
 
   <script>
-    // Renommé en "db" pour éviter la collision avec l'objet global "supabase" du CDN
     const db = supabase.createClient(
       'https://jsuvimxjmjiljntmgbzu.supabase.co',
       'sb_publishable_Ngm29impwbTLGhuqyCxSJA_E1jXc1DX'
     );
 
+    let userId = null;
     let currentEmail = null;
 
     // SÉCURITÉ : Vérification de session au démarrage
@@ -73,18 +73,35 @@
             return;
         }
 
+        userId = session.user.id;
         currentEmail = session.user.email;
         document.getElementById('displayEmail').innerText = currentEmail;
 
         await refreshPoints();
     };
 
-    // Recharge les points depuis Supabase (évite de se fier au DOM comme source de vérité)
+    // Recharge le total des points cumulés depuis ta nouvelle table 'codes_points'
     async function refreshPoints() {
-        const { data, error } = await db.from('users').select('points').eq('email', currentEmail).single();
+        // Optionnel : On conserve aussi la lecture de ton solde global actuel si tu as une table 'profiles' ou 'users'
+        // Ici on va d'abord chercher s'il y a des lignes dans codes_points pour cet utilisateur
+        const { data, error } = await db
+            .from('codes_points')
+            .select('points_required')
+            .eq('user_id', userId);
+
         if (!error && data) {
-            document.getElementById('user-points').innerText = data.points;
-            document.getElementById('user-points-display').innerText = data.points;
+            // Fait la somme de tous les points de la table pour cet utilisateur
+            const totalPoints = data.reduce((sum, row) => sum + (row.points_required || 0), 0);
+            
+            document.getElementById('user-points').innerText = totalPoints;
+            document.getElementById('user-points-display').innerText = totalPoints;
+        } else {
+            // Si aucune ligne ou erreur, on tente de lire l'ancien champ 'points' par sécurité
+            const { data: userData } = await db.from('users').select('points').eq('email', currentEmail).single();
+            if (userData) {
+                document.getElementById('user-points').innerText = userData.points;
+                document.getElementById('user-points-display').innerText = userData.points;
+            }
         }
     }
 
@@ -92,11 +109,14 @@
     function openModal() { document.getElementById('modal').style.display = 'flex'; }
     function closeModal() { document.getElementById('modal').style.display = 'none'; }
 
+    // Génère le code et l'enregistre directement dans 'codes_points'
     async function generateCode() {
         const btn = document.getElementById('genCodeBtn');
         const pts = parseInt(document.getElementById('ptsInput').value);
         const currentPts = parseInt(document.getElementById('user-points').innerText);
 
+        // Si tu veux utiliser tes points pour Générer un code, tu dois en avoir assez sur ton solde global.
+        // Note : Si ton système retire des points globaux, on met à jour la table 'users' ET on ajoute une trace ou un code dans codes_points.
         if (!pts || pts > currentPts || pts <= 0) {
             alert("Points insuffisants ou invalides");
             return;
@@ -105,20 +125,26 @@
         btn.disabled = true;
 
         try {
-            const code = "SHADOW-" + Math.random().toString(36).substr(2, 6).toUpperCase();
-
-            const { error: insertError } = await db.from('discounts').insert([
-                { code, discount_percent: pts, used: false, owner_email: currentEmail }
+            // Simulation ou création d'une nouvelle ligne d'avantage de points
+            // Ici, on insère la ligne dans 'codes_points' avec le coût en points et la valeur de réduction associée
+            const { error: insertError } = await db.from('codes_points').insert([
+                { 
+                    user_id: userId, 
+                    points_required: pts, 
+                    reduction_value: parseFloat(pts) // 1 point = 1% de remise
+                }
             ]);
             if (insertError) throw insertError;
 
+            // Optionnel : Si tu as un solde global à déduire dans la table 'users'
             const { error: updateError } = await db.from('users')
                 .update({ points: currentPts - pts })
                 .eq('email', currentEmail);
-            if (updateError) throw updateError;
+            
+            // Si la table users n'existe plus ou est migrée, supprime ou adapte cette ligne ci-dessus.
 
-            document.getElementById('resultCode').innerText = "Code : " + code;
-            await refreshPoints(); // resynchronise avec la BDD plutôt que de calculer en local
+            document.getElementById('resultCode').innerText = "Points enregistrés avec succès !";
+            await refreshPoints(); 
             document.getElementById('ptsInput').value = '';
         } catch (err) {
             alert("Erreur : " + err.message);
@@ -134,3 +160,4 @@
   </script>
 </body>
 </html>
+
