@@ -21,20 +21,23 @@
             font-family: sans-serif;
             margin: 0;
             padding: 0;
-            display: flex;
-            min-height: 100vh;
+            box-sizing: border-box;
         }
 
-        /* Barre latérale d'origine (3 barres) */
+        /* Barre latérale flottante (Fixe) pour ne pas pousser ou écraser le contenu central */
         .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 60px;
+            height: 100vh;
             background: #000;
             border-right: 1px solid #111;
             display: flex;
             flex-direction: column;
             align-items: center;
             padding-top: 20px;
-            z-index: 10;
+            z-index: 100;
         }
 
         .menu-toggle {
@@ -53,12 +56,13 @@
             border-radius: 2px;
         }
 
-        /* Zone de contenu principal - Rendu Idéal */
+        /* Conteneur principal centré avec marge à gauche pour laisser la place à la barre */
         .main-content {
-            flex: 1;
+            margin-left: 60px;
             display: flex;
             justify-content: center;
             padding: 20px;
+            min-height: 100vh;
             box-sizing: border-box;
         }
 
@@ -70,7 +74,7 @@
             gap: 20px;
         }
 
-        /* Compteur de Diamants */
+        /* Compteur de Diamants - Aligné avec ton rendu idéal */
         .points-header-box {
             border: 2px solid var(--cyan-neon);
             border-radius: 16px;
@@ -94,9 +98,10 @@
             color: #fff;
             font-size: 0.9rem;
             margin-top: 10px;
+            line-height: 1.4;
         }
 
-        /* Panneaux d'affichage */
+        /* Panneaux */
         .panel {
             background: var(--panel-bg);
             border-radius: 12px;
@@ -122,7 +127,7 @@
             font-weight: 600;
         }
 
-        /* Flexbox pour éviter que les boutons sortent du cadre */
+        /* Alignements des formulaires */
         .flex-row {
             display: flex;
             gap: 10px;
@@ -181,20 +186,20 @@
 </head>
 <body>
 
-    <!-- Barre latérale avec l'icône fonctionnelle des 3 barres -->
+    <!-- Barre latérale flottante - N'interfère pas avec le layout de la page -->
     <div class="sidebar">
-        <div class="menu-toggle" onclick="console.log('Menu cliqué')">
+        <div class="menu-toggle" onclick="toggleSidebarMenu()">
             <span></span>
             <span></span>
             <span></span>
         </div>
     </div>
 
-    <!-- Contenu central parfaitement aligné -->
+    <!-- Contenu centralisé autonome -->
     <div class="main-content">
         <div class="container">
 
-            <!-- Affichage dynamique du solde -->
+            <!-- Cadre des Points -->
             <div class="points-header-box">
                 <div class="diamond-counter">
                     💎 <span id="user-points-display">0</span>
@@ -204,7 +209,7 @@
                 </div>
             </div>
 
-            <!-- Panneau Principal Boutique & Fusion -->
+            <!-- Espace Échange et Fusion -->
             <div class="panel">
                 <h2>💎 Boutique de points & Fusion</h2>
 
@@ -232,7 +237,7 @@
                 </div>
             </div>
 
-            <!-- Panneau Mes Commandes -->
+            <!-- Commandes -->
             <div class="panel">
                 <h2>📦 Mes commandes</h2>
                 <div class="orders-empty-text">
@@ -244,7 +249,7 @@
     </div>
 
     <script>
-        // Configuration de la connexion Supabase
+        // Configuration de l'accès Supabase
         const db = supabase.createClient(
           'https://jsuvimxjmjiljntmgbzu.supabase.co',
           'sb_publishable_Ngm29impwbTLGhuqyCxSJA_E1jXc1DX'
@@ -252,7 +257,12 @@
 
         let userId = null;
 
-        // Événement asynchrone sécurisé pour ne pas bloquer l'interface
+        // Fonction pour l'interaction de ton menu latéral (remplace par ta logique si nécessaire)
+        function toggleSidebarMenu() {
+            console.log("Menu latéral cliqué");
+        }
+
+        // Chargement sécurisé de la session
         document.addEventListener("DOMContentLoaded", async () => {
             try {
                 const { data: { session }, error } = await db.auth.getSession();
@@ -264,7 +274,7 @@
                 userId = session.user.id; 
                 await refreshPoints();
             } catch (err) {
-                console.error("Erreur d'initialisation de l'application:", err);
+                console.error("Erreur d'authentification:", err);
             }
         });
 
@@ -277,7 +287,7 @@
             return result;
         }
 
-        // Récupère les points depuis la colonne 'loyalty_points'
+        // Récupération dynamique depuis 'loyalty_points'
         async function refreshPoints() {
             if (!userId) return 0;
             try {
@@ -295,12 +305,12 @@
                     return data.loyalty_points;
                 }
             } catch (err) {
-                console.error("Erreur lors de la mise à jour des points:", err);
+                console.error("Erreur lors de la synchronisation du solde:", err);
                 return 0;
             }
         }
 
-        // Action 1 : Convertir points -> Code Promo
+        // Action 1 : Points -> Code
         async function exchangePointsForCode() {
             const selectElem = document.getElementById('select-points-tier');
             if (!selectElem) return;
@@ -346,7 +356,7 @@
             }
         }
 
-        // Action 2 : Fusionner un code promo en points
+        // Action 2 : Code -> Points
         async function fusionCodeToPoints() {
             const inputElem = document.getElementById('input-fusion-code');
             if (!inputElem) return;
