@@ -101,8 +101,8 @@
             <h3>${p.name}</h3>
             <div class="stock-info">Stock : ${isOutOfStock ? 'Épuisé' : stockVal}</div>
             <div class="price-wrapper">
-                ${p.old_price > p.price ? `<span class="old-price">${p.old_price} EUR</span>` : ''}
-                <span class="current-price">${p.price} EUR</span>
+                ${p.old_price > p.price ? `<span class="old-price">${p.old_price.toFixed(2)} €</span>` : ''}
+                <span class="current-price">${p.price.toFixed(2)} €</span>
             </div>
             <button class="buy-btn" ${isOutOfStock ? 'disabled' : ''} onclick="handlePurchase('${productParam}', ${stockVal})">
                 ${isOutOfStock ? 'ÉPUISÉ' : 'AJOUTER AU PANIER'}
