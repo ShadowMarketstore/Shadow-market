@@ -6,22 +6,48 @@
   <title>Shadow Market - Profil</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
-    body { background: #000; color: #fff; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; }
-    .menu-btn { position: fixed; top: 20px; left: 20px; z-index: 2000; cursor: pointer; font-size: 30px; color: #00ffff; }
-    .sidebar { position: fixed; left: -250px; top: 0; width: 250px; height: 100%; background: #111; border-right: 2px solid #00ffff; transition: 0.3s; z-index: 1500; padding-top: 80px; }
+    :root {
+      --bg-color: #000000;
+      --panel-bg: #111111;
+      --cyan-neon: #00ffff;
+      --crimson-neon: #ff0055;
+      --text-muted: #888899;
+      --border-color: #22222b;
+    }
+
+    body { background: var(--bg-color); color: #fff; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; }
+    
+    /* Navigation */
+    .menu-btn { position: fixed; top: 20px; left: 20px; z-index: 2000; cursor: pointer; font-size: 30px; color: var(--cyan-neon); }
+    .sidebar { position: fixed; left: -250px; top: 0; width: 250px; height: 100%; background: #111; border-right: 2px solid var(--cyan-neon); transition: 0.3s; z-index: 1500; padding-top: 80px; }
     .sidebar.active { left: 0; }
     .sidebar a { display: flex; align-items: center; gap: 10px; padding: 20px; color: white; text-decoration: none; font-size: 1.2em; border-bottom: 1px solid #222; cursor: pointer; }
-    .sidebar a:hover { background: #222; color: #00ffff; }
-    .main-content-wrapper { max-width: 500px; margin: 80px auto 0 auto; background: #111; padding: 30px; border: 2px solid #00ffff; border-radius: 20px; box-shadow: 0 0 15px rgba(0, 255, 255, 0.3); text-align: center; }
-    h1 { color: #00ffff; text-transform: uppercase; letter-spacing: 2px; }
-    .loyalty-card { background: linear-gradient(135deg, #0a0a0a, #1a1a1a); border: 2px solid #00ffff; border-radius: 15px; padding: 20px; margin: 20px auto; }
-    .loyalty-value { font-size: 2.5em; font-weight: bold; color: #fff; text-shadow: 0 0 10px #00ffff; }
-    .info-msg { color: #00ffff; font-size: 0.9em; margin-top: 10px; font-style: italic; }
-    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 3000; justify-content: center; align-items: center; }
-    .modal-content { background: #111; padding: 30px; border: 2px solid #00ffff; border-radius: 20px; text-align: center; width: 300px; }
-    input { background: #000; border: 1px solid #00ffff; color: #fff; padding: 10px; width: 80%; margin: 10px 0; border-radius: 5px; text-align: center; }
-    .btn { background: #00ffff; color: #000; border: none; padding: 10px 20px; border-radius: 5px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+    .sidebar a:hover { background: #222; color: var(--cyan-neon); }
+    
+    /* Conteneur principal */
+    .main-content-wrapper { max-width: 500px; margin: 80px auto 40px auto; background: var(--panel-bg); padding: 30px; border: 2px solid var(--cyan-neon); border-radius: 20px; box-shadow: 0 0 15px rgba(0, 255, 255, 0.3); text-align: center; display: flex; flex-direction: column; gap: 20px; }
+    h1 { color: var(--cyan-neon); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px; }
+    h3 { color: var(--cyan-neon); text-transform: uppercase; font-size: 16px; letter-spacing: 1px; margin-bottom: 15px; text-align: left; }
+    
+    /* Panneaux */
+    .panel { background: #0a0a0c; border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; text-align: left; }
+    .loyalty-card { background: linear-gradient(135deg, #0a0a0a, #1a1a1a); border: 2px solid var(--cyan-neon); border-radius: 15px; padding: 20px; text-align: center; }
+    .loyalty-value { font-size: 2.5em; font-weight: bold; color: #fff; text-shadow: 0 0 10px var(--cyan-neon); }
+    .info-msg { color: var(--cyan-neon); font-size: 0.9em; margin-top: 10px; font-style: italic; }
+    
+    /* Formulaires et Boutons */
+    .form-group { margin-bottom: 15px; }
+    .form-group label { display: block; font-size: 12px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; letter-spacing: 0.5px; }
+    .code-input-container { display: flex; gap: 10px; }
+    
+    input, select { background: #000; border: 1px solid var(--cyan-neon); color: #fff; padding: 12px; border-radius: 8px; font-size: 14px; outline: none; width: 100%; box-sizing: border-box; }
+    input:focus, select:focus { border-color: var(--crimson-neon); }
+    
+    .btn { background: var(--cyan-neon); color: #000; border: none; padding: 12px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 14px; white-space: nowrap; transition: 0.2s ease; }
+    .btn:hover { opacity: 0.9; }
     .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    
+    hr { border: 0; border-top: 1px solid var(--border-color); margin: 20px 0; }
   </style>
 </head>
 <body>
@@ -31,30 +57,67 @@
   <div class="sidebar" id="sidebar">
     <a href="index.html">🏠 Accueil</a>
     <a href="#">📚 Bibliothèque</a>
-    <a onclick="openModal()">💎 Points : <span id="user-points">0</span></a>
+    <a href="#points-section" onclick="toggleMenu()">💎 Points : <span id="user-points">0</span></a>
+    <a href="#orders-section" onclick="toggleMenu()">📦 Mes commandes</a>
     <a href="#">📜 Historique</a>
     <a onclick="logout()" style="color: #DC143C;">⏻ Déconnexion</a>
   </div>
 
   <main class="main-content-wrapper">
     <h1>Espace Personnel</h1>
+    <p style="margin: 0;">Email : <strong id="displayEmail">...</strong></p>
+    
+    <!-- Carte fidélité globale -->
     <div class="loyalty-card">
         <div class="loyalty-value">💎 <span id="user-points-display">0</span></div>
-        <div class="info-msg">💡 Vous pouvez convertir vos points en réductions (1 point = 1% de remise) !</div>
+        <div class="info-msg">💡 Échangez vos points contre des codes ou fusionnez-les !</div>
     </div>
-    <p>Email : <strong id="displayEmail"></strong></p>
-  </main>
 
-  <div class="modal" id="modal">
-    <div class="modal-content">
-      <h3>Convertir mes points</h3>
-      <input type="number" id="ptsInput" placeholder="Nombre de points">
-      <br>
-      <button class="btn" id="genCodeBtn" onclick="generateCode()">Générer le code</button>
-      <button class="btn" style="background:#444;" onclick="closeModal()">Fermer</button>
-      <p id="resultCode" style="margin-top:20px; color:#00ffff; font-weight:bold;"></p>
+    <!-- SECTION : BOUTIQUE DE POINTS AUTOMATIQUE & FUSION -->
+    <div class="panel" id="points-section">
+        <h3>💎 Boutique de Points & Fusion</h3>
+        
+        <!-- ÉTAPE 1 : Convertir points -> Code -->
+        <div class="form-group">
+            <label>1. Convertir mes points en Code Promo</label>
+            <div class="code-input-container">
+                <select id="points-tier-select">
+                    <option value="2">2 Points</option>
+                    <option value="5">5 Points</option>
+                    <option value="10">10 Points</option>
+                    <option value="15">15 Points</option>
+                    <option value="20">20 Points</option>
+                    <option value="25">25 Points</option>
+                    <option value="30">30 Points</option>
+                    <option value="35">35 Points</option>
+                    <option value="40">40 Points</option>
+                    <option value="45">45 Points</option>
+                    <option value="50">50 Points</option>
+                </select>
+                <button type="button" class="btn" id="btn-convert-to-code">Échanger</button>
+            </div>
+        </div>
+
+        <hr>
+
+        <!-- ÉTAPE 2 : Reconvertir Code -> Points (Fusion) -->
+        <div class="form-group">
+            <label for="code-to-reconvert">2. Reconvertir un code en points (Fusion)</label>
+            <div class="code-input-container">
+                <input type="text" id="code-to-reconvert" placeholder="Ex: SHADOW-PT-XXXXXX">
+                <button type="button" class="btn" id="btn-reconvert-to-points" style="background: var(--crimson-neon); color: white;">Fusionner</button>
+            </div>
+        </div>
     </div>
-  </div>
+
+    <!-- PROCHAINE ÉTAPE : SECTION MES COMMANDES (STRUCTURE) -->
+    <div class="panel" id="orders-section">
+        <h3>📦 Mes Commandes</h3>
+        <p style="font-size: 13px; color: var(--text-muted);">Vos produits achetés et clés d'activation s'afficheront ici.</p>
+        <!-- On ajoutera la grille dynamique des commandes ici à l'étape suivante -->
+    </div>
+
+  </main>
 
   <script>
     const db = supabase.createClient(
@@ -80,78 +143,119 @@
         await refreshPoints();
     };
 
-    // Recharge le total des points cumulés depuis ta nouvelle table 'codes_points'
+    // Charge et affiche le solde actuel de l'utilisateur depuis la table 'profiles'
     async function refreshPoints() {
-        // Optionnel : On conserve aussi la lecture de ton solde global actuel si tu as une table 'profiles' ou 'users'
-        // Ici on va d'abord chercher s'il y a des lignes dans codes_points pour cet utilisateur
         const { data, error } = await db
-            .from('codes_points')
-            .select('points_required')
-            .eq('user_id', userId);
+            .from('profiles')
+            .select('points')
+            .eq('id', userId)
+            .single();
 
         if (!error && data) {
-            // Fait la somme de tous les points de la table pour cet utilisateur
-            const totalPoints = data.reduce((sum, row) => sum + (row.points_required || 0), 0);
-            
-            document.getElementById('user-points').innerText = totalPoints;
-            document.getElementById('user-points-display').innerText = totalPoints;
-        } else {
-            // Si aucune ligne ou erreur, on tente de lire l'ancien champ 'points' par sécurité
-            const { data: userData } = await db.from('users').select('points').eq('email', currentEmail).single();
-            if (userData) {
-                document.getElementById('user-points').innerText = userData.points;
-                document.getElementById('user-points-display').innerText = userData.points;
-            }
+            document.getElementById('user-points').innerText = data.points;
+            document.getElementById('user-points-display').innerText = data.points;
         }
     }
 
     function toggleMenu() { document.getElementById('sidebar').classList.toggle('active'); }
-    function openModal() { document.getElementById('modal').style.display = 'flex'; }
-    function closeModal() { document.getElementById('modal').style.display = 'none'; }
 
-    // Génère le code et l'enregistre directement dans 'codes_points'
-    async function generateCode() {
-        const btn = document.getElementById('genCodeBtn');
-        const pts = parseInt(document.getElementById('ptsInput').value);
+    // ACTION 1 : CONVERTIR POINTS -> CODE UNIQUE
+    document.getElementById('btn-convert-to-code').addEventListener('click', async () => {
+        const btn = document.getElementById('btn-convert-to-code');
+        const pointsToSpend = parseInt(document.getElementById('points-tier-select').value);
         const currentPts = parseInt(document.getElementById('user-points').innerText);
 
-        // Si tu veux utiliser tes points pour Générer un code, tu dois en avoir assez sur ton solde global.
-        // Note : Si ton système retire des points globaux, on met à jour la table 'users' ET on ajoute une trace ou un code dans codes_points.
-        if (!pts || pts > currentPts || pts <= 0) {
-            alert("Points insuffisants ou invalides");
+        if (currentPts < pointsToSpend) {
+            alert(`Points insuffisants ! Il vous faut au moins ${pointsToSpend} points.`);
             return;
         }
 
         btn.disabled = true;
 
         try {
-            // Simulation ou création d'une nouvelle ligne d'avantage de points
-            // Ici, on insère la ligne dans 'codes_points' avec le coût en points et la valeur de réduction associée
-            const { error: insertError } = await db.from('codes_points').insert([
-                { 
-                    user_id: userId, 
-                    points_required: pts, 
-                    reduction_value: parseFloat(pts) // 1 point = 1% de remise
-                }
-            ]);
+            // 1. Soustraire les points de la table 'profiles'
+            const { error: updateError } = await db
+                .from('profiles')
+                .update({ points: currentPts - pointsToSpend })
+                .eq('id', userId);
+
+            if (updateError) throw updateError;
+
+            // 2. Générer le code unique à la volée
+            const uniqueCode = "SHADOW-PT-" + Math.random().toString(36).substring(2, 8).toUpperCase();
+
+            // 3. Insérer le code dans 'codes_points'
+            const { error: insertError } = await db
+                .from('codes_points')
+                .insert([{ 
+                    code: uniqueCode, 
+                    points: pointsToSpend, 
+                    used: false 
+                }]);
+
             if (insertError) throw insertError;
 
-            // Optionnel : Si tu as un solde global à déduire dans la table 'users'
-            const { error: updateError } = await db.from('users')
-                .update({ points: currentPts - pts })
-                .eq('email', currentEmail);
-            
-            // Si la table users n'existe plus ou est migrée, supprime ou adapte cette ligne ci-dessus.
-
-            document.getElementById('resultCode').innerText = "Points enregistrés avec succès !";
-            await refreshPoints(); 
-            document.getElementById('ptsInput').value = '';
+            alert(`Succès ! Votre code de ${pointsToSpend} points a été généré :\n\n👉 ${uniqueCode}`);
+            await refreshPoints();
         } catch (err) {
-            alert("Erreur : " + err.message);
+            alert("Erreur lors de la génération : " + err.message);
         } finally {
             btn.disabled = false;
         }
-    }
+    });
+
+    // ACTION 2 : RECONVERTIR CODE -> POINTS (FUSION)
+    document.getElementById('btn-reconvert-to-points').addEventListener('click', async () => {
+        const btn = document.getElementById('btn-reconvert-to-points');
+        const inputCode = document.getElementById('code-to-reconvert').value.trim();
+        const currentPts = parseInt(document.getElementById('user-points').innerText);
+
+        if (!inputCode) {
+            alert("Veuillez entrer un code à reconvertir.");
+            return;
+        }
+
+        btn.disabled = true;
+
+        try {
+            // 1. Vérifier si le code existe et est valide (used = false)
+            const { data: codeData, error: cError } = await db
+                .from('codes_points')
+                .select('*')
+                .eq('code', inputCode)
+                .eq('used', false)
+                .single();
+
+            if (cError || !codeData) {
+                alert("Code invalide, inexistant ou déjà utilisé.");
+                return;
+            }
+
+            // 2. Désactiver le code immédiatement (used = true)
+            const { error: codeUpdateError } = await db
+                .from('codes_points')
+                .update({ used: true })
+                .eq('id', codeData.id);
+
+            if (codeUpdateError) throw codeUpdateError;
+
+            // 3. Ajouter les points au profil de l'utilisateur
+            const { error: profileUpdateError } = await db
+                .from('profiles')
+                .update({ points: currentPts + codeData.points })
+                .eq('id', userId);
+
+            if (profileUpdateError) throw profileUpdateError;
+
+            alert(`Fusion réussie ! +${codeData.points} points ajoutés à votre compte.`);
+            document.getElementById('code-to-reconvert').value = "";
+            await refreshPoints();
+        } catch (err) {
+            alert("Erreur lors de la fusion : " + err.message);
+        } finally {
+            btn.disabled = false;
+        }
+    });
 
     async function logout() {
         await db.auth.signOut();
