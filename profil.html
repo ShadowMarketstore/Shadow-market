@@ -1,267 +1,351 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Shadow Market - Profil</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <style>
-    :root {
-      --bg-color: #000000;
-      --panel-bg: #111111;
-      --cyan-neon: #00ffff;
-      --crimson-neon: #ff0055;
-      --text-muted: #888899;
-      --border-color: #22222b;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mon Espace - Shadow Market</title>
+    <!-- SDK Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --bg-color: #050505;
+            --panel-bg: #0d0d0d;
+            --cyan-neon: #00ffff;
+            --crimson-neon: #ff0055;
+            --text-muted: #888;
+        }
 
-    body { background: var(--bg-color); color: #fff; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; }
-    
-    /* Navigation */
-    .menu-btn { position: fixed; top: 20px; left: 20px; z-index: 2000; cursor: pointer; font-size: 30px; color: var(--cyan-neon); }
-    .sidebar { position: fixed; left: -250px; top: 0; width: 250px; height: 100%; background: #111; border-right: 2px solid var(--cyan-neon); transition: 0.3s; z-index: 1500; padding-top: 80px; }
-    .sidebar.active { left: 0; }
-    .sidebar a { display: flex; align-items: center; gap: 10px; padding: 20px; color: white; text-decoration: none; font-size: 1.2em; border-bottom: 1px solid #222; cursor: pointer; }
-    .sidebar a:hover { background: #222; color: var(--cyan-neon); }
-    
-    /* Conteneur principal */
-    .main-content-wrapper { max-width: 500px; margin: 80px auto 40px auto; background: var(--panel-bg); padding: 30px; border: 2px solid var(--cyan-neon); border-radius: 20px; box-shadow: 0 0 15px rgba(0, 255, 255, 0.3); text-align: center; display: flex; flex-direction: column; gap: 20px; }
-    h1 { color: var(--cyan-neon); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px; }
-    h3 { color: var(--cyan-neon); text-transform: uppercase; font-size: 16px; letter-spacing: 1px; margin-bottom: 15px; text-align: left; }
-    
-    /* Panneaux */
-    .panel { background: #0a0a0c; border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; text-align: left; }
-    .loyalty-card { background: linear-gradient(135deg, #0a0a0a, #1a1a1a); border: 2px solid var(--cyan-neon); border-radius: 15px; padding: 20px; text-align: center; }
-    .loyalty-value { font-size: 2.5em; font-weight: bold; color: #fff; text-shadow: 0 0 10px var(--cyan-neon); }
-    .info-msg { color: var(--cyan-neon); font-size: 0.9em; margin-top: 10px; font-style: italic; }
-    
-    /* Formulaires et Boutons */
-    .form-group { margin-bottom: 15px; }
-    .form-group label { display: block; font-size: 12px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; letter-spacing: 0.5px; }
-    .code-input-container { display: flex; gap: 10px; }
-    
-    input, select { background: #000; border: 1px solid var(--cyan-neon); color: #fff; padding: 12px; border-radius: 8px; font-size: 14px; outline: none; width: 100%; box-sizing: border-box; }
-    input:focus, select:focus { border-color: var(--crimson-neon); }
-    
-    .btn { background: var(--cyan-neon); color: #000; border: none; padding: 12px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 14px; white-space: nowrap; transition: 0.2s ease; }
-    .btn:hover { opacity: 0.9; }
-    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-    
-    hr { border: 0; border-top: 1px solid var(--border-color); margin: 20px 0; }
-  </style>
+        body {
+            background-color: var(--bg-color);
+            color: #fff;
+            font-family: sans-serif;
+            padding: 20px;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 450px;
+            border: 2px solid var(--cyan-neon);
+            border-radius: 12px;
+            padding: 20px;
+            background: #000;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.1);
+        }
+
+        /* En-tête du solde */
+        .points-header-box {
+            border: 2px solid var(--cyan-neon);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 25px;
+            background: var(--panel-bg);
+            position: relative;
+        }
+
+        .diamond-counter {
+            font-size: 3.5rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            text-shadow: 0 0 10px var(--cyan-neon);
+        }
+
+        .hint-text {
+            color: #fff;
+            font-size: 0.9rem;
+            margin-top: 10px;
+        }
+
+        /* Sections / Panneaux */
+        .panel {
+            background: var(--panel-bg);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid #1a1a1a;
+        }
+
+        h2 {
+            color: var(--cyan-neon);
+            font-size: 1.15rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 0;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        h3 {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        /* Formulaires et Boutons */
+        .flex-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        select, input[type="text"] {
+            flex: 1;
+            background: #151515;
+            border: 1px solid var(--cyan-neon);
+            color: #fff;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        input[type="text"] {
+            border-color: #333;
+        }
+        input[type="text"]:focus {
+            border-color: var(--crimson-neon);
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+        .btn:active { transform: scale(0.98); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .btn-cyan { background: var(--cyan-neon); color: #000; }
+        .btn-crimson { background: var(--crimson-neon); color: #fff; }
+
+        .separator {
+            height: 1px;
+            background: #222;
+            margin: 20px 0;
+        }
+
+        .orders-empty-text {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-top: 10px;
+        }
+    </style>
 </head>
 <body>
 
-  <div class="menu-btn" onclick="toggleMenu()">☰</div>
+    <div class="container">
 
-  <div class="sidebar" id="sidebar">
-    <a href="index.html">🏠 Accueil</a>
-    <a href="#">📚 Bibliothèque</a>
-    <a href="#points-section" onclick="toggleMenu()">💎 Points : <span id="user-points">0</span></a>
-    <a href="#orders-section" onclick="toggleMenu()">📦 Mes commandes</a>
-    <a href="#">📜 Historique</a>
-    <a onclick="logout()" style="color: #DC143C;">⏻ Déconnexion</a>
-  </div>
+        <!-- Zone d'affichage des points -->
+        <div class="points-header-box">
+            <div class="diamond-counter">
+                💎 <span id="user-points-display">0</span>
+            </div>
+            <div class="hint-text">
+                💡 Échangez vos points contre des codes ou fusionnez-les !
+            </div>
+        </div>
 
-  <main class="main-content-wrapper">
-    <h1>Espace Personnel</h1>
-    <p style="margin: 0;">Email : <strong id="displayEmail">...</strong></p>
-    
-    <!-- Carte fidélité globale -->
-    <div class="loyalty-card">
-        <div class="loyalty-value">💎 <span id="user-points-display">0</span></div>
-        <div class="info-msg">💡 Échangez vos points contre des codes ou fusionnez-les !</div>
-    </div>
+        <!-- Section Boutique & Fusion -->
+        <div class="panel">
+            <h2>💎 Boutique de points & Fusion</h2>
 
-    <!-- SECTION : BOUTIQUE DE POINTS AUTOMATIQUE & FUSION -->
-    <div class="panel" id="points-section">
-        <h3>💎 Boutique de Points & Fusion</h3>
-        
-        <!-- ÉTAPE 1 : Convertir points -> Code -->
-        <div class="form-group">
-            <label>1. Convertir mes points en Code Promo</label>
-            <div class="code-input-container">
-                <select id="points-tier-select">
+            <!-- 1. Convertir les points -->
+            <h3>1. Convertir mes points en code promo</h3>
+            <div class="flex-row">
+                <select id="select-points-tier">
                     <option value="2">2 Points</option>
                     <option value="5">5 Points</option>
                     <option value="10">10 Points</option>
-                    <option value="15">15 Points</option>
-                    <option value="20">20 Points</option>
                     <option value="25">25 Points</option>
-                    <option value="30">30 Points</option>
-                    <option value="35">35 Points</option>
-                    <option value="40">40 Points</option>
-                    <option value="45">45 Points</option>
                     <option value="50">50 Points</option>
+                    <option value="100">100 Points</option>
                 </select>
-                <button type="button" class="btn" id="btn-convert-to-code">Échanger</button>
+                <button class="btn btn-cyan" id="btn-exchange" onclick="exchangePointsForCode()">Échanger</button>
+            </div>
+
+            <div class="separator"></div>
+
+            <!-- 2. Fusionner un code -->
+            <h3>2. Reconvertir un code en points (Fusion)</h3>
+            <div class="flex-row">
+                <input type="text" id="input-fusion-code" placeholder="Ex: SHADOW-PT-X...">
+                <button class="btn btn-crimson" id="btn-fusion" onclick="fusionCodeToPoints()">Fusionner</button>
             </div>
         </div>
 
-        <hr>
-
-        <!-- ÉTAPE 2 : Reconvertir Code -> Points (Fusion) -->
-        <div class="form-group">
-            <label for="code-to-reconvert">2. Reconvertir un code en points (Fusion)</label>
-            <div class="code-input-container">
-                <input type="text" id="code-to-reconvert" placeholder="Ex: SHADOW-PT-XXXXXX">
-                <button type="button" class="btn" id="btn-reconvert-to-points" style="background: var(--crimson-neon); color: white;">Fusionner</button>
+        <!-- Section Mes Commandes -->
+        <div class="panel">
+            <h2>📦 Mes commandes</h2>
+            <div class="orders-empty-text">
+                Vos produits achetés et clés d'activation s'afficheront ici.
             </div>
         </div>
+
     </div>
 
-    <!-- PROCHAINE ÉTAPE : SECTION MES COMMANDES (STRUCTURE) -->
-    <div class="panel" id="orders-section">
-        <h3>📦 Mes Commandes</h3>
-        <p style="font-size: 13px; color: var(--text-muted);">Vos produits achetés et clés d'activation s'afficheront ici.</p>
-        <!-- On ajoutera la grille dynamique des commandes ici à l'étape suivante -->
-    </div>
+    <script>
+        // Initialisation de Supabase
+        const db = supabase.createClient(
+          'https://jsuvimxjmjiljntmgbzu.supabase.co',
+          'sb_publishable_Ngm29impwbTLGhuqyCxSJA_E1jXc1DX'
+        );
 
-  </main>
+        // ID fixe pour les tests basé sur ta table Supabase
+        const userId = "03065300-0f14-4cc8-9feb-712..."; 
 
-  <script>
-    const db = supabase.createClient(
-      'https://jsuvimxjmjiljntmgbzu.supabase.co',
-      'sb_publishable_Ngm29impwbTLGhuqyCxSJA_E1jXc1DX'
-    );
-
-    let userId = null;
-    let currentEmail = null;
-
-    // SÉCURITÉ : Vérification de session au démarrage
-    window.onload = async () => {
-        const { data: { session } } = await db.auth.getSession();
-        if (!session) {
-            window.location.href = "login.html";
-            return;
+        // Fonction pour générer une chaîne de caractères unique
+        function makeRandomString(length) {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let result = '';
+            for (let i = 0; i < length; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return result;
         }
 
-        userId = session.user.id;
-        currentEmail = session.user.email;
-        document.getElementById('displayEmail').innerText = currentEmail;
+        // Charge et affiche le solde actuel depuis la colonne 'loyalty_points'
+        async function refreshPoints() {
+            try {
+                const { data, error } = await db
+                    .from('profiles')
+                    .select('loyalty_points')
+                    .eq('id', userId)
+                    .single();
 
-        await refreshPoints();
-    };
+                if (error) throw error;
 
-    // Charge et affiche le solde actuel de l'utilisateur depuis la table 'profiles'
-    async function refreshPoints() {
-        const { data, error } = await db
-            .from('profiles')
-            .select('points')
-            .eq('id', userId)
-            .single();
-
-        if (!error && data) {
-            document.getElementById('user-points').innerText = data.points;
-            document.getElementById('user-points-display').innerText = data.points;
-        }
-    }
-
-    function toggleMenu() { document.getElementById('sidebar').classList.toggle('active'); }
-
-    // ACTION 1 : CONVERTIR POINTS -> CODE UNIQUE
-    document.getElementById('btn-convert-to-code').addEventListener('click', async () => {
-        const btn = document.getElementById('btn-convert-to-code');
-        const pointsToSpend = parseInt(document.getElementById('points-tier-select').value);
-        const currentPts = parseInt(document.getElementById('user-points').innerText);
-
-        if (currentPts < pointsToSpend) {
-            alert(`Points insuffisants ! Il vous faut au moins ${pointsToSpend} points.`);
-            return;
+                if (data) {
+                    document.getElementById('user-points-display').innerText = data.loyalty_points;
+                    return data.loyalty_points;
+                }
+            } catch (err) {
+                console.error("Erreur de récupération des points:", err);
+                return 0;
+            }
         }
 
-        btn.disabled = true;
+        // ACTION 1 : Échanger des points contre un Code Promo
+        async function exchangePointsForCode() {
+            const pointsToSpend = parseInt(document.getElementById('select-points-tier').value);
+            const btn = document.getElementById('btn-exchange');
 
-        try {
-            // 1. Soustraire les points de la table 'profiles'
-            const { error: updateError } = await db
-                .from('profiles')
-                .update({ points: currentPts - pointsToSpend })
-                .eq('id', userId);
+            btn.disabled = true;
+            const currentPts = await refreshPoints();
 
-            if (updateError) throw updateError;
-
-            // 2. Générer le code unique à la volée
-            const uniqueCode = "SHADOW-PT-" + Math.random().toString(36).substring(2, 8).toUpperCase();
-
-            // 3. Insérer le code dans 'codes_points'
-            const { error: insertError } = await db
-                .from('codes_points')
-                .insert([{ 
-                    code: uniqueCode, 
-                    points: pointsToSpend, 
-                    used: false 
-                }]);
-
-            if (insertError) throw insertError;
-
-            alert(`Succès ! Votre code de ${pointsToSpend} points a été généré :\n\n👉 ${uniqueCode}`);
-            await refreshPoints();
-        } catch (err) {
-            alert("Erreur lors de la génération : " + err.message);
-        } finally {
-            btn.disabled = false;
-        }
-    });
-
-    // ACTION 2 : RECONVERTIR CODE -> POINTS (FUSION)
-    document.getElementById('btn-reconvert-to-points').addEventListener('click', async () => {
-        const btn = document.getElementById('btn-reconvert-to-points');
-        const inputCode = document.getElementById('code-to-reconvert').value.trim();
-        const currentPts = parseInt(document.getElementById('user-points').innerText);
-
-        if (!inputCode) {
-            alert("Veuillez entrer un code à reconvertir.");
-            return;
-        }
-
-        btn.disabled = true;
-
-        try {
-            // 1. Vérifier si le code existe et est valide (used = false)
-            const { data: codeData, error: cError } = await db
-                .from('codes_points')
-                .select('*')
-                .eq('code', inputCode)
-                .eq('used', false)
-                .single();
-
-            if (cError || !codeData) {
-                alert("Code invalide, inexistant ou déjà utilisé.");
+            if (currentPts < pointsToSpend) {
+                alert("❌ Solde de points insuffisant pour ce palier.");
+                btn.disabled = false;
                 return;
             }
 
-            // 2. Désactiver le code immédiatement (used = true)
-            const { error: codeUpdateError } = await db
-                .from('codes_points')
-                .update({ used: true })
-                .eq('id', codeData.id);
+            // Génération du code unique
+            const generatedCode = "SHADOW-PT-" + makeRandomString(6);
 
-            if (codeUpdateError) throw codeUpdateError;
+            try {
+                // 1. Déduire les points du profil de l'utilisateur
+                const { error: updateError } = await db
+                    .from('profiles')
+                    .update({ loyalty_points: currentPts - pointsToSpend })
+                    .eq('id', userId);
 
-            // 3. Ajouter les points au profil de l'utilisateur
-            const { error: profileUpdateError } = await db
-                .from('profiles')
-                .update({ points: currentPts + codeData.points })
-                .eq('id', userId);
+                if (updateError) throw updateError;
 
-            if (profileUpdateError) throw profileUpdateError;
+                // 2. Insérer le code généré dans la table 'codes_points'
+                const { error: insertError } = await db
+                    .from('codes_points')
+                    .insert([
+                        { code: generatedCode, points: pointsToSpend, used: false }
+                    ]);
 
-            alert(`Fusion réussie ! +${codeData.points} points ajoutés à votre compte.`);
-            document.getElementById('code-to-reconvert').value = "";
-            await refreshPoints();
-        } catch (err) {
-            alert("Erreur lors de la fusion : " + err.message);
-        } finally {
-            btn.disabled = false;
+                if (insertError) throw insertError;
+
+                alert(`🎉 Succès ! Code généré : ${generatedCode}\nIl vous donne droit à -${pointsToSpend}% de réduction.`);
+                await refreshPoints();
+
+            } catch (err) {
+                console.error(err);
+                alert("Une erreur est survenue lors de l'échange.");
+            } finally {
+                btn.disabled = false;
+            }
         }
-    });
 
-    async function logout() {
-        await db.auth.signOut();
-        window.location.href = 'index.html';
-    }
-  </script>
+        // ACTION 2 : Fusionner (Reconvertir un code inutilisé en points)
+        async function fusionCodeToPoints() {
+            const codeSaisi = document.getElementById('input-fusion-code').value.trim();
+            const btn = document.getElementById('btn-fusion');
+
+            if (!codeSaisi) {
+                alert("Veuillez entrer un code à fusionner.");
+                return;
+            }
+
+            btn.disabled = true;
+
+            try {
+                // 1. Vérifier si le code existe et n'est pas utilisé
+                const { data: codeData, error: codeError } = await db
+                    .from('codes_points')
+                    .select('*')
+                    .eq('code', codeSaisi)
+                    .eq('used', false)
+                    .single();
+
+                if (codeError || !codeData) {
+                    alert("❌ Ce code est invalide, inexistant ou a déjà été consommé.");
+                    btn.disabled = false;
+                    return;
+                }
+
+                // Récupérer le solde actuel de points
+                const currentPts = await refreshPoints();
+
+                // 2. Rendre le code obsolète (used = true)
+                const { error: disableError } = await db
+                    .from('codes_points')
+                    .update({ used: true })
+                    .eq('id', codeData.id);
+
+                if (disableError) throw disableError;
+
+                // 3. Réinjecter la valeur du code dans les points de l'utilisateur
+                const { error: profileUpdateError } = await db
+                    .from('profiles')
+                    .update({ loyalty_points: currentPts + codeData.points })
+                    .eq('id', userId);
+
+                if (profileUpdateError) throw profileUpdateError;
+
+                alert(`✨ Fusion réussie ! +${codeData.points} points ont été recrédités sur votre compte.`);
+                document.getElementById('input-fusion-code').value = "";
+                await refreshPoints();
+
+            } catch (err) {
+                console.error(err);
+                alert("Une erreur technique s'est produite lors de la fusion.");
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        // Chargement initial au démarrage de la page
+        window.onload = async () => {
+            await refreshPoints();
+        };
+    </script>
 </body>
 </html>
 
