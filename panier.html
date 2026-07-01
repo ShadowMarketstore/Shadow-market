@@ -40,7 +40,7 @@
     <p id="msg-points" style="font-size: 0.8em; margin-top: 5px;"></p>
 
     <div class="total-section">
-        Total : <span id="total-somme">0.00</span> EUR
+        Total : <span id="total-somme">0.00</span> €
     </div>
 
     <button class="btn-paiement" onclick="versPaiement()">PASSER AU PAIEMENT</button>
@@ -54,7 +54,7 @@
 
         let prixBaseTotal = 0;
         let tauxCreateur = 0;
-        let remisePoints = 0; // Cette valeur correspondra au pourcentage ou montant récupéré de la BDD
+        let remisePoints = 0; 
 
         const codesCreateurs = { "SHADOW10": 0.10, "NINJA20": 0.20 };
 
@@ -71,7 +71,7 @@
                     <div class="item-card">
                         <img src="${p.image_url || ''}" width="50" style="border-radius: 4px;">
                         <div class="item-info">
-                            <strong>${p.name || 'Produit'}</strong><br>${prix.toFixed(2)} EUR
+                            <strong>${p.name || 'Produit'}</strong><br>${prix.toFixed(2)} €
                         </div>
                         <button class="remove-btn" onclick="supprimerArticle(${index})">X</button>
                     </div>
@@ -89,7 +89,6 @@
             calculerTotal();
         }
 
-        // Nouvelle version dynamique qui cherche dans Supabase
         async function appliquerPoints() {
             const codeSaisi = document.getElementById('code-points-input').value.trim();
             const msg = document.getElementById('msg-points');
@@ -101,21 +100,18 @@
             }
 
             try {
-                // On va chercher dans la table codes_promo (ou codes_points si le code y est rattaché)
-                // Ici, j'utilise 'codes_promo' comme visible sur ton panneau latéral Supabase, à ajuster si besoin
                 const { data, error } = await db
                     .from('codes_promo')
                     .select('reduction_value')
                     .eq('code', codeSaisi)
-                    .single(); // Récupère une seule ligne correspondante
+                    .single();
 
                 if (error || !data) {
                     remisePoints = 0;
                     msg.innerText = "Code points invalide ou expiré";
                     msg.style.color = "#ff3333";
                 } else {
-                    // Si tes codes promo stockent un pourcentage (ex: 15 pour 15%), on divise par 100
-                    // Si c'est une valeur fixe en EUR, garde directement : remisePoints = data.reduction_value;
+                    // Supposition : reduction_value est stocké en pourcentage (ex: 15 pour 15%)
                     remisePoints = parseFloat(data.reduction_value) / 100; 
                     
                     msg.innerText = `Code appliqué ! Remise de ${(remisePoints * 100).toFixed(0)}% activée.`;
@@ -130,9 +126,8 @@
             calculerTotal();
         }
 
-        function calcularTotal() {
-            // Logique de calcul : Prix de base - réduction créateur (pourcentage) - réduction points (pourcentage)
-            // Si ta réduction points est une valeur fixe en euros (ex: -5€), remplace par : prixBaseTotal - (prixBaseTotal * tauxCreateur) - remisePoints
+        // CORRIGÉ : La fonction possède désormais la bonne orthographe pour s'exécuter correctement
+        function calculerTotal() {
             let totalFinal = prixBaseTotal - (prixBaseTotal * tauxCreateur) - (prixBaseTotal * remisePoints);
             document.getElementById('total-somme').innerText = Math.max(totalFinal, 0).toFixed(2);
         }
@@ -146,7 +141,6 @@
 
         function versPaiement() {
             localStorage.setItem('totalPanier', document.getElementById('total-somme').innerText);
-            // Stocke également le code utilisé si tu as besoin de le marquer comme "utilisé" après validation du paiement
             localStorage.setItem('codePointsApplique', document.getElementById('code-points-input').value.trim());
             window.location.href = 'paiement.html';
         }
