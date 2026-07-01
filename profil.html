@@ -3,150 +3,405 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mon Panier - Shadow Market</title>
-    <!-- Ajout du CDN Supabase -->
+    <title>Mon Espace - Shadow Market</title>
+    <!-- SDK Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        body { background: #050505; color: white; font-family: sans-serif; padding: 20px; }
-        .item-card { border: 1px solid #00ffff; padding: 15px; margin-bottom: 10px; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; background: #111; }
-        .item-info { flex-grow: 1; margin-left: 15px; }
-        .remove-btn { color: #ff3333; font-size: 1.5em; cursor: pointer; border: none; background: none; font-weight: bold; padding: 0 10px; }
-        
-        .promo-section { margin-top: 15px; display: flex; gap: 5px; }
-        input[type="text"] { padding: 10px; background: #222; border: 1px solid #00ffff; color: white; border-radius: 4px; width: 60%; }
-        .btn-promo { padding: 10px; background: #00ffff; color: #000; border: none; cursor: pointer; font-weight: bold; border-radius: 4px; }
-        
-        .btn-paiement { width: 100%; padding: 15px; background: #ff3333; border: none; color: white; font-weight: bold; cursor: pointer; margin-top: 20px; font-size: 1.1em; }
-        .total-section { font-size: 1.4em; font-weight: bold; margin-top: 20px; text-align: center; color: #00ffff; }
+        :root {
+            --bg-color: #050505;
+            --panel-bg: #0d0d0d;
+            --cyan-neon: #00ffff;
+            --crimson-neon: #ff0055;
+            --text-muted: #888;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: #fff;
+            font-family: sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Barre latérale d'origine fixe à gauche */
+        .sidebar {
+            width: 60px;
+            background: #000;
+            border-right: 1px solid #111;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 20px;
+            z-index: 10;
+        }
+
+        .menu-toggle {
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            width: 25px;
+        }
+
+        .menu-toggle span {
+            display: block;
+            height: 3px;
+            width: 100%;
+            background: var(--cyan-neon);
+            border-radius: 2px;
+        }
+
+        /* Contenu centralisé autonome - Rendu Idéal */
+        .main-content {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 450px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Cadre du Compteur de Diamants */
+        .points-header-box {
+            border: 2px solid var(--cyan-neon);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            background: var(--panel-bg);
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.1);
+        }
+
+        .diamond-counter {
+            font-size: 3.5rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            text-shadow: 0 0 10px var(--cyan-neon);
+        }
+
+        .hint-text {
+            color: #fff;
+            font-size: 0.9rem;
+            margin-top: 10px;
+        }
+
+        /* Panneaux d'affichage */
+        .panel {
+            background: var(--panel-bg);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #1a1a1a;
+            box-sizing: border-box;
+        }
+
+        h2 {
+            color: var(--cyan-neon);
+            font-size: 1.15rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+
+        h3 {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        /* Flexbox pour aligner boutons et inputs proprement */
+        .flex-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            width: 100%;
+        }
+
+        select, input[type="text"] {
+            flex: 1;
+            background: #151515;
+            border: 1px solid var(--cyan-neon);
+            color: #fff;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 1rem;
+            outline: none;
+            min-width: 0;
+            box-sizing: border-box;
+        }
+
+        input[type="text"] {
+            border-color: #333;
+        }
+        input[type="text"]:focus {
+            border-color: var(--crimson-neon);
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: transform 0.1s;
+            white-space: nowrap;
+        }
+        .btn:active { transform: scale(0.98); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .btn-cyan { background: var(--cyan-neon); color: #000; }
+        .btn-crimson { background: var(--crimson-neon); color: #fff; }
+
+        .separator {
+            height: 1px;
+            background: #222;
+            margin: 20px 0;
+        }
+
+        .orders-empty-text {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
 
-    <h1>Mon Panier</h1>
-    <div id="panier-liste"></div>
-    
-    <!-- Code Créateur -->
-    <div class="promo-section">
-        <input type="text" id="code-createur-input" placeholder="Code créateur...">
-        <button class="btn-promo" onclick="appliquerCreateur()">Appliquer</button>
-    </div>
-    <p id="msg-createur" style="font-size: 0.8em; margin-top: 5px;"></p>
-
-    <!-- Code Points -->
-    <div class="promo-section">
-        <input type="text" id="code-points-input" placeholder="Code points...">
-        <button class="btn-promo" onclick="appliquerPoints()">Appliquer</button>
-    </div>
-    <p id="msg-points" style="font-size: 0.8em; margin-top: 5px;"></p>
-
-    <div class="total-section">
-        Total : <span id="total-somme">0.00</span> €
+    <!-- Barre latérale d'origine rétablie -->
+    <div class="sidebar">
+        <div class="menu-toggle" onclick="window.location.href='panier.html'">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
     </div>
 
-    <button class="btn-paiement" onclick="versPaiement()">PASSER AU PAIEMENT</button>
+    <!-- Contenu central parfaitement cadré -->
+    <div class="main-content">
+        <div class="container">
+
+            <!-- Cadre supérieur des diamants -->
+            <div class="points-header-box">
+                <div class="diamond-counter">
+                    💎 <span id="user-points-display">0</span>
+                </div>
+                <div class="hint-text">
+                    💡 Échangez vos points contre des codes ou fusionnez-les !
+                </div>
+            </div>
+
+            <!-- Espace Boutique & Fusion -->
+            <div class="panel">
+                <h2>💎 Boutique de points & Fusion</h2>
+
+                <!-- 1. Échange -->
+                <h3>1. Convertir mes points en code promo</h3>
+                <div class="flex-row">
+                    <select id="select-points-tier">
+                        <option value="2">2 Points</option>
+                        <option value="5">5 Points</option>
+                        <option value="10">10 Points</option>
+                        <option value="25">25 Points</option>
+                        <option value="50">50 Points</option>
+                        <option value="100">100 Points</option>
+                    </select>
+                    <button class="btn btn-cyan" id="btn-exchange" onclick="exchangePointsForCode()">Échanger</button>
+                </div>
+
+                <div class="separator"></div>
+
+                <!-- 2. Fusion -->
+                <h3>2. Reconvertir un code en points (Fusion)</h3>
+                <div class="flex-row">
+                    <input type="text" id="input-fusion-code" placeholder="Ex: SHADOW-PT-X...">
+                    <button class="btn btn-crimson" id="btn-fusion" onclick="fusionCodeToPoints()">Fusionner</button>
+                </div>
+            </div>
+
+            <!-- Section Mes Commandes -->
+            <div class="panel">
+                <h2>📦 Mes commandes</h2>
+                <div class="orders-empty-text">
+                    Vos produits achetés et clés d'activation s'afficheront ici.
+                </div>
+            </div>
+
+        </div>
+    </div>
 
     <script>
-        // Initialisation du client Supabase
+        // Initialisation de ta base Supabase
         const db = supabase.createClient(
           'https://jsuvimxjmjiljntmgbzu.supabase.co',
           'sb_publishable_Ngm29impwbTLGhuqyCxSJA_E1jXc1DX'
         );
 
-        let prixBaseTotal = 0;
-        let tauxCreateur = 0;
-        let remisePoints = 0; 
+        let userId = null;
 
-        const codesCreateurs = { "SHADOW10": 0.10, "NINJA20": 0.20 };
+        // Connexion automatique de la session utilisateur au chargement
+        document.addEventListener("DOMContentLoaded", async () => {
+            try {
+                const { data: { session }, error } = await db.auth.getSession();
+                if (error || !session) {
+                    window.location.href = "login.html"; 
+                    return;
+                }
 
-        function chargerPanier() {
-            let panier = JSON.parse(localStorage.getItem('monPanier')) || [];
-            let liste = document.getElementById('panier-liste');
-            prixBaseTotal = 0;
-            liste.innerHTML = '';
+                userId = session.user.id; 
+                await refreshPoints();
+            } catch (err) {
+                console.error("Erreur d'initialisation :", err);
+            }
+        });
 
-            panier.forEach((p, index) => {
-                const prix = parseFloat(p.price) || 0;
-                prixBaseTotal += prix;
-                liste.innerHTML += `
-                    <div class="item-card">
-                        <img src="${p.image_url || ''}" width="50" style="border-radius: 4px;">
-                        <div class="item-info">
-                            <strong>${p.name || 'Produit'}</strong><br>${prix.toFixed(2)} €
-                        </div>
-                        <button class="remove-btn" onclick="supprimerArticle(${index})">X</button>
-                    </div>
-                `;
-            });
-            calculerTotal();
+        function makeRandomString(length) {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let result = '';
+            for (let i = 0; i < length; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return result;
         }
 
-        function appliquerCreateur() {
-            const code = document.getElementById('code-createur-input').value.toUpperCase();
-            const msg = document.getElementById('msg-createur');
-            tauxCreateur = codesCreateurs[code] || 0;
-            msg.innerText = tauxCreateur > 0 ? "Code appliqué !" : "Code invalide";
-            msg.style.color = tauxCreateur > 0 ? "#00ff00" : "#ff3333";
-            calculerTotal();
+        // Récupère ton solde depuis 'loyalty_points'
+        async function refreshPoints() {
+            if (!userId) return 0;
+            try {
+                const { data, error } = await db
+                    .from('profiles')
+                    .select('loyalty_points')
+                    .eq('id', userId)
+                    .single();
+
+                if (error) throw error;
+
+                if (data) {
+                    const display = document.getElementById('user-points-display');
+                    if (display) display.innerText = data.loyalty_points;
+                    return data.loyalty_points;
+                }
+            } catch (err) {
+                console.error("Erreur de récupération des points:", err);
+                return 0;
+            }
         }
 
-        async function appliquerPoints() {
-            const codeSaisi = document.getElementById('code-points-input').value.trim();
-            const msg = document.getElementById('msg-points');
+        // Action 1 : Convertir points -> Code Promo
+        async function exchangePointsForCode() {
+            const selectElem = document.getElementById('select-points-tier');
+            if (!selectElem) return;
 
-            if (!codeSaisi) {
-                msg.innerText = "Veuillez entrer un code.";
-                msg.style.color = "#ff3333";
+            const pointsToSpend = parseInt(selectElem.value);
+            const btn = document.getElementById('btn-exchange');
+
+            if (btn) btn.disabled = true;
+            const currentPts = await refreshPoints();
+
+            if (currentPts < pointsToSpend) {
+                alert("❌ Solde de points insuffisant pour ce palier.");
+                if (btn) btn.disabled = false;
                 return;
             }
 
+            const generatedCode = "SHADOW-PT-" + makeRandomString(6);
+
             try {
-                // Requête corrigée sur la table codes_points avec le statut utilisé à false
-                const { data, error } = await db
+                const { error: updateError } = await db
+                    .from('profiles')
+                    .update({ loyalty_points: currentPts - pointsToSpend })
+                    .eq('id', userId);
+
+                if (updateError) throw updateError;
+
+                const { error: insertError } = await db
                     .from('codes_points')
-                    .select('points')
+                    .insert([
+                        { code: generatedCode, points: pointsToSpend, used: false }
+                    ]);
+
+                if (insertError) throw insertError;
+
+                alert(`🎉 Succès ! Code généré : ${generatedCode}\nIl vous donne droit à -${pointsToSpend}% de réduction.`);
+                await refreshPoints();
+
+            } catch (err) {
+                console.error(err);
+                alert("Une erreur est survenue lors de l'échange.");
+            } finally {
+                if (btn) btn.disabled = false;
+            }
+        }
+
+        // Action 2 : Fusionner un code en points
+        async function fusionCodeToPoints() {
+            const inputElem = document.getElementById('input-fusion-code');
+            if (!inputElem) return;
+
+            const codeSaisi = inputElem.value.trim();
+            const btn = document.getElementById('btn-fusion');
+
+            if (!codeSaisi) {
+                alert("Veuillez entrer un code à fusionner.");
+                return;
+            }
+
+            if (btn) btn.disabled = true;
+
+            try {
+                const { data: codeData, error: codeError } = await db
+                    .from('codes_points')
+                    .select('*')
                     .eq('code', codeSaisi)
                     .eq('used', false)
                     .single();
 
-                if (error || !data) {
-                    remisePoints = 0;
-                    msg.innerText = "Code points invalide, expiré ou déjà consommé";
-                    msg.style.color = "#ff3333";
-                } else {
-                    // Conversion de la valeur du palier (ex: 5 points = 5% de réduction)
-                    remisePoints = parseFloat(data.points) / 100; 
-                    
-                    msg.innerText = `Code appliqué ! Remise de ${(remisePoints * 100).toFixed(0)}% activée.`;
-                    msg.style.color = "#00ff00";
+                if (codeError || !codeData) {
+                    alert("❌ Ce code est invalide, inexistant ou a déjà été consommé.");
+                    if (btn) btn.disabled = false;
+                    return;
                 }
+
+                const currentPts = await refreshPoints();
+
+                const { error: disableError } = await db
+                    .from('codes_points')
+                    .update({ used: true })
+                    .eq('id', codeData.id);
+
+                if (disableError) throw disableError;
+
+                const { error: profileUpdateError } = await db
+                    .from('profiles')
+                    .update({ loyalty_points: currentPts + codeData.points })
+                    .eq('id', userId);
+
+                if (profileUpdateError) throw profileUpdateError;
+
+                alert(`✨ Fusion réussie ! +${codeData.points} points ont été recrédités sur votre compte.`);
+                inputElem.value = "";
+                await refreshPoints();
+
             } catch (err) {
                 console.error(err);
-                msg.innerText = "Erreur de connexion à la base de données";
-                msg.style.color = "#ff3333";
+                alert("Une erreur technique s'est produite lors de l'fusion.");
+            } finally {
+                if (btn) btn.disabled = false;
             }
-
-            calculerTotal();
         }
-
-        function calculerTotal() {
-            let totalFinal = prixBaseTotal - (prixBaseTotal * tauxCreateur) - (prixBaseTotal * remisePoints);
-            document.getElementById('total-somme').innerText = Math.max(totalFinal, 0).toFixed(2);
-        }
-
-        function supprimerArticle(index) {
-            let panier = JSON.parse(localStorage.getItem('monPanier')) || [];
-            panier.splice(index, 1);
-            localStorage.setItem('monPanier', JSON.stringify(panier));
-            chargerPanier();
-        }
-
-        function versPaiement() {
-            localStorage.setItem('totalPanier', document.getElementById('total-somme').innerText);
-            localStorage.setItem('codePointsApplique', document.getElementById('code-points-input').value.trim());
-            window.location.href = 'paiement.html';
-        }
-
-        window.onload = chargerPanier;
     </script>
 </body>
 </html>
