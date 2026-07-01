@@ -15,6 +15,7 @@
         .promo-section { margin-top: 15px; display: flex; gap: 5px; }
         input[type="text"] { padding: 10px; background: #222; border: 1px solid #00ffff; color: white; border-radius: 4px; width: 60%; }
         .btn-promo { padding: 10px; background: #00ffff; color: #000; border: none; cursor: pointer; font-weight: bold; border-radius: 4px; }
+        .btn-promo:disabled { opacity: 0.5; cursor: not-allowed; }
         
         .btn-paiement { width: 100%; padding: 15px; background: #ff3333; border: none; color: white; font-weight: bold; cursor: pointer; margin-top: 20px; font-size: 1.1em; }
         .total-section { font-size: 1.4em; font-weight: bold; margin-top: 20px; text-align: center; color: #00ffff; }
@@ -35,7 +36,7 @@
     <!-- Code Points -->
     <div class="promo-section">
         <input type="text" id="code-points-input" placeholder="Code points...">
-        <button class="btn-promo" onclick="appliquerPoints()">Appliquer</button>
+        <button class="btn-promo" id="btn-points" onclick="appliquerPoints()">Appliquer</button>
     </div>
     <p id="msg-points" style="font-size: 0.8em; margin-top: 5px;"></p>
 
@@ -89,9 +90,11 @@
             calculerTotal();
         }
 
+        // MISE À JOUR : Adaptation pour cibler ton système automatisé 'codes_points'
         async function appliquerPoints() {
             const codeSaisi = document.getElementById('code-points-input').value.trim();
             const msg = document.getElementById('msg-points');
+            const btn = document.getElementById('btn-points');
 
             if (!codeSaisi) {
                 msg.innerText = "Veuillez entrer un code.";
@@ -99,34 +102,41 @@
                 return;
             }
 
+            btn.disabled = true;
+            msg.innerText = "Vérification...";
+            msg.style.color = "#aaa";
+
             try {
+                // Requête ciblant 'codes_points' où le code correspond et n'est pas utilisé (used = false)
                 const { data, error } = await db
-                    .from('codes_promo')
-                    .select('reduction_value')
+                    .from('codes_points')
+                    .select('*')
                     .eq('code', codeSaisi)
+                    .eq('used', false)
                     .single();
 
                 if (error || !data) {
                     remisePoints = 0;
-                    msg.innerText = "Code points invalide ou expiré";
+                    msg.innerText = "Code points invalide, expiré ou déjà utilisé";
                     msg.style.color = "#ff3333";
                 } else {
-                    // Supposition : reduction_value est stocké en pourcentage (ex: 15 pour 15%)
-                    remisePoints = parseFloat(data.reduction_value) / 100; 
+                    // 1 point = 1% de remise (ex: 25 points donne 0.25 de réduction)
+                    remisePoints = parseFloat(data.points) / 100; 
                     
                     msg.innerText = `Code appliqué ! Remise de ${(remisePoints * 100).toFixed(0)}% activée.`;
                     msg.style.color = "#00ff00";
                 }
             } catch (err) {
                 console.error(err);
-                msg.innerText = "Erreur de connexion à la base de données";
+                msg.innerText = "Erreur de connexion au serveur";
                 msg.style.color = "#ff3333";
+            } finally {
+                btn.disabled = false;
             }
 
             calculerTotal();
         }
 
-        // CORRIGÉ : La fonction possède désormais la bonne orthographe pour s'exécuter correctement
         function calculerTotal() {
             let totalFinal = prixBaseTotal - (prixBaseTotal * tauxCreateur) - (prixBaseTotal * remisePoints);
             document.getElementById('total-somme').innerText = Math.max(totalFinal, 0).toFixed(2);
