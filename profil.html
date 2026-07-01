@@ -34,9 +34,11 @@
             flex-direction: column;
             align-items: center;
             padding-top: 20px;
+            gap: 25px;
             z-index: 10;
         }
 
+        /* Bouton des 3 barres */
         .menu-toggle {
             cursor: pointer;
             display: flex;
@@ -51,6 +53,27 @@
             width: 100%;
             background: var(--cyan-neon);
             border-radius: 2px;
+        }
+
+        /* Zone pour tes icônes de navigation d'origine (Exemple) */
+        .sidebar-menu-items {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            width: 100%;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .sidebar-item {
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: color 0.2s;
+            text-decoration: none;
+            color: #fff;
+        }
+        .sidebar-item:hover {
+            color: var(--cyan-neon);
         }
 
         /* Contenu centralisé autonome - Rendu Idéal */
@@ -181,12 +204,20 @@
 </head>
 <body>
 
-    <!-- Barre latérale d'origine rétablie -->
+    <!-- Barre latérale d'origine complète -->
     <div class="sidebar">
-        <div class="menu-toggle" onclick="window.location.href='panier.html'">
+        <!-- Les 3 barres qui déclenchent l'ouverture de ton menu global -->
+        <div class="menu-toggle" onclick="toggleSidebarMenu()">
             <span></span>
             <span></span>
             <span></span>
+        </div>
+
+        <!-- Tes icônes de navigation (Ajoute ou modifie tes liens/icones ici) -->
+        <div class="sidebar-menu-items">
+            <a href="index.html" class="sidebar-item" title="Accueil">🏠</a>
+            <a href="panier.html" class="sidebar-item" title="Mon Panier">🛒</a>
+            <a href="profil.html" class="sidebar-item" title="Mon Profil" style="color: var(--cyan-neon);">👤</a>
         </div>
     </div>
 
@@ -251,6 +282,12 @@
         );
 
         let userId = null;
+
+        // CORRECTION : Mets ici le code JavaScript d'origine qui ouvre ou déroule ton menu si tu en as un
+        function toggleSidebarMenu() {
+            console.log("Ouverture du menu latéral...");
+            // Si tu as une fonction spéciale dans ton script d'origine pour ouvrir le menu, mets-la ici.
+        }
 
         // Connexion automatique de la session utilisateur au chargement
         document.addEventListener("DOMContentLoaded", async () => {
@@ -397,7 +434,7 @@
 
             } catch (err) {
                 console.error(err);
-                alert("Une erreur technique s'est produite lors de l'fusion.");
+                alert("Une erreur technique s'est produite lors de la fusion.");
             } finally {
                 if (btn) btn.disabled = false;
             }
