@@ -37,6 +37,7 @@
 </div>
 
 <script>
+  // Initialisation client
   const supabase = supabase.createClient(
     'https://jsuvimxjmjiljntmgbzu.supabase.co',
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzdXZpbXhqbWppbGpudG1nYnp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI0Njk0NTgsImV4cCI6MjA5ODA0NTQ1OH0.F6aDK6oTyp3Tlb9fmkqpzgn4KGAxA5-ClIKlkqzfcR4'
@@ -44,6 +45,7 @@
 
   let isLogin = true;
 
+  // Gestion changement mode (Connexion/Inscription)
   function toggleMode() {
     isLogin = !isLogin;
     document.getElementById('formTitle').innerText = isLogin ? "CONNEXION" : "CRÉER UN COMPTE";
@@ -51,6 +53,7 @@
     document.getElementById('toggleText').innerText = isLogin ? "Pas de compte ? Créer un compte" : "Déjà un compte ? Connexion";
   }
 
+  // Visibilité mot de passe
   function togglePassword() {
     const p = document.getElementById('password');
     const i = document.getElementById('eyeIcon');
@@ -58,19 +61,33 @@
     else { p.type = 'password'; i.innerText = '🙈'; }
   }
 
+  // Soumission Formulaire
   document.getElementById('authForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     const email = document.getElementById('email').value.trim();
     const password = document.getElementById('password').value;
     const btn = document.getElementById('submitBtn');
     btn.disabled = true;
+    btn.innerText = "PATIENTEZ...";
 
-    const { error } = isLogin 
-        ? await supabase.auth.signInWithPassword({ email, password })
-        : await supabase.auth.signUp({ email, password });
-
-    if (error) { alert("Erreur : " + error.message); btn.disabled = false; }
-    else { window.location.href = "profil.html"; }
+    try {
+      if (isLogin) {
+        // Connexion
+        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error) throw error;
+        window.location.href = "profil.html";
+      } else {
+        // Inscription
+        const { error } = await supabase.auth.signUp({ email, password });
+        if (error) throw error;
+        alert("Compte créé avec succès !");
+        window.location.href = "profil.html";
+      }
+    } catch (err) {
+      alert("Erreur : " + err.message);
+      btn.disabled = false;
+      btn.innerText = isLogin ? "SE CONNECTER" : "S'INSCRIRE";
+    }
   });
 </script>
 </body>
