@@ -6,73 +6,67 @@
     <title>Mes Commandes - Shadow Market</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        :root { --bg: #0d0e12; --cyan: #00f2fe; --rose: #ff0055; --text: #fff; }
+        :root { --bg: #0d0e12; --cyan: #00f2fe; --rose: #ff0055; --text: #fff; --green: #28a745; }
         body { background: var(--bg); color: var(--text); font-family: sans-serif; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
         .wrapper { width: 90%; max-width: 400px; }
         h2 { color: var(--cyan); text-align: center; border-bottom: 2px solid var(--rose); padding-bottom: 10px; }
         
-        .order-card { background: #1a1c23; border: 1px solid #333; padding: 15px; margin: 10px 0; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; }
-        .order-info h3 { margin: 0; font-size: 1.1rem; color: #fff; }
-        .order-info p { margin: 5px 0 0; font-size: 0.9rem; color: var(--cyan); font-weight: bold; }
-        
-        .btn-access { background: var(--cyan); color: #000; border: none; padding: 8px 12px; border-radius: 5px; font-weight: bold; cursor: pointer; text-decoration: none; font-size: 0.85rem; }
-        .back-btn { display: block; text-align: center; margin-top: 20px; color: white; text-decoration: none; border: 1px solid var(--cyan); padding: 10px; border-radius: 5px; }
-        .diagnostic-msg { color: #ff0055; font-size: 0.9rem; text-align: center; padding: 10px; }
+        .order-card { background: #1a1c23; border: 1px solid #333; padding: 15px; margin: 10px 0; border-radius: 10px; }
+        .input-group { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
+        input { padding: 8px; border-radius: 5px; border: none; }
+        .btn-verify { background: var(--rose); color: white; border: none; padding: 8px; border-radius: 5px; cursor: pointer; }
+        .btn-download { display: none; background: var(--green); color: white; padding: 10px; text-align: center; border-radius: 5px; text-decoration: none; font-weight: bold; }
+
+        /* Style de la Popup (Inspiré de 1000312758.jpg) */
+        .popup { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+        .popup-content { background: #1a1c23; padding: 30px; border-radius: 15px; border: 2px solid var(--cyan); text-align: center; color: white; }
     </style>
 </head>
 <body>
-
     <div class="wrapper">
         <h2>MES COMMANDES</h2>
-        <div id="orders-list">Chargement des données...</div>
-        <a href="profil.html" class="back-btn">⬅ Retour au Profil</a>
+        <div id="orders-list">Chargement...</div>
     </div>
 
     <script>
-        // Initialisation Supabase
         const db = supabase.createClient("https://jsuvimxjmjiljntmgbzu.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzdXZpbXhqbWppbGpudG1nYnp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI0Njk0NTgsImV4cCI6MjA5ODA0NTQ1OH0.F6aDK6oTyp3Tlb9fmkqpzgn4KGAxA5-ClIKlkqzfcR4");
 
         async function loadOrders() {
-            const listDiv = document.getElementById('orders-list');
+            const { data: { user } } = await db.auth.getUser();
+            const { data, error } = await db.from('pending_orders').select('*').eq('user_id', user.id);
             
-            try {
-                // 1. Diagnostic Authentification
-                const { data: { user }, error: authError } = await db.auth.getUser();
-                if (authError) throw new Error("Erreur Auth: " + authError.message);
-                if (!user) {
-                    window.location.href = "login.html";
-                    return;
-                }
-
-                // 2. Diagnostic Chargement Table
-                const { data, error } = await db
-                    .from('pending_orders')
-                    .select('product_name, price')
-                    .eq('user_id', user.id);
-
-                if (error) throw new Error("Erreur Supabase: " + error.message);
-
-                // 3. Affichage
-                if (!data || data.length === 0) {
-                    listDiv.innerHTML = "<p style='text-align:center; color:#777;'>Aucune commande traitée pour le moment.</p>";
-                } else {
-                    listDiv.innerHTML = data.map(order => `
-                        <div class="order-card">
-                            <div class="order-info">
-                                <h3>${order.product_name}</h3>
-                                <p>${order.price} Points</p>
-                            </div>
-                            <a href="panier.html?product=${encodeURIComponent(order.product_name)}&price=${order.price}" 
-                               class="btn-access">OBTENIR</a>
-                        </div>
-                    `).join('');
-                }
-            } catch (err) {
-                listDiv.innerHTML = `<div class="diagnostic-msg">DIAGNOSTIC ÉCHEC: ${err.message}</div>`;
-                console.error(err);
-            }
+            const listDiv = document.getElementById('orders-list');
+            listDiv.innerHTML = data.map(order => `
+                <div class="order-card">
+                    <h3>${order.product_name}</h3>
+                    <div class="input-group">
+                        <input type="text" id="code-${order.id}" placeholder="Ex: CODE-XXXXXXXX">
+                        <button class="btn-verify" onclick="verifyCode('${order.id}')">VÉRIFIER LE CODE</button>
+                        <a id="dl-${order.id}" class="btn-download" href="#">TÉLÉCHARGER</a>
+                    </div>
+                </div>
+            `).join('');
         }
 
+        async function verifyCode(id) {
+            const code = document.getElementById(`code-${id}`).value;
+            const { data } = await db.from('codes_points').select('*').eq('code', code).single();
+
+            if (data) {
+                document.body.insertAdjacentHTML('beforeend', `
+                    <div class="popup">
+                        <div class="popup-content">
+                            <div style="font-size: 50px;">✅ 🎉</div>
+                            <h3>Succès !</h3>
+                            <p>Fusion réussie !</p>
+                            <button onclick="this.parentElement.parentElement.remove()">OK</button>
+                        </div>
+                    </div>`);
+                document.getElementById(`dl-${id}`).style.display = 'block';
+            } else {
+                alert("Code invalide");
+            }
+        }
         window.onload = loadOrders;
     </script>
 </body>
