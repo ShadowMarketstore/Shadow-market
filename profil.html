@@ -3,26 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Espace Personnel - Shadow Market</title>
+    <title>Mon Profil - Shadow Market</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        :root { --bg-color: #0d0e12; --accent-color: #00f2fe; --crimson-neon: #ff0055; --text-color: #ffffff; }
-        body { margin: 0; background: var(--bg-color); color: var(--text-color); font-family: sans-serif; display: flex; flex-direction: column; align-items: center; }
+        :root { --bg: #0d0e12; --accent: #00f2fe; --crimson: #ff0055; --text: #fff; }
+        body { background: var(--bg); color: var(--text); font-family: sans-serif; margin: 0; display: flex; flex-direction: column; align-items: center; }
         
+        /* Menu Hamburger */
         .menu-toggle { position: absolute; top: 20px; left: 20px; cursor: pointer; z-index: 1000; display: flex; flex-direction: column; gap: 6px; }
-        .menu-toggle span { display: block; width: 30px; height: 3px; background: var(--accent-color); transition: 0.3s; }
-        
-        .nav-menu { position: fixed; left: -100%; top: 0; width: 250px; height: 100%; background: #090a0e; transition: 0.3s; padding: 80px 20px; z-index: 999; border-right: 2px solid var(--accent-color); }
+        .menu-toggle span { display: block; width: 30px; height: 3px; background: var(--accent); transition: 0.3s; }
+        .nav-menu { position: fixed; left: -100%; top: 0; width: 250px; height: 100%; background: #090a0e; transition: 0.3s; padding: 80px 20px; z-index: 999; border-right: 2px solid var(--accent); }
         .nav-menu.open { left: 0; }
-        .nav-menu a { display: block; color: var(--text-color); text-decoration: none; padding: 15px 0; border-bottom: 1px solid #222; font-size: 16px; }
+        .nav-menu a { display: block; color: var(--text); text-decoration: none; padding: 15px 0; border-bottom: 1px solid #222; }
 
-        .neon-wrapper { width: 90%; max-width: 400px; border: 2px solid var(--accent-color); border-radius: 20px; padding: 25px; margin-top: 80px; text-align: center; }
-        .points-count { font-size: 48px; font-weight: bold; margin: 15px 0; }
-        .input-box { width: 100%; padding: 12px; margin: 10px 0; background: #1a1c23; border: 1px solid #333; color: white; border-radius: 8px; box-sizing: border-box; }
-        .btn-main { width: 100%; padding: 12px; background: var(--accent-color); border: none; font-weight: bold; border-radius: 8px; cursor: pointer; text-transform: uppercase; margin-top: 10px; }
-        .btn-fusion { background: var(--crimson-neon); color: white; }
-        
-        .debug-console { margin-top: 30px; width: 90%; max-width: 400px; padding: 10px; border: 1px dashed var(--crimson-neon); font-size: 11px; color: #ff99bb; }
+        /* Conteneur principal */
+        .wrapper { width: 90%; max-width: 400px; margin-top: 80px; text-align: center; border: 2px solid var(--accent); padding: 25px; border-radius: 20px; }
+        .points-val { font-size: 45px; font-weight: bold; color: var(--accent); margin: 15px 0; }
+        .boutique-section { text-align: left; margin-top: 20px; }
+        .btn-main { width: 100%; padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; text-transform: uppercase; margin-top: 10px; }
+        .btn-echanger { background: var(--accent); }
+        .btn-fusion { background: var(--crimson); color: white; }
+        .input-code { width: 100%; padding: 12px; background: #1a1c23; border: 1px solid #333; color: white; border-radius: 8px; box-sizing: border-box; margin-top: 10px; }
+        .status-box { margin-top: 20px; padding: 10px; border: 1px dashed var(--crimson); font-size: 11px; color: var(--crimson); text-align: center; }
     </style>
 </head>
 <body>
@@ -33,74 +35,62 @@
 
     <div id="nav" class="nav-menu">
         <a href="index.html">🏠 Accueil</a>
-        <a href="profil.html">👤 Mon Profil</a>
+        <a href="profil.html">👤 Profil</a>
         <a href="commandes.html">📦 Mes Commandes</a>
         <a href="points.html">💎 Mes Points</a>
         <a href="bibliotheque.html">📚 Bibliothèque</a>
         <hr style="border: 0; border-top: 1px solid #333; margin: 20px 0;">
-        <a href="#" onclick="logout()" style="color: var(--crimson-neon);">⏻ Déconnexion</a>
+        <a href="#" onclick="logout()" style="color: var(--crimson);">⏻ Déconnexion</a>
     </div>
 
-    <div class="neon-wrapper">
-        <h2 style="color: var(--accent-color);">MON PROFIL</h2>
-        <div id="user-info" style="margin-bottom: 20px;">Chargement...</div>
-        <div class="points-count">💎 <span id="points-display">0</span></div>
+    <div class="wrapper">
+        <h2 style="color: var(--accent);">MON PROFIL</h2>
+        <div id="user-email">...</div>
+        <div class="points-val">💎 <span id="pts">0</span></div>
         
-        <hr style="border: 0; border-top: 1px solid #333; margin: 20px 0;">
-        
-        <button class="btn-main" onclick="echangerPoints()">ÉCHANGER</button>
-        
-        <input type="text" id="code-input" class="input-box" placeholder="Ex: SHADOW-PT-XXXXXX">
-        <button class="btn-main btn-fusion" onclick="fusionnerCode()">FUSIONNER</button>
+        <div class="boutique-section">
+            <label>1. CONVERTIR MES POINTS</label>
+            <button class="btn-main btn-echanger" onclick="echanger()">ÉCHANGER</button>
+            
+            <label style="display:block; margin-top:20px;">2. FUSIONNER UN CODE</label>
+            <input type="text" id="code-input" class="input-code" placeholder="Ex: SHADOW-PT-XXXXXX">
+            <button class="btn-main btn-fusion" onclick="fusionner()">FUSIONNER</button>
+        </div>
     </div>
 
-    <div class="debug-console" id="debug-log">Initialisation...</div>
+    <div class="status-box" id="status">Système initialisé.</div>
 
     <script>
-        const SUPABASE_URL = "https://jsuvimxjmjiljntmgbzu.supabase.co"; 
-        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzdXZpbXhqbWppbGpudG1nYnp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI0Njk0NTgsImV4cCI6MjA5ODA0NTQ1OH0.F6aDK6oTyp3Tlb9fmkqpzgn4KGAxA5-ClIKlkqzfcR4"; 
-        const client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const SUPABASE_URL = "https://jsuvimxjmjiljntmgbzu.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzdXZpbXhqbWppbGpudG1nYnp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI0Njk0NTgsImV4cCI6MjA5ODA0NTQ1OH0.F6aDK6oTyp3Tlb9fmkqpzgn4KGAxA5-ClIKlkqzfcR4";
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        async function initApp() {
-            const logBox = document.getElementById('debug-log');
-            try {
-                const { data: { session } } = await client.auth.getSession();
-                if (session) {
-                    document.getElementById('user-info').textContent = session.user.email;
-                    const { data } = await client.from('profiles').select('loyalty_points').eq('id', session.user.id).single();
-                    document.getElementById('points-display').textContent = data ? data.loyalty_points : 0;
-                    logBox.textContent = "✅ Système opérationnel.";
-                } else {
-                    logBox.textContent = "❌ Session non trouvée.";
-                }
-            } catch (err) {
-                logBox.textContent = "💥 Erreur : " + err.message;
-            }
-        }
-
-        async function echangerPoints() {
-            const { error } = await client.rpc('convertir_points_en_code');
-            if (error) {
-                document.getElementById('debug-log').textContent = "Erreur échange : " + error.message;
+        async function init() {
+            const { data: { user } } = await supabase.auth.getUser();
+            if(user) {
+                document.getElementById('user-email').innerText = user.email;
+                const { data } = await supabase.from('profiles').select('loyalty_points').eq('id', user.id).single();
+                document.getElementById('pts').innerText = data ? data.loyalty_points : 0;
             } else {
-                alert("Code généré !");
-                initApp();
+                document.getElementById('status').innerText = "Non connecté.";
             }
         }
 
-        async function fusionnerCode() {
+        async function echanger() {
+            const { error } = await supabase.rpc('convertir_points_en_code');
+            if (error) document.getElementById('status').innerText = "Erreur : " + error.message;
+            else { alert("Échange effectué !"); init(); }
+        }
+
+        async function fusionner() {
             const code = document.getElementById('code-input').value;
-            const { error } = await client.rpc('fusion_code_secure', { code_input: code });
-            if (error) {
-                document.getElementById('debug-log').textContent = "Erreur fusion : " + error.message;
-            } else {
-                alert("Fusion réussie !");
-                initApp();
-            }
+            const { error } = await supabase.rpc('fusion_code_secure', { code_input: code });
+            if (error) document.getElementById('status').innerText = "Erreur : " + error.message;
+            else { alert("Code fusionné avec succès !"); init(); }
         }
 
         function logout() { window.location.href = "index.html"; }
-        window.onload = initApp;
+        window.onload = init;
     </script>
 </body>
 </html>
