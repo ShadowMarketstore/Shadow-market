@@ -98,10 +98,6 @@
             
             document.getElementById('user-email').innerText = user.email;
             
-            // Récupération des points
-            // ⚠️ FIX : .maybeSingle() au lieu de .single() pour ne pas planter
-            // si l'utilisateur n'a pas encore de ligne dans "profiles"
-            // (ex: juste après inscription, avant création du profil).
             const { data, error } = await db
                 .from('profiles')
                 .select('loyalty_points')
@@ -114,7 +110,6 @@
                 return;
             }
 
-            // data === null si aucun profil trouvé -> on affiche 0 sans planter
             document.getElementById('pts').innerText = data ? data.loyalty_points : 0;
         }
 
@@ -124,9 +119,19 @@
             
             btn.disabled = true; btn.innerText = "TRAITEMENT...";
             try {
-                const { error } = await db.rpc('convertir_points_en_code', { amount: parseInt(amount) });
+                // 1. On appelle la bonne fonction et on récupère 'data' qui contient le code
+                const { data: codeGenere, error } = await db.rpc('convert_points_en_code', { amount: parseInt(amount) });
+                
                 if (error) throw error;
-                alert("Échange validé !");
+                
+                // 2. On affiche le code généré à l'utilisateur
+                if (codeGenere) {
+                    alert("Échange validé ! Votre code de réduction est : " + codeGenere);
+                } else {
+                    alert("Échange validé, mais aucun code n'a été retourné.");
+                }
+
+                // 3. On actualise l'affichage des points
                 await init();
             } catch (err) {
                 alert("Erreur : " + err.message);
@@ -156,7 +161,7 @@
 
         // Fonction de déconnexion
         async function logoutUser(e) {
-            if (e) e.preventDefault(); // empêche le lien "#" de naviguer tout seul
+            if (e) e.preventDefault();
             try {
                 await db.auth.signOut();
             } catch (err) {
