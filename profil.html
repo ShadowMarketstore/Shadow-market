@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Espace Personnel - Shadow Market</title>
+    <!-- CDN neutre et ultra-compatible pour éviter les blocages mobiles -->
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
         :root {
@@ -502,12 +503,9 @@
             }
         });
 
-        // Lancement immédiat dès que le DOM est prêt
-        if (document.readyState === "loading") {
-            document.addEventListener("DOMContentLoaded", initApp);
-        } else {
-            initApp();
-        }
+        // Lancement forcé et immédiat sans délai de chargement
+        initApp();
     </script>
 </body>
 </html>
+
