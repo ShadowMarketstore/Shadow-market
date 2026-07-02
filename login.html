@@ -12,7 +12,7 @@
     label { display: block; margin-bottom: 5px; color: #00f2fe; }
     input { background: #000; border: 1px solid #00f2fe; color: #fff; padding: 12px; width: 100%; box-sizing: border-box; border-radius: 5px; }
     .submit-btn { width: 100%; padding: 12px; background: #ff0055; color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; margin-top: 10px; text-transform: uppercase; }
-    #eyeIcon { cursor: pointer; color: #00f2fe; position: absolute; right: 15px; }
+    #eyeIcon { cursor: pointer; color: #00f2fe; position: absolute; right: 15px; user-select: none; }
   </style>
 </head>
 <body>
@@ -28,7 +28,7 @@
       <label>Mot de passe</label>
       <div style="position: relative; display: flex; align-items: center;">
         <input type="password" id="password" required>
-        <span id="eyeIcon" onclick="togglePassword()">🙉</span>
+        <span id="eyeIcon" onclick="togglePassword()">🙈</span>
       </div>
     </div>
     <button type="submit" class="submit-btn" id="submitBtn">SE CONNECTER</button>
@@ -37,7 +37,6 @@
 </div>
 
 <script>
-  // Initialisation avec ta clé valide
   const supabase = supabase.createClient(
     'https://jsuvimxjmjiljntmgbzu.supabase.co',
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzdXZpbXhqbWppbGpudG1nYnp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI0Njk0NTgsImV4cCI6MjA5ODA0NTQ1OH0.F6aDK6oTyp3Tlb9fmkqpzgn4KGAxA5-ClIKlkqzfcR4'
@@ -45,7 +44,6 @@
 
   let isLogin = true;
 
-  // Vérifier si déjà connecté
   supabase.auth.getSession().then(({ data: { session } }) => {
     if (session) window.location.href = "profil.html";
   });
@@ -56,6 +54,7 @@
     document.getElementById('submitBtn').innerText = isLogin ? "SE CONNECTER" : "S'INSCRIRE";
     document.getElementById('toggleText').innerText = isLogin ? "Pas de compte ? Créer un compte" : "Déjà un compte ? Connexion";
   }
+
   function togglePassword() {
     const p = document.getElementById('password');
     const i = document.getElementById('eyeIcon');
@@ -65,7 +64,9 @@
     } else {
       p.type = 'password';
       i.innerText = '🙈';
-      
+    }
+  } // <-- L'accolade manquante était ici
+
   document.getElementById('authForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     const submitBtn = document.getElementById('submitBtn');
