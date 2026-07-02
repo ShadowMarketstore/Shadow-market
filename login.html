@@ -39,14 +39,17 @@
 </div>
 
 <script>
-    // ⚠️ FIX TDZ : le client Supabase est renommé "db" pour éviter le conflit
-    // de nom avec l'objet global "supabase" injecté par le CDN.
-    // (const supabase = supabase.createClient(...) plante avec
-    // "ReferenceError: Cannot access 'supabase' before initialization")
     const db = supabase.createClient(
         'https://jsuvimxjmjiljntmgbzu.supabase.co',
         'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzdXZpbXhqbWppbGpudG1nYnp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI0Njk0NTgsImV4cCI6MjA5ODA0NTQ1OH0.F6aDK6oTyp3Tlb9fmkqpzgn4KGAxA5-ClIKlkqzfcR4'
     );
+
+    // 1. Vérification automatique : si déjà connecté, rediriger direct vers profil
+    async function checkSession() {
+        const { data: { session } } = await db.auth.getSession();
+        if (session) { window.location.href = "profil.html"; }
+    }
+    checkSession();
 
     let isLogin = true;
 
@@ -79,13 +82,14 @@
                 if (error) throw error;
                 window.location.href = "profil.html";
             } else {
+                // Inscription : Suppression du alert() pour fluidité totale
                 const { error } = await db.auth.signUp({ email, password });
                 if (error) throw error;
-                alert("Inscription réussie !");
+                // Redirection immédiate après succès d'inscription
+                window.location.href = "profil.html";
             }
         } catch (err) {
             alert("Erreur : " + err.message);
-        } finally {
             btn.disabled = false;
             btn.innerText = isLogin ? "SE CONNECTER" : "S'INSCRIRE";
         }
