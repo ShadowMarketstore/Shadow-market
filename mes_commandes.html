@@ -7,12 +7,10 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="style.css"> 
     <style>
-        /* Ajouts spécifiques pour la logique de commande */
+        .diag-box { background: #1a0000; border: 1px solid #dc143c; color: #ffcccc; padding: 10px; margin: 20px; font-size: 12px; border-radius: 8px; }
         .btn-download { display: none; background: #28a745 !important; margin-top: 10px; }
         .input-group { margin-top: 15px; }
-        .input-group input { margin-bottom: 10px; border: 1px solid #00f3ff; background: #000; color: #fff; padding: 10px; border-radius: 8px; width: 100%; }
-        
-        /* Animation Popup comme sur l'image 1000312758.jpg */
+        .input-group input { width: 100%; padding: 12px; background: #000; border: 1px solid #dc143c; color: #fff; border-radius: 8px; margin-bottom: 10px; }
         .popup { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); display:flex; align-items:center; justify-content:center; z-index:9999; }
         .popup-content { background:#080808; padding:30px; border-radius:20px; border:2px solid #00f3ff; text-align:center; width: 85%; max-width: 300px; }
     </style>
@@ -25,36 +23,51 @@
     </div>
 
     <h2 class="section-title">Mes Commandes</h2>
-    <div id="orders-list" style="width: 95%; max-width: 450px;">Chargement...</div>
+    <div id="diagnostic-area"></div>
+    <div id="orders-list" style="width: 95%; max-width: 450px;"></div>
 </div>
 
 <script>
     const db = supabase.createClient("https://jsuvimxjmjiljntmgbzu.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzdXZpbXhqbWppbGpudG1nYnp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI0Njk0NTgsImV4cCI6MjA5ODA0NTQ1OH0.F6aDK6oTyp3Tlb9fmkqpzgn4KGAxA5-ClIKlkqzfcR4");
 
+    function showDiag(msg) {
+        document.getElementById('diagnostic-area').innerHTML += `<div class="diag-box">DIAG: ${msg}</div>`;
+    }
+
     async function loadOrders() {
-        const { data: { user } } = await db.auth.getUser();
-        const { data } = await db.from('pending_orders').select('*').eq('user_id', user.id);
-        
-        const listDiv = document.getElementById('orders-list');
-        listDiv.innerHTML = data.map(order => `
-            <div class="order-card" style="margin-bottom: 15px;">
-                <div class="product-name" style="font-size: 16px;">${order.product_name}</div>
-                <div class="input-group">
-                    <input type="text" id="code-${order.id}" placeholder="CODE-XXXXXXXX">
-                    <button class="buy-btn" onclick="verifyCode('${order.id}')">VALIDER</button>
-                    <a id="dl-${order.id}" class="buy-btn btn-download" href="#">TÉLÉCHARGER</a>
+        try {
+            const { data: { user }, error: authError } = await db.auth.getUser();
+            if (authError) { showDiag("Erreur Auth: " + authError.message); return; }
+            if (!user) { showDiag("Utilisateur non connecté"); return; }
+            showDiag("Utilisateur ID: " + user.id);
+
+            const { data, error } = await db.from('pending_orders').select('*').eq('user_id', user.id);
+            
+            if (error) { showDiag("Erreur Table: " + error.message); return; }
+            if (!data || data.length === 0) { showDiag("Aucune donnée trouvée dans pending_orders pour cet ID."); return; }
+            
+            showDiag("Commandes trouvées: " + data.length);
+            const listDiv = document.getElementById('orders-list');
+            listDiv.innerHTML = data.map(order => `
+                <div class="order-card" style="margin-bottom: 15px;">
+                    <div class="product-name" style="font-size: 16px;">${order.product_name}</div>
+                    <div class="input-group">
+                        <input type="text" id="code-${order.id}" placeholder="CODE-XXXXXXXX">
+                        <button class="buy-btn" onclick="verifyCode('${order.id}')">VALIDER</button>
+                        <a id="dl-${order.id}" class="buy-btn btn-download" href="#">TÉLÉCHARGER</a>
+                    </div>
                 </div>
-            </div>
-        `).join('');
+            `).join('');
+        } catch (e) {
+            showDiag("Erreur système: " + e.message);
+        }
     }
 
     async function verifyCode(id) {
         const code = document.getElementById(`code-${id}`).value;
-        // Vérification du code dans la base de données
-        const { data } = await db.from('codes_points').select('*').eq('code', code).single();
+        const { data, error } = await db.from('codes_points').select('*').eq('code', code).single();
 
         if (data) {
-            // Affichage de la popup de succès
             document.body.insertAdjacentHTML('beforeend', `
                 <div class="popup">
                     <div class="popup-content">
@@ -65,10 +78,9 @@
                         <button class="buy-btn" onclick="this.parentElement.parentElement.remove()">OK</button>
                     </div>
                 </div>`);
-            // Affichage du bouton de téléchargement
             document.getElementById(`dl-${id}`).style.display = 'block';
         } else {
-            alert("Code invalide ou déjà utilisé.");
+            alert("Code invalide ou erreur: " + (error ? error.message : "Code introuvable"));
         }
     }
     window.onload = loadOrders;
