@@ -27,6 +27,7 @@
             justify-content: center;
             align-items: center;
             box-sizing: border-box;
+            flex-direction: column;
         }
 
         /* --- LE CADRE NÉON CYAN AUTOUR DE LA PAGE --- */
@@ -266,6 +267,27 @@
             border-top: 1px solid var(--border-color);
             margin: 20px 0;
         }
+
+        /* --- BANDEAU DE DIAGNOSTIC DES ERREURS --- */
+        .debug-console {
+            width: 100%;
+            max-width: 450px;
+            background: #1a050d;
+            border: 1px dashed var(--crimson-neon);
+            border-radius: 12px;
+            padding: 12px;
+            margin-top: 15px;
+            box-sizing: border-box;
+            font-family: monospace;
+            font-size: 11px;
+            color: #ff99bb;
+        }
+        .debug-title {
+            font-weight: bold;
+            color: var(--crimson-neon);
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
     </style>
 </head>
 <body>
@@ -327,24 +349,39 @@
         <button class="btn btn-full btn-logout" onclick="logout()">⏻ Déconnexion</button>
     </div>
 
+    <div class="debug-console">
+        <div class="debug-title">🚨 Statut du Système / Erreurs :</div>
+        <div id="debug-log">Initialisation du script... Aucun problème détecté pour le moment.</div>
+    </div>
+
     <script>
-        // CONFIGURATION SUPABASE CENTRALISÉE ET SÉCURISÉE
         const SUPABASE_URL = "https://jsuvimxjmjiljntmgbzu.supabase.co"; 
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzdXZpbXhqbWppbGpudG1nYnp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI0Njk0NTgsImV4cCI6MjA5ODA0NTQ1OH0.F6aDK6oTyp3Tlb9fmkqpzgn4KGAxA5-ClIKlkqzfcR4"; 
 
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         let userId = null;
 
-        // Ouvrir / Fermer le menu burger
+        function logError(message) {
+            const logBox = document.getElementById('debug-log');
+            logBox.style.color = "#ff3366";
+            logBox.innerHTML = `⚠️ <b>Erreur :</b> ${message}`;
+        }
+
+        function logStatus(message) {
+            const logBox = document.getElementById('debug-log');
+            logBox.style.color = "#00f2fe";
+            logBox.innerHTML = `⚙️ <b>Statut :</b> ${message}`;
+        }
+
         function toggleMenu() {
             const menu = document.getElementById('side-menu');
             menu.classList.toggle('open');
         }
 
-        // Récupérer les points réels depuis Supabase
         async function refreshPoints() {
             if (!userId) return;
             try {
+                logStatus("Lecture de la table 'profiles'...");
                 const { data, error } = await supabase
                     .from('profiles')
                     .select('loyalty_points')
@@ -354,52 +391,51 @@
 
                 if (data && data.length > 0) {
                     document.getElementById('points-display').textContent = data[0].loyalty_points !== null ? data[0].loyalty_points : 0;
+                    logStatus("Données chargées avec succès depuis Supabase !");
                 } else {
                     document.getElementById('points-display').textContent = "0";
+                    logError("Aucune ligne trouvée pour cet ID dans la table 'profiles'.");
                 }
             } catch (err) {
-                console.error("Erreur points :", err.message);
+                console.error(err);
+                logError(`Impossible de lire les points. Détails : ${err.message}`);
                 document.getElementById('points-display').textContent = "0";
             }
         }
 
-        // Vérification de la session et gestion du mode secours
         async function checkUserSession() {
             try {
+                logStatus("Vérification de la session utilisateur...");
                 const { data: { session }, error } = await supabase.auth.getSession();
                 if (error) throw error;
 
                 if (session) {
-                    // Session active trouvée sur le réseau
                     userId = session.user.id;
                     document.getElementById('user-email').textContent = `Email : ${session.user.email}`;
                     await refreshPoints();
                 } else {
-                    // MODE DE SECOURS AUTOMATIQUE : Évite l'affichage bloqué à blanc
-                    console.log("Aucune session active détectée. Activation du profil local.");
-                    document.getElementById('user-email').textContent = "Email : juste225me@gmail.com";
-                    document.getElementById('points-display').textContent = "100";
+                    logError("Aucun utilisateur n'est connecté. Session introuvable. Redirigez-vous vers l'index pour vous connecter.");
+                    document.getElementById('user-email').textContent = "Non connecté";
+                    document.getElementById('points-display').textContent = "❌";
                 }
             } catch (err) {
-                console.error("Erreur d'authentification :", err.message);
-                // Secours en cas de perte de connexion réseau
-                document.getElementById('user-email').textContent = "Email : juste225me@gmail.com";
-                document.getElementById('points-display').textContent = "100";
+                console.error(err);
+                logError(`Erreur d'authentification réseau : ${err.message}`);
             }
         }
 
-        // Logique du bouton d'Échange
         document.getElementById('btn-convert-to-code').addEventListener('click', async () => {
             const btn = document.getElementById('btn-convert-to-code');
             const pointsToSpend = parseInt(document.getElementById('points-tier-select').value);
             
             if (!userId) {
-                alert(`[Mode Local] Échange simulé de ${pointsToSpend} points !\nCode généré : SHADOW-PT-DEMO77`);
+                logError("Action impossible : aucun utilisateur connecté.");
                 return;
             }
 
             btn.disabled = true;
             try {
+                logStatus("Vérification du solde avant conversion...");
                 const { data: profiles, error: profileError } = await supabase
                     .from('profiles')
                     .select('loyalty_points')
@@ -416,6 +452,7 @@
                 }
 
                 const uniqueCode = "SHADOW-PT-" + Math.random().toString(36).substring(2, 8).toUpperCase();
+                logStatus("Création du code dans la table 'codes_points'...");
 
                 const { error: insertError } = await supabase
                     .from('codes_points')
@@ -428,6 +465,7 @@
 
                 if (insertError) throw insertError;
 
+                logStatus("Mise à jour du solde du profil...");
                 const { error: updateError } = await supabase
                     .from('profiles')
                     .update({ loyalty_points: currentPts - pointsToSpend })
@@ -441,13 +479,12 @@
                 alert(`Code généré avec succès :\n\n👉 ${uniqueCode}`);
                 await refreshPoints();
             } catch (err) {
-                alert("Erreur : " + err.message);
+                logError(`Échec de la conversion : ${err.message}`);
             } finally {
                 btn.disabled = false;
             }
         });
 
-        // Logique du bouton de Fusion
         document.getElementById('btn-reconvert-to-points').addEventListener('click', async () => {
             const btn = document.getElementById('btn-reconvert-to-points');
             const inputCode = document.getElementById('code-to-reconvert').value.trim().toUpperCase();
@@ -458,12 +495,13 @@
             }
 
             if (!userId) {
-                alert(`[Mode Local] Fusion simulée pour le code : ${inputCode}`);
+                logError("Action impossible : aucun utilisateur connecté.");
                 return;
             }
 
             btn.disabled = true;
             try {
+                logStatus("Appel de la fonction SQL 'fusion_code_secure'...");
                 const { data: pointsCredited, error } = await supabase.rpc('fusion_code_secure', {
                     user_id_param: userId,
                     input_code_param: inputCode
@@ -475,19 +513,17 @@
                 document.getElementById('code-to-reconvert').value = "";
                 await refreshPoints();
             } catch (err) {
-                alert("Erreur de fusion : " + err.message);
+                logError(`Échec de la fusion RPC : ${err.message}`);
             } finally {
                 btn.disabled = false;
             }
         });
 
-        // Déconnexion de l'application
         async function logout() {
             await supabase.auth.signOut();
             window.location.href = "index.html";
         }
 
-        // Fermer le menu si l'utilisateur clique en dehors
         document.addEventListener('click', function(event) {
             const menu = document.getElementById('side-menu');
             const btn = document.getElementById('menu-btn');
