@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Espace Personnel - Shadow Market</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/supabase/2.39.8/supabase.js"></script>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
         :root {
             --bg-color: #0d0e12;
@@ -30,6 +30,7 @@
             flex-direction: column;
         }
 
+        /* --- LE CADRE NÉON CYAN AUTOUR DE LA PAGE --- */
         .neon-wrapper {
             width: 100%;
             max-width: 450px;
@@ -45,6 +46,7 @@
             flex-direction: column;
         }
 
+        /* --- LE BOUTON 3 BARRES (TOP GAUCHE) --- */
         .menu-toggle {
             background: none;
             border: none;
@@ -69,6 +71,7 @@
             box-shadow: 0 0 8px rgba(0, 242, 254, 0.8);
         }
 
+        /* --- PANNEAU DU MENU COULISSANT --- */
         .nav-menu {
             position: fixed;
             top: 0;
@@ -121,6 +124,7 @@
             padding-bottom: 20px;
         }
 
+        /* --- TITRE PRINCIPAL --- */
         .main-title {
             text-align: center;
             font-size: 32px;
@@ -133,6 +137,7 @@
             text-shadow: 0 0 10px rgba(0, 242, 254, 0.4);
         }
 
+        /* --- AFFICHAGE DE L'EMAIL --- */
         .user-email {
             text-align: center;
             font-size: 15px;
@@ -142,6 +147,7 @@
             word-break: break-all;
         }
 
+        /* --- BOITE DE POINTS --- */
         .points-box {
             border: 2px solid var(--accent-color);
             border-radius: 18px;
@@ -177,6 +183,7 @@
             padding: 0 10px;
         }
 
+        /* --- FORMULAIRES & BOUTONS --- */
         .shop-container {
             background: #12141a;
             border-radius: 16px;
@@ -261,6 +268,7 @@
             margin: 20px 0;
         }
 
+        /* --- CONSOLE DE DIAGNOSTIC --- */
         .debug-console {
             width: 100%;
             max-width: 450px;
@@ -343,13 +351,13 @@
 
     <div class="debug-console">
         <div class="debug-title">🚨 Statut du Système / Erreurs :</div>
-        <div id="debug-log">Démarrage forcé...</div>
+        <div id="debug-log">Démarrage...</div>
     </div>
 
     <script>
-        // Force l'affichage immédiat des logs de défaillance globale
+        // Attrape les crashs globaux
         window.onerror = function(message, source, lineno, colno, error) {
-            document.getElementById('debug-log').innerHTML = `💥 <b>Crash Script :</b> ${message} à la ligne ${lineno}`;
+            document.getElementById('debug-log').innerHTML = `💥 <b>Crash :</b> ${message} (Ligne ${lineno})`;
             return false;
         };
 
@@ -379,7 +387,7 @@
         async function refreshPoints() {
             if (!userId) return;
             try {
-                logStatus("Lecture de la table 'profiles'...");
+                logStatus("Lecture du solde de points...");
                 const { data, error } = await supabase
                     .from('profiles')
                     .select('loyalty_points')
@@ -389,27 +397,27 @@
 
                 if (data && data.length > 0) {
                     document.getElementById('points-display').textContent = data[0].loyalty_points !== null ? data[0].loyalty_points : 0;
-                    logStatus("Données chargées !");
+                    logStatus("Données synchronisées !");
                 } else {
                     document.getElementById('points-display').textContent = "0";
-                    logError("Aucun profil correspondant à cet ID.");
+                    logError("Profil introuvable dans la table.");
                 }
             } catch (err) {
-                logError(`Erreur lecture table : ${err.message}`);
+                logError(`Erreur table : ${err.message}`);
                 document.getElementById('points-display').textContent = "0";
             }
         }
 
         async function initApp() {
             try {
-                logStatus("Initialisation du client Supabase...");
+                logStatus("Vérification du chargement de la bibliothèque...");
                 if (!window.supabase) {
                     throw new Error("La bibliothèque Supabase n'a pas pu être téléchargée depuis le CDN.");
                 }
                 
                 supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
                 
-                logStatus("Vérification de la session active...");
+                logStatus("Connexion à la session utilisateur...");
                 const { data: { session }, error } = await supabase.auth.getSession();
                 if (error) throw error;
 
@@ -418,7 +426,7 @@
                     document.getElementById('user-email').textContent = `Email : ${session.user.email}`;
                     await refreshPoints();
                 } else {
-                    logError("Aucune session trouvée. Vous devez vous connecter sur la page index.");
+                    logError("Aucune session active. Connecte-toi d'abord via l'index.");
                     document.getElementById('user-email').textContent = "Non connecté";
                     document.getElementById('points-display').textContent = "❌";
                 }
@@ -486,7 +494,15 @@
             window.location.href = "index.html";
         }
 
-        // Lancement immédiat au chargement de la structure HTML
+        document.addEventListener('click', function(event) {
+            const menu = document.getElementById('side-menu');
+            const btn = document.getElementById('menu-btn');
+            if (menu && !menu.contains(event.target) && btn && !btn.contains(event.target) && menu.classList.contains('open')) {
+                menu.classList.remove('open');
+            }
+        });
+
+        // Lancement immédiat dès que le DOM est prêt
         if (document.readyState === "loading") {
             document.addEventListener("DOMContentLoaded", initApp);
         } else {
@@ -495,4 +511,3 @@
     </script>
 </body>
 </html>
-
