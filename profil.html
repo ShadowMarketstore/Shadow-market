@@ -6,26 +6,21 @@
     <title>Espace Personnel - Shadow Market</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        :root { --bg-color: #0d0e12; --accent-color: #00f2fe; --crimson-neon: #ff0055; --text-muted: #a0a0ab; }
-        body { margin: 0; background: var(--bg-color); color: #fff; font-family: sans-serif; }
+        :root { --bg-color: #0d0e12; --accent-color: #00f2fe; --crimson-neon: #ff0055; --text-color: #ffffff; }
+        body { margin: 0; background: var(--bg-color); color: var(--text-color); font-family: sans-serif; display: flex; flex-direction: column; align-items: center; }
         
-        /* Menu Hamburger */
         .menu-toggle { position: absolute; top: 20px; left: 20px; cursor: pointer; z-index: 1000; display: flex; flex-direction: column; gap: 6px; }
         .menu-toggle span { display: block; width: 30px; height: 3px; background: var(--accent-color); transition: 0.3s; }
         
-        /* Menu Coulissant */
-        .nav-menu { position: fixed; left: -100%; top: 0; width: 250px; height: 100%; background: #12141a; transition: 0.3s; padding: 80px 20px; z-index: 999; border-right: 2px solid var(--accent-color); }
+        .nav-menu { position: fixed; left: -100%; top: 0; width: 250px; height: 100%; background: #090a0e; transition: 0.3s; padding: 80px 20px; z-index: 999; border-right: 2px solid var(--accent-color); }
         .nav-menu.open { left: 0; }
-        .nav-menu a { display: block; color: #fff; text-decoration: none; padding: 15px 0; font-size: 18px; border-bottom: 1px solid #333; }
+        .nav-menu a { display: block; color: var(--text-color); text-decoration: none; padding: 15px 0; border-bottom: 1px solid #222; font-size: 16px; }
 
-        /* Conteneur Principal */
-        .wrapper { display: flex; flex-direction: column; align-items: center; padding-top: 80px; }
-        .card { width: 90%; max-width: 400px; border: 2px solid var(--accent-color); border-radius: 20px; padding: 20px; text-align: center; background: #0d0e12; }
-        
-        /* Éléments Boutique */
-        .input-style { width: 100%; padding: 10px; margin: 10px 0; background: #1a1c23; border: 1px solid #333; color: white; border-radius: 5px; box-sizing: border-box; }
-        .btn-main { width: 100%; padding: 12px; background: var(--accent-color); border: none; font-weight: bold; border-radius: 5px; cursor: pointer; }
-        .btn-danger { background: var(--crimson-neon); color: white; margin-top: 10px; }
+        .neon-wrapper { width: 90%; max-width: 400px; border: 2px solid var(--accent-color); border-radius: 20px; padding: 25px; margin-top: 80px; text-align: center; }
+        .points-count { font-size: 48px; font-weight: bold; margin: 15px 0; }
+        .input-box { width: 100%; padding: 12px; margin: 10px 0; background: #1a1c23; border: 1px solid #333; color: white; border-radius: 8px; box-sizing: border-box; }
+        .btn-main { width: 100%; padding: 12px; background: var(--accent-color); border: none; font-weight: bold; border-radius: 8px; cursor: pointer; text-transform: uppercase; margin-top: 10px; }
+        .btn-fusion { background: var(--crimson-neon); color: white; }
         
         .debug-console { margin-top: 30px; width: 90%; max-width: 400px; padding: 10px; border: 1px dashed var(--crimson-neon); font-size: 11px; color: #ff99bb; }
     </style>
@@ -38,56 +33,73 @@
 
     <div id="nav" class="nav-menu">
         <a href="index.html">🏠 Accueil</a>
-        <a href="profil.html">👤 Profil</a>
-        <a href="#" onclick="logout()">⏻ Déconnexion</a>
+        <a href="profil.html">👤 Mon Profil</a>
+        <a href="commandes.html">📦 Mes Commandes</a>
+        <a href="points.html">💎 Mes Points</a>
+        <a href="bibliotheque.html">📚 Bibliothèque</a>
+        <hr style="border: 0; border-top: 1px solid #333; margin: 20px 0;">
+        <a href="#" onclick="logout()" style="color: var(--crimson-neon);">⏻ Déconnexion</a>
     </div>
 
-    <div class="wrapper">
-        <div class="card">
-            <h2 style="color: var(--accent-color);">MON PROFIL</h2>
-            <div id="user-info" style="margin-bottom: 15px;">Chargement...</div>
-            <div style="font-size: 40px; margin: 20px;">💎 <span id="points-display">0</span></div>
-            
-            <hr style="border: 0; border-top: 1px solid #333; margin: 20px 0;">
-            
-            <label>Convertir en code</label>
-            <button class="btn-main" onclick="alert('Fonction à activer')">ÉCHANGER</button>
-            
-            <label style="display:block; margin-top:15px;">Fusionner un code</label>
-            <input type="text" class="input-style" placeholder="Ex: SHADOW-PT-XXXXXX">
-            <button class="btn-main btn-danger">FUSIONNER</button>
-        </div>
+    <div class="neon-wrapper">
+        <h2 style="color: var(--accent-color);">MON PROFIL</h2>
+        <div id="user-info" style="margin-bottom: 20px;">Chargement...</div>
+        <div class="points-count">💎 <span id="points-display">0</span></div>
         
-        <div class="debug-console" id="debug-log">Initialisation...</div>
+        <hr style="border: 0; border-top: 1px solid #333; margin: 20px 0;">
+        
+        <button class="btn-main" onclick="echangerPoints()">ÉCHANGER</button>
+        
+        <input type="text" id="code-input" class="input-box" placeholder="Ex: SHADOW-PT-XXXXXX">
+        <button class="btn-main btn-fusion" onclick="fusionnerCode()">FUSIONNER</button>
     </div>
+
+    <div class="debug-console" id="debug-log">Initialisation...</div>
 
     <script>
         const SUPABASE_URL = "https://jsuvimxjmjiljntmgbzu.supabase.co"; 
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzdXZpbXhqbWppbGpudG1nYnp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI0Njk0NTgsImV4cCI6MjA5ODA0NTQ1OH0.F6aDK6oTyp3Tlb9fmkqpzgn4KGAxA5-ClIKlkqzfcR4"; 
+        const client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         async function initApp() {
             const logBox = document.getElementById('debug-log');
             try {
-                const client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-                const { data: { session }, error } = await client.auth.getSession();
-                
+                const { data: { session } } = await client.auth.getSession();
                 if (session) {
                     document.getElementById('user-info').textContent = session.user.email;
                     const { data } = await client.from('profiles').select('loyalty_points').eq('id', session.user.id).single();
                     document.getElementById('points-display').textContent = data ? data.loyalty_points : 0;
-                    logBox.textContent = "✅ Système en ligne.";
+                    logBox.textContent = "✅ Système opérationnel.";
                 } else {
-                    logBox.textContent = "❌ Non connecté.";
+                    logBox.textContent = "❌ Session non trouvée.";
                 }
             } catch (err) {
                 logBox.textContent = "💥 Erreur : " + err.message;
             }
         }
 
-        function logout() {
-            window.location.href = "index.html";
+        async function echangerPoints() {
+            const { error } = await client.rpc('convertir_points_en_code');
+            if (error) {
+                document.getElementById('debug-log').textContent = "Erreur échange : " + error.message;
+            } else {
+                alert("Code généré !");
+                initApp();
+            }
         }
 
+        async function fusionnerCode() {
+            const code = document.getElementById('code-input').value;
+            const { error } = await client.rpc('fusion_code_secure', { code_input: code });
+            if (error) {
+                document.getElementById('debug-log').textContent = "Erreur fusion : " + error.message;
+            } else {
+                alert("Fusion réussie !");
+                initApp();
+            }
+        }
+
+        function logout() { window.location.href = "index.html"; }
         window.onload = initApp;
     </script>
 </body>
