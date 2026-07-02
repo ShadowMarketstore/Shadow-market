@@ -38,7 +38,7 @@
     <div id="customModal">
         <div class="modal-box">
             <div style="font-size:3rem; margin-bottom:10px;">✅ 🎉</div>
-            <h3 id="modalTitle" style="color:white; margin:0;">Copié !</h3>
+            <h3 id="modalTitle" style="color:white; margin:0;">Succès !</h3>
             <p id="modalMsg" style="color:#aaa; margin:15px 0;"></p>
             <button onclick="closeModal()" style="background:var(--cyan); border:none; padding:10px 20px; border-radius:5px; font-weight:bold; cursor:pointer;">OK</button>
         </div>
@@ -63,21 +63,34 @@
             const { data: { user } } = await db.auth.getUser();
             if (!user) return window.location.href = "login.html";
 
-            const { data, error } = await db.from('coupons').select('code, discount_percent').eq('user_id', user.id).order('id', { ascending: false });
+            // Récupération avec is_active
+            const { data, error } = await db
+                .from('coupons')
+                .select('code, discount_percent, is_active')
+                .eq('user_id', user.id)
+                .order('id', { ascending: false });
 
             const listDiv = document.getElementById('codes-list');
             if (error) { listDiv.innerHTML = "Erreur chargement."; return; }
             if (data.length === 0) { listDiv.innerHTML = "<p style='text-align:center;'>Aucun code généré.</p>"; return; }
 
-            listDiv.innerHTML = data.map(c => `
-                <div class="code-card">
+            listDiv.innerHTML = data.map(c => {
+                const isUsed = !c.is_active;
+                const cardStyle = isUsed ? 'style="opacity: 0.4; border: 1px solid #555;"' : '';
+                const textStyle = isUsed ? 'style="text-decoration: line-through; color: #777;"' : '';
+                const tagContent = isUsed ? 'UTILISÉ' : c.discount_percent + '%';
+                const tagStyle = isUsed ? 'style="background:#333; color:#aaa;"' : '';
+
+                return `
+                <div class="code-card" ${cardStyle}>
                     <div class="code-info">
-                        <span class="code-text">${c.code}</span>
-                        <button class="copy-btn" onclick="copyCode('${c.code}')"><svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg></button>
+                        <span class="code-text" ${textStyle}>${c.code}</span>
+                        ${!isUsed ? `<button class="copy-btn" onclick="copyCode('${c.code}')"><svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg></button>` : ''}
                     </div>
-                    <span class="discount-tag">${c.discount_percent}%</span>
+                    <span class="discount-tag" ${tagStyle}>${tagContent}</span>
                 </div>
-            `).join('');
+                `;
+            }).join('');
         }
         window.onload = chargerCodes;
     </script>
