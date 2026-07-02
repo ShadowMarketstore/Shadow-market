@@ -44,10 +44,6 @@
 
   let isLogin = true;
 
-  supabase.auth.getSession().then(({ data: { session } }) => {
-    if (session) window.location.href = "profil.html";
-  });
-
   function toggleMode() {
     isLogin = !isLogin;
     document.getElementById('formTitle').innerText = isLogin ? "CONNEXION" : "CRÉER UN COMPTE";
@@ -58,32 +54,23 @@
   function togglePassword() {
     const p = document.getElementById('password');
     const i = document.getElementById('eyeIcon');
-    if (p.type === 'password') {
-      p.type = 'text';
-      i.innerText = '🙉';
-    } else {
-      p.type = 'password';
-      i.innerText = '🙈';
-    }
-  } // <-- L'accolade manquante était ici
+    if (p.type === 'password') { p.type = 'text'; i.innerText = '🙉'; } 
+    else { p.type = 'password'; i.innerText = '🙈'; }
+  }
 
   document.getElementById('authForm').addEventListener('submit', async (e) => {
     e.preventDefault();
-    const submitBtn = document.getElementById('submitBtn');
-    submitBtn.disabled = true;
-
     const email = document.getElementById('email').value.trim();
     const password = document.getElementById('password').value;
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
 
-    if (isLogin) {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) { alert(error.message); submitBtn.disabled = false; }
-      else { window.location.href = "profil.html"; }
-    } else {
-      const { error } = await supabase.auth.signUp({ email, password });
-      if (error) { alert(error.message); submitBtn.disabled = false; }
-      else { alert("Inscription réussie !"); window.location.href = "profil.html"; }
-    }
+    const { error } = isLogin 
+        ? await supabase.auth.signInWithPassword({ email, password })
+        : await supabase.auth.signUp({ email, password });
+
+    if (error) { alert("Erreur : " + error.message); btn.disabled = false; }
+    else { window.location.href = "profil.html"; }
   });
 </script>
 </body>
