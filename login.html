@@ -1,82 +1,92 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Shadow Market - Connexion</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <style>
-    body { background: #000; color: #fff; font-family: sans-serif; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-    .order-form { width: 100%; max-width: 400px; background: #111; padding: 30px; border: 2px solid #00f2fe; border-radius: 20px; box-sizing: border-box; }
-    .form-group { margin-bottom: 20px; }
-    label { display: block; margin-bottom: 5px; color: #00f2fe; }
-    input { background: #000; border: 1px solid #00f2fe; color: #fff; padding: 12px; width: 100%; box-sizing: border-box; border-radius: 5px; }
-    .submit-btn { width: 100%; padding: 12px; background: #ff0055; color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; margin-top: 10px; text-transform: uppercase; }
-    #eyeIcon { cursor: pointer; color: #00f2fe; position: absolute; right: 15px; user-select: none; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Shadow Market - Connexion</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { background: #000; color: #fff; font-family: sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .order-form { width: 90%; max-width: 400px; background: #111; padding: 30px; border: 2px solid #00f2fe; border-radius: 20px; box-sizing: border-box; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; color: #00f2fe; margin-bottom: 5px; }
+        input { background: #000; border: 1px solid #00f2fe; color: #fff; padding: 12px; width: 100%; border-radius: 5px; box-sizing: border-box; }
+        .submit-btn { width: 100%; padding: 12px; background: #ff0055; color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; margin-top: 10px; text-transform: uppercase; }
+        #toggleText { cursor: pointer; text-align: center; margin-top: 15px; font-size: 0.8rem; color: #aaa; text-decoration: underline; }
+        .password-wrapper { position: relative; display: flex; align-items: center; }
+        #eyeIcon { position: absolute; right: 10px; cursor: pointer; user-select: none; }
+    </style>
 </head>
 <body>
 
 <div class="order-form">
   <h2 id="formTitle" style="color: #00f2fe; text-align: center;">CONNEXION</h2>
-  <form id="authForm" autocomplete="off">
+  <form id="authForm">
     <div class="form-group">
       <label>Email</label>
       <input type="email" id="email" required>
     </div>
     <div class="form-group">
       <label>Mot de passe</label>
-      <div style="position: relative; display: flex; align-items: center;">
+      <div class="password-wrapper">
         <input type="password" id="password" required>
         <span id="eyeIcon" onclick="togglePassword()">👀</span>
       </div>
     </div>
     <button type="submit" class="submit-btn" id="submitBtn">SE CONNECTER</button>
-    <p id="toggleText" onclick="toggleMode()" style="cursor: pointer; text-align: center; margin-top: 15px; font-size: 0.8rem;">Pas de compte ? Créer un compte</p>
+    <p id="toggleText" onclick="toggleMode()">Pas de compte ? Créer un compte</p>
   </form>
 </div>
 
 <script>
-  const supabase = supabase.createClient('https://jsuvimxjmjiljntmgbzu.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzdXZpbXhqbWppbGpudG1nYnp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI0Njk0NTgsImV4cCI6MjA5ODA0NTQ1OH0.F6aDK6oTyp3Tlb9fmkqpzgn4KGAxA5-ClIKlkqzfcR4');
-  let isLogin = true;
+    const supabase = supabase.createClient('https://jsuvimxjmjiljntmgbzu.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzdXZpbXhqbWppbGpudG1nYnp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI0Njk0NTgsImV4cCI6MjA5ODA0NTQ1OH0.F6aDK6oTyp3Tlb9fmkqpzgn4KGAxA5-ClIKlkqzfcR4');
 
-  function toggleMode() {
-    isLogin = !isLogin;
-    document.getElementById('formTitle').innerText = isLogin ? "CONNEXION" : "CRÉER UN COMPTE";
-    document.getElementById('submitBtn').innerText = isLogin ? "SE CONNECTER" : "S'INSCRIRE";
-    document.getElementById('toggleText').innerText = isLogin ? "Pas de compte ? Créer un compte" : "Déjà un compte ? Connexion";
-  }
+    let isLogin = true;
 
-  function togglePassword() {
-    const p = document.getElementById('password');
-    const i = document.getElementById('eyeIcon');
-    if (p.type === 'password') { p.type = 'text'; i.innerText = '🙉'; } 
-    else { p.type = 'password'; i.innerText = '🙈'; }
-  }
-
-  document.getElementById('authForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const email = document.getElementById('email').value.trim();
-    const password = document.getElementById('password').value;
-    const btn = document.getElementById('submitBtn');
-    btn.disabled = true;
-    btn.innerText = "PATIENTEZ...";
-    try {
-      if (isLogin) {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
-      } else {
-        const { error } = await supabase.auth.signUp({ email, password });
-        if (error) throw error;
-        alert("Compte créé avec succès !");
-      }
-      window.location.href = "profil.html";
-    } catch (err) {
-      alert("Erreur : " + err.message);
-      btn.disabled = false;
-      btn.innerText = isLogin ? "SE CONNECTER" : "S'INSCRIRE";
+    // 1. Fonction pour basculer Inscription/Connexion
+    function toggleMode() {
+        isLogin = !isLogin;
+        document.getElementById('formTitle').innerText = isLogin ? "CONNEXION" : "CRÉER UN COMPTE";
+        document.getElementById('submitBtn').innerText = isLogin ? "SE CONNECTER" : "S'INSCRIRE";
+        document.getElementById('toggleText').innerText = isLogin ? "Pas de compte ? Créer un compte" : "Déjà un compte ? Connexion";
     }
-  });
+
+    // 2. Fonction pour afficher/masquer le mot de passe
+    function togglePassword() {
+        const p = document.getElementById('password');
+        const i = document.getElementById('eyeIcon');
+        if (p.type === 'password') { p.type = 'text'; i.innerText = '🙉'; } 
+        else { p.type = 'password'; i.innerText = '🙈'; }
+    }
+
+    // 3. Gestion de la soumission
+    document.getElementById('authForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const btn = document.getElementById('submitBtn');
+        
+        btn.disabled = true;
+        btn.innerText = "TRAITEMENT...";
+
+        try {
+            if (isLogin) {
+                const { error } = await supabase.auth.signInWithPassword({ email, password });
+                if (error) throw error;
+                window.location.href = "profil.html";
+            } else {
+                const { error } = await supabase.auth.signUp({ email, password });
+                if (error) throw error;
+                alert("Compte créé ! Vérifie tes emails pour confirmer ou connecte-toi.");
+                // Optionnel : toggleMode(); // Revenir en mode connexion
+            }
+        } catch (err) {
+            alert("Erreur : " + err.message);
+        } finally {
+            btn.disabled = false;
+            btn.innerText = isLogin ? "SE CONNECTER" : "S'INSCRIRE";
+        }
+    });
 </script>
 </body>
 </html>
