@@ -17,48 +17,63 @@
         
         .btn-access { background: var(--cyan); color: #000; border: none; padding: 8px 12px; border-radius: 5px; font-weight: bold; cursor: pointer; text-decoration: none; font-size: 0.85rem; }
         .back-btn { display: block; text-align: center; margin-top: 20px; color: white; text-decoration: none; border: 1px solid var(--cyan); padding: 10px; border-radius: 5px; }
+        .diagnostic-msg { color: #ff0055; font-size: 0.9rem; text-align: center; padding: 10px; }
     </style>
 </head>
 <body>
 
     <div class="wrapper">
         <h2>MES COMMANDES</h2>
-        <div id="orders-list">Chargement de vos commandes traitées...</div>
+        <div id="orders-list">Chargement des données...</div>
         <a href="profil.html" class="back-btn">⬅ Retour au Profil</a>
     </div>
 
     <script>
+        // Initialisation Supabase
         const db = supabase.createClient("https://jsuvimxjmjiljntmgbzu.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzdXZpbXhqbWppbGpudG1nYnp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI0Njk0NTgsImV4cCI6MjA5ODA0NTQ1OH0.F6aDK6oTyp3Tlb9fmkqpzgn4KGAxA5-ClIKlkqzfcR4");
 
         async function loadOrders() {
-            const { data: { user } } = await db.auth.getUser();
-            if (!user) return window.location.href = "login.html";
-
             const listDiv = document.getElementById('orders-list');
+            
+            try {
+                // 1. Diagnostic Authentification
+                const { data: { user }, error: authError } = await db.auth.getUser();
+                if (authError) throw new Error("Erreur Auth: " + authError.message);
+                if (!user) {
+                    window.location.href = "login.html";
+                    return;
+                }
 
-            // Récupère les commandes que tu as déposées pour cet utilisateur
-            const { data, error } = await db
-                .from('pending_orders')
-                .select('product_name, price')
-                .eq('user_id', user.id);
+                // 2. Diagnostic Chargement Table
+                const { data, error } = await db
+                    .from('pending_orders')
+                    .select('product_name, price')
+                    .eq('user_id', user.id);
 
-            if (error) { listDiv.innerHTML = "Erreur de chargement."; return; }
-            if (data.length === 0) { listDiv.innerHTML = "<p style='text-align:center; color:#777;'>Aucune commande traitée pour le moment.</p>"; return; }
+                if (error) throw new Error("Erreur Supabase: " + error.message);
 
-            listDiv.innerHTML = data.map(order => `
-                <div class="order-card">
-                    <div class="order-info">
-                        <h3>${order.product_name}</h3>
-                        <p>${order.price} Points</p>
-                    </div>
-                    <a href="panier.html?product=${encodeURIComponent(order.product_name)}&price=${order.price}" 
-                       class="btn-access">OBTENIR</a>
-                </div>
-            `).join('');
+                // 3. Affichage
+                if (!data || data.length === 0) {
+                    listDiv.innerHTML = "<p style='text-align:center; color:#777;'>Aucune commande traitée pour le moment.</p>";
+                } else {
+                    listDiv.innerHTML = data.map(order => `
+                        <div class="order-card">
+                            <div class="order-info">
+                                <h3>${order.product_name}</h3>
+                                <p>${order.price} Points</p>
+                            </div>
+                            <a href="panier.html?product=${encodeURIComponent(order.product_name)}&price=${order.price}" 
+                               class="btn-access">OBTENIR</a>
+                        </div>
+                    `).join('');
+                }
+            } catch (err) {
+                listDiv.innerHTML = `<div class="diagnostic-msg">DIAGNOSTIC ÉCHEC: ${err.message}</div>`;
+                console.error(err);
+            }
         }
 
         window.onload = loadOrders;
     </script>
 </body>
 </html>
-
