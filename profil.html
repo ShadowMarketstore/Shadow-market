@@ -14,7 +14,7 @@
             --text-color: #ffffff;
             --text-muted: #a0a0ab;
             --border-color: #22222b;
-            --sidebar-width: 240px;
+            --sidebar-width: 260px;
         }
 
         body {
@@ -27,14 +27,14 @@
             min-height: 100vh;
         }
 
-        /* --- MENU LATÉRAL --- */
+        /* --- BARRE LATÉRALE (SIDEBAR) --- */
         .sidebar {
             width: var(--sidebar-width);
             background-color: var(--card-bg);
             border-right: 1px solid var(--border-color);
             display: flex;
             flex-direction: column;
-            padding: 30px 20px;
+            padding: 30px 15px;
             box-sizing: border-box;
             position: fixed;
             height: 100vh;
@@ -49,16 +49,25 @@
             text-transform: uppercase;
             letter-spacing: 2px;
             color: var(--text-color);
-            margin-bottom: 40px;
+            margin-bottom: 35px;
             text-align: center;
         }
 
         .sidebar-brand span { color: var(--accent-color); }
-        .sidebar-menu { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; }
+        
+        .sidebar-menu { 
+            list-style: none; 
+            padding: 0; 
+            margin: 0; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 8px; 
+        }
 
         .sidebar-item a {
             display: flex;
             align-items: center;
+            gap: 12px;
             padding: 12px 15px;
             color: var(--text-muted);
             text-decoration: none;
@@ -73,7 +82,7 @@
             border-left: 3px solid var(--accent-color);
         }
 
-        .sidebar-footer { margin-top: auto; }
+        .sidebar-footer { margin-top: auto; padding-top: 15px; }
 
         /* --- CONTENU --- */
         .main-content {
@@ -86,7 +95,7 @@
             box-sizing: border-box;
         }
 
-        .container { width: 100%; max-width: 450px; }
+        .container { width: 100%; max-width: 460px; }
 
         .card {
             background-color: var(--card-bg);
@@ -97,15 +106,15 @@
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
         }
 
-        h1 { font-size: 24px; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 5px; color: var(--text-color); }
+        h1 { font-size: 26px; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 5px; color: var(--text-color); }
         .subtitle { color: var(--accent-color); font-size: 14px; font-weight: bold; letter-spacing: 1px; margin-bottom: 25px; text-transform: uppercase; }
-        .user-email { font-size: 14px; color: var(--text-muted); margin-bottom: 30px; word-break: break-all; }
+        .user-email { font-size: 14px; color: var(--text-muted); margin-bottom: 25px; word-break: break-all; }
 
         .points-box {
             border: 2px solid var(--accent-color);
             border-radius: 12px;
             padding: 20px;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
             background: rgba(0, 242, 254, 0.03);
             box-shadow: 0 0 15px rgba(0, 242, 254, 0.1);
             display: flex;
@@ -114,12 +123,12 @@
             justify-content: center;
         }
 
-        .points-count { font-size: 48px; font-weight: 800; color: #fff; text-shadow: 0 0 10px rgba(0, 242, 254, 0.5); margin-top: 5px; }
-        .points-label { font-size: 12px; color: var(--text-muted); margin-top: 5px; }
+        .points-count { font-size: 52px; font-weight: 800; color: #fff; text-shadow: 0 0 10px rgba(0, 242, 254, 0.5); margin-top: 5px; }
+        .points-label { font-size: 12px; color: var(--text-muted); margin-top: 8px; line-height: 1.4; }
 
         .shop-section { text-align: left; border-top: 1px solid var(--border-color); padding-top: 20px; }
         .shop-title { font-size: 14px; font-weight: bold; color: var(--accent-color); margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; }
-        .form-group { margin-bottom: 20px; }
+        .form-group { margin-bottom: 18px; }
         label { display: block; font-size: 12px; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase; }
 
         select, input {
@@ -164,9 +173,10 @@
             body { flex-direction: column; }
             .sidebar { position: relative; width: 100%; height: auto; border-right: none; border-bottom: 1px solid var(--border-color); padding: 15px; }
             .sidebar-brand { margin-bottom: 15px; }
-            .sidebar-menu { flex-direction: row; justify-content: center; flex-wrap: wrap; }
-            .main-content { margin-left: 0; padding: 20px 10px; }
-            .sidebar-footer { display: none; }
+            .sidebar-menu { flex-direction: row; justify-content: center; flex-wrap: wrap; gap: 5px; }
+            .sidebar-item a { padding: 8px 12px; font-size: 14px; }
+            .main-content { margin-left: 0; padding: 25px 10px; }
+            .sidebar-footer { width: 100%; margin-top: 10px; }
         }
     </style>
 </head>
@@ -178,6 +188,8 @@
             <li class="sidebar-item"><a href="index.html">🏠 Accueil</a></li>
             <li class="sidebar-item"><a href="#">🛒 Boutique</a></li>
             <li class="sidebar-item active"><a href="profil.html">👤 Mon Profil</a></li>
+            <li class="sidebar-item"><a href="#">📦 Mes Commandes</a></li>
+            <li class="sidebar-item"><a href="#">💎 Mes Points</a></li>
         </ul>
         <div class="sidebar-footer">
             <button class="btn btn-logout" onclick="logout()">⏻ Déconnexion</button>
@@ -190,11 +202,11 @@
                 <h1>Espace Personnel</h1>
                 <div class="subtitle">Shadow Market</div>
                 
-                <div class="user-email" id="user-email">Chargement...</div>
+                <div class="user-email" id="user-email">Chargement de la session...</div>
 
                 <div class="points-box">
-                    <span style="font-size: 24px;">💎</span>
-                    <div class="points-count" id="points-display">0</div>
+                    <span style="font-size: 28px;">💎</span>
+                    <div class="points-count" id="points-display">...</div>
                     <div class="points-label">💡 Échangez vos points contre des codes ou fusionnez-les !</div>
                 </div>
 
@@ -224,6 +236,7 @@
     </main>
 
     <script>
+        // Configuration Supabase d'après tes paramètres uniques
         const SUPABASE_URL = "https://jsuvimxjmjiljntmgbzu.supabase.co"; 
         const SUPABASE_ANON_KEY = "sb_publishable_Ngm29impwbTLGhuqyCxSJA_E1jXc1DX"; 
 
@@ -231,6 +244,7 @@
 
         let userId = null;
 
+        // Fonction pour récupérer en temps réel tes points (Ex: 100 points)
         async function refreshPoints() {
             if (!userId) return;
             try {
@@ -242,22 +256,24 @@
                 if (error) throw error;
 
                 if (data && data.length > 0) {
-                    document.getElementById('points-display').textContent = data[0].loyalty_points || 0;
+                    document.getElementById('points-display').textContent = data[0].loyalty_points !== null ? data[0].loyalty_points : 0;
                 } else {
                     document.getElementById('points-display').textContent = 0;
                 }
             } catch (err) {
-                console.error("Erreur points:", err.message);
+                console.error("Erreur d'affichage des points :", err.message);
+                document.getElementById('points-display').textContent = "0";
             }
         }
 
+        // Vérification de la connexion de l'utilisateur au chargement
         async function checkUserSession() {
             try {
                 const { data: { session }, error } = await supabase.auth.getSession();
                 if (error) throw error;
 
                 if (!session) {
-                    window.location.href = "index.html"; // Redirige vers l'accueil si pas connecté
+                    window.location.href = "index.html"; 
                     return;
                 }
 
@@ -265,12 +281,12 @@
                 document.getElementById('user-email').textContent = `Email : ${session.user.email}`;
                 await refreshPoints();
             } catch (err) {
-                console.error("Erreur session:", err.message);
+                console.error("Erreur d'authentification :", err.message);
                 window.location.href = "index.html";
             }
         }
 
-        // Échanger
+        // Action : Échanger des points contre un code
         document.getElementById('btn-convert-to-code').addEventListener('click', async () => {
             const btn = document.getElementById('btn-convert-to-code');
             const pointsToSpend = parseInt(document.getElementById('points-tier-select').value);
@@ -288,11 +304,13 @@
 
                 if (currentPts < pointsToSpend) {
                     alert(`Points insuffisants ! Il vous faut au moins ${pointsToSpend} points.`);
+                    btn.disabled = false;
                     return;
                 }
 
                 const uniqueCode = "SHADOW-PT-" + Math.random().toString(36).substring(2, 8).toUpperCase();
 
+                // Insertion sécurisée dans 'codes_points'
                 const { error: insertError } = await supabase
                     .from('codes_points')
                     .insert([{
@@ -304,6 +322,7 @@
 
                 if (insertError) throw insertError;
 
+                // Déduction des points de l'utilisateur
                 const { error: updateError } = await supabase
                     .from('profiles')
                     .update({ loyalty_points: currentPts - pointsToSpend })
@@ -317,19 +336,19 @@
                 alert(`Succès ! Code généré :\n\n👉 ${uniqueCode}`);
                 await refreshPoints();
             } catch (err) {
-                alert("Erreur : " + err.message);
+                alert("Erreur lors de la génération. Si l'erreur de cache persiste, veuillez patienter 1 à 2 minutes que Supabase valide votre nouvelle colonne 'code'.\n\nDétails : " + err.message);
             } finally {
                 btn.disabled = false;
             }
         });
 
-        // Fusionner
+        // Action : Reconvertir / Fusionner un code
         document.getElementById('btn-reconvert-to-points').addEventListener('click', async () => {
             const btn = document.getElementById('btn-reconvert-to-points');
             const inputCode = document.getElementById('code-to-reconvert').value.trim().toUpperCase();
 
             if (!inputCode) {
-                alert("Veuillez entrer un code à reconvertir.");
+                alert("Veuillez entrer un code à fusionner.");
                 return;
             }
 
@@ -353,6 +372,7 @@
             }
         });
 
+        // Déconnexion
         async function logout() {
             await supabase.auth.signOut();
             window.location.href = "index.html";
