@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mes Commandes - Shadow Market</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root { --bg: #0d0e12; --cyan: #00f2fe; --rose: #ff0055; --text: #fff; }
+        body { background: var(--bg); color: var(--text); font-family: sans-serif; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        .wrapper { width: 90%; max-width: 400px; }
+        h2 { color: var(--cyan); text-align: center; border-bottom: 2px solid var(--rose); padding-bottom: 10px; }
+        
+        .order-card { background: #1a1c23; border: 1px solid #333; padding: 15px; margin: 10px 0; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .order-info h3 { margin: 0; font-size: 1.1rem; color: #fff; }
+        .order-info p { margin: 5px 0 0; font-size: 0.9rem; color: var(--cyan); font-weight: bold; }
+        
+        .btn-access { background: var(--cyan); color: #000; border: none; padding: 8px 12px; border-radius: 5px; font-weight: bold; cursor: pointer; text-decoration: none; font-size: 0.85rem; }
+        .back-btn { display: block; text-align: center; margin-top: 20px; color: white; text-decoration: none; border: 1px solid var(--cyan); padding: 10px; border-radius: 5px; }
+    </style>
+</head>
+<body>
+
+    <div class="wrapper">
+        <h2>MES COMMANDES</h2>
+        <div id="orders-list">Chargement de vos commandes traitées...</div>
+        <a href="profil.html" class="back-btn">⬅ Retour au Profil</a>
+    </div>
+
+    <script>
+        const db = supabase.createClient("https://jsuvimxjmjiljntmgbzu.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzdXZpbXhqbWppbGpudG1nYnp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI0Njk0NTgsImV4cCI6MjA5ODA0NTQ1OH0.F6aDK6oTyp3Tlb9fmkqpzgn4KGAxA5-ClIKlkqzfcR4");
+
+        async function loadOrders() {
+            const { data: { user } } = await db.auth.getUser();
+            if (!user) return window.location.href = "login.html";
+
+            const listDiv = document.getElementById('orders-list');
+
+            // Récupère les commandes que tu as déposées pour cet utilisateur
+            const { data, error } = await db
+                .from('pending_orders')
+                .select('product_name, price')
+                .eq('user_id', user.id);
+
+            if (error) { listDiv.innerHTML = "Erreur de chargement."; return; }
+            if (data.length === 0) { listDiv.innerHTML = "<p style='text-align:center; color:#777;'>Aucune commande traitée pour le moment.</p>"; return; }
+
+            listDiv.innerHTML = data.map(order => `
+                <div class="order-card">
+                    <div class="order-info">
+                        <h3>${order.product_name}</h3>
+                        <p>${order.price} Points</p>
+                    </div>
+                    <a href="panier.html?product=${encodeURIComponent(order.product_name)}&price=${order.price}" 
+                       class="btn-access">OBTENIR</a>
+                </div>
+            `).join('');
+        }
+
+        window.onload = loadOrders;
+    </script>
+</body>
+</html>
+
