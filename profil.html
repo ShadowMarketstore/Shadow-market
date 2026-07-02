@@ -10,11 +10,9 @@
             --bg-color: #0a0a0c;
             --card-bg: #111115;
             --accent-color: #00f2fe;
-            --crimson-neon: #ff0055;
             --text-color: #ffffff;
             --text-muted: #a0a0ab;
             --border-color: #22222b;
-            --sidebar-width: 240px;
         }
 
         body {
@@ -24,69 +22,17 @@
             background-color: var(--bg-color);
             color: var(--text-color);
             display: flex;
+            justify-content: center;
+            align-items: center;
             min-height: 100vh;
         }
 
-        /* --- MENU LATÉRAL --- */
-        .sidebar {
-            width: var(--sidebar-width);
-            background-color: var(--card-bg);
-            border-right: 1px solid var(--border-color);
-            display: flex;
-            flex-direction: column;
-            padding: 30px 20px;
-            box-sizing: border-box;
-            position: fixed;
-            height: 100vh;
-            left: 0;
-            top: 0;
-            z-index: 100;
-        }
-
-        .sidebar-brand {
-            font-size: 20px;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            color: var(--text-color);
-            margin-bottom: 40px;
-            text-align: center;
-        }
-
-        .sidebar-brand span { color: var(--accent-color); }
-        .sidebar-menu { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; }
-
-        .sidebar-item a {
-            display: flex;
-            align-items: center;
-            padding: 12px 15px;
-            color: var(--text-muted);
-            text-decoration: none;
-            border-radius: 8px;
-            font-size: 15px;
-            transition: all 0.3s;
-        }
-
-        .sidebar-item a:hover, .sidebar-item.active a {
-            color: #fff;
-            background: rgba(0, 242, 254, 0.05);
-            border-left: 3px solid var(--accent-color);
-        }
-
-        .sidebar-footer { margin-top: auto; }
-
-        /* --- CONTENU --- */
-        .main-content {
-            margin-left: var(--sidebar-width);
-            flex: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 40px 20px;
+        .container {
+            width: 100%;
+            max-width: 450px;
+            padding: 20px;
             box-sizing: border-box;
         }
-
-        .container { width: 100%; max-width: 450px; }
 
         .card {
             background-color: var(--card-bg);
@@ -97,9 +43,29 @@
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
         }
 
-        h1 { font-size: 24px; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 5px; color: var(--text-color); }
-        .subtitle { color: var(--accent-color); font-size: 14px; font-weight: bold; letter-spacing: 1px; margin-bottom: 25px; text-transform: uppercase; }
-        .user-email { font-size: 14px; color: var(--text-muted); margin-bottom: 30px; word-break: break-all; }
+        h1 {
+            font-size: 24px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 5px;
+            color: var(--text-color);
+        }
+
+        .subtitle {
+            color: var(--accent-color);
+            font-size: 14px;
+            font-weight: bold;
+            letter-spacing: 1px;
+            margin-bottom: 25px;
+            text-transform: uppercase;
+        }
+
+        .user-email {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 30px;
+            word-break: break-all;
+        }
 
         .points-box {
             border: 2px solid var(--accent-color);
@@ -114,15 +80,48 @@
             justify-content: center;
         }
 
-        .points-count { font-size: 48px; font-weight: 800; color: #fff; text-shadow: 0 0 10px rgba(0, 242, 254, 0.5); margin-top: 5px; }
-        .points-label { font-size: 12px; color: var(--text-muted); margin-top: 5px; }
+        .points-count {
+            font-size: 48px;
+            font-weight: 800;
+            color: #fff;
+            text-shadow: 0 0 10px rgba(0, 242, 254, 0.5);
+            margin-top: 5px;
+        }
 
-        .shop-section { text-align: left; border-top: 1px solid var(--border-color); padding-top: 20px; }
-        .shop-title { font-size: 14px; font-weight: bold; color: var(--accent-color); margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; }
-        .form-group { margin-bottom: 20px; }
-        label { display: block; font-size: 12px; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase; }
+        .points-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 5px;
+        }
 
-        select, input {
+        .shop-section {
+            text-align: left;
+            border-top: 1px solid var(--border-color);
+            padding-top: 20px;
+        }
+
+        .shop-title {
+            font-size: 14px;
+            font-weight: bold;
+            color: var(--accent-color);
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        select {
             width: 100%;
             padding: 12px;
             background-color: #0a0a0c;
@@ -131,11 +130,13 @@
             color: #fff;
             font-size: 14px;
             outline: none;
-            box-sizing: border-box;
+            cursor: pointer;
             transition: border-color 0.3s;
         }
 
-        select:focus, input:focus { border-color: var(--accent-color); }
+        select:focus {
+            border-color: var(--accent-color);
+        }
 
         .btn {
             width: 100%;
@@ -149,215 +150,176 @@
             text-transform: uppercase;
             letter-spacing: 1px;
             cursor: pointer;
-            margin-bottom: 15px;
             transition: opacity 0.2s, transform 0.1s;
         }
 
-        .btn:hover { opacity: 0.9; }
-        .btn:disabled { background-color: var(--border-color); color: var(--text-muted); cursor: not-allowed; }
-        .btn-logout { background-color: transparent; color: var(--crimson-neon); border: 1px solid var(--crimson-neon); width: 100%; }
-        .btn-logout:hover { background-color: rgba(255, 0, 85, 0.1); }
-        hr { border: 0; border-top: 1px solid var(--border-color); margin: 20px 0; }
+        .btn:hover {
+            opacity: 0.9;
+        }
 
-        /* --- RESPONSIVE MOBILE --- */
-        @media (max-width: 768px) {
-            body { flex-direction: column; }
-            .sidebar { position: relative; width: 100%; height: auto; border-right: none; border-bottom: 1px solid var(--border-color); padding: 15px; }
-            .sidebar-brand { margin-bottom: 15px; }
-            .sidebar-menu { flex-direction: row; justify-content: center; flex-wrap: wrap; }
-            .main-content { margin-left: 0; padding: 20px 10px; }
-            .sidebar-footer { display: none; }
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn:disabled {
+            background-color: var(--border-color);
+            color: var(--text-muted);
+            cursor: not-allowed;
         }
     </style>
 </head>
 <body>
 
-    <nav class="sidebar">
-        <div class="sidebar-brand">Shadow<span>Market</span></div>
-        <ul class="sidebar-menu">
-            <li class="sidebar-item"><a href="index.html">🏠 Accueil</a></li>
-            <li class="sidebar-item"><a href="#">🛒 Boutique</a></li>
-            <li class="sidebar-item active"><a href="profil.html">👤 Mon Profil</a></li>
-        </ul>
-        <div class="sidebar-footer">
-            <button class="btn btn-logout" onclick="logout()">⏻ Déconnexion</button>
-        </div>
-    </nav>
+    <div class="container">
+        <div class="card">
+            <h1>Espace Personnel</h1>
+            <div class="subtitle">Shadow Market</div>
+            
+            <div class="user-email" id="user-email">Chargement...</div>
 
-    <main class="main-content">
-        <div class="container">
-            <div class="card">
-                <h1>Espace Personnel</h1>
-                <div class="subtitle">Shadow Market</div>
+            <div class="points-box">
+                <span style="font-size: 24px;">💎</span>
+                <div class="points-count" id="points-display">0</div>
+                <div class="points-label">💡 Échangez vos points contre des codes ou fusionnez-les !</div>
+            </div>
+
+            <div class="shop-section">
+                <div class="shop-title">💎 Boutique de points & Fusion</div>
                 
-                <div class="user-email" id="user-email">Chargement...</div>
-
-                <div class="points-box">
-                    <span style="font-size: 24px;">💎</span>
-                    <div class="points-count" id="points-display">0</div>
-                    <div class="points-label">💡 Échangez vos points contre des codes ou fusionnez-les !</div>
+                <div class="form-group">
+                    <label for="points-tier-select">1. Convertir mes points en code promo</label>
+                    <select id="points-tier-select">
+                        <option value="2">2 Points</option>
+                        <option value="5">5 Points</option>
+                        <option value="10">10 Points</option>
+                    </select>
                 </div>
 
-                <div class="shop-section">
-                    <div class="shop-title">💎 Boutique de points & Fusion</div>
-                    
-                    <div class="form-group">
-                        <label for="points-tier-select">1. Convertir mes points en code promo</label>
-                        <select id="points-tier-select">
-                            <option value="2">2 Points</option>
-                            <option value="5">5 Points</option>
-                            <option value="10">10 Points</option>
-                        </select>
-                    </div>
-                    <button class="btn" id="btn-convert-to-code">Échanger</button>
-
-                    <hr>
-
-                    <div class="form-group">
-                        <label for="code-to-reconvert">2. Reconvertir un code en points (Fusion)</label>
-                        <input type="text" id="code-to-reconvert" placeholder="Ex: SHADOW-PT-XXXXXX">
-                    </div>
-                    <button class="btn" id="btn-reconvert-to-points" style="background-color: var(--crimson-neon); color: #fff;">Fusionner</button>
-                </div>
+                <button class="btn" id="btn-convert-to-code">Échanger</button>
             </div>
         </div>
-    </main>
+    </div>
 
     <script>
-        const SUPABASE_URL = "https://jsuvimxjmjiljntmgbzu.supabase.co"; 
-        const SUPABASE_ANON_KEY = "sb_publishable_Ngm29impwbTLGhuqyCxSJA_E1jXc1DX"; 
+        // CONFIGURATION SUPABASE (Remplacer par tes vraies clés si nécessaire)
+        const SUPABASE_URL = "https://shadow-market-ypg1.onrender.com"; // Ton URL de redirection ou proxy render
+        const SUPABASE_ANON_KEY = "TON_ANON_KEY_ICI"; 
 
+        // Initialisation de Supabase
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const db = supabase; 
 
         let userId = null;
 
+        // Fonction pour récupérer et afficher les points en temps réel
         async function refreshPoints() {
             if (!userId) return;
             try {
-                const { data, error } = await supabase
+                // Lecture basée sur ta colonne exacte : loyalty_points
+                const { data, error } = await db
                     .from('profiles')
                     .select('loyalty_points')
-                    .eq('id', userId);
+                    .eq('id', userId)
+                    .single();
 
                 if (error) throw error;
 
-                if (data && data.length > 0) {
-                    document.getElementById('points-display').textContent = data[0].loyalty_points || 0;
-                } else {
-                    document.getElementById('points-display').textContent = 0;
-                }
+                document.getElementById('points-display').textContent = data.loyalty_points || 0;
             } catch (err) {
-                console.error("Erreur points:", err.message);
+                console.error("Erreur lors de la récupération des points:", err.message);
             }
         }
 
+        // Vérification de la session utilisateur au chargement
         async function checkUserSession() {
             try {
                 const { data: { session }, error } = await supabase.auth.getSession();
+                
                 if (error) throw error;
 
                 if (!session) {
-                    window.location.href = "index.html"; // Redirige vers l'accueil si pas connecté
+                    // Pas connecté -> Redirection vers la page de connexion
+                    window.location.href = "connexion.html"; 
                     return;
                 }
 
                 userId = session.user.id;
                 document.getElementById('user-email').textContent = `Email : ${session.user.email}`;
+                
+                // Charger les points de l'utilisateur
                 await refreshPoints();
+
             } catch (err) {
-                console.error("Erreur session:", err.message);
-                window.location.href = "index.html";
+                alert("Erreur de session : " + err.message);
+                window.location.href = "connexion.html";
             }
         }
 
-        // Échanger
+        // ÉTAPE 1 : Échanger des points contre un code unique
         document.getElementById('btn-convert-to-code').addEventListener('click', async () => {
             const btn = document.getElementById('btn-convert-to-code');
             const pointsToSpend = parseInt(document.getElementById('points-tier-select').value);
+
             btn.disabled = true;
 
             try {
-                const { data: profiles, error: profileError } = await supabase
+                // 1. Lire le solde actuel sur la colonne 'loyalty_points'
+                const { data: profileData, error: profileError } = await db
                     .from('profiles')
                     .select('loyalty_points')
-                    .eq('id', userId);
+                    .eq('id', userId)
+                    .single();
 
                 if (profileError) throw profileError;
-                
-                const currentPts = (profiles && profiles[0]) ? (profiles[0].loyalty_points || 0) : 0;
+                const currentPts = profileData.loyalty_points || 0;
 
+                // Vérifier si l'utilisateur a assez de points
                 if (currentPts < pointsToSpend) {
                     alert(`Points insuffisants ! Il vous faut au moins ${pointsToSpend} points.`);
                     return;
                 }
 
+                // Générer un code au format SHADOW-PT-XXXXXX
                 const uniqueCode = "SHADOW-PT-" + Math.random().toString(36).substring(2, 8).toUpperCase();
 
-                const { error: insertError } = await supabase
+                // 2. Insérer le code dans la table 'codes_points' avec tes colonnes réelles
+                const { error: insertError } = await db
                     .from('codes_points')
                     .insert([{
-                        code: uniqueCode,
-                        points_required: pointsToSpend,
-                        user_id: userId,
-                        used: false
+                        code: uniqueCode,                  // Ta nouvelle colonne text
+                        points_required: pointsToSpend,   // Ta colonne int8 existante
+                        user_id: userId,                  // Ta colonne int8/uuid existante
+                        used: false                        // Ta nouvelle colonne bool
                     }]);
 
                 if (insertError) throw insertError;
 
-                const { error: updateError } = await supabase
+                // 3. Déduire les points du profil de l'utilisateur
+                const { error: updateError } = await db
                     .from('profiles')
                     .update({ loyalty_points: currentPts - pointsToSpend })
                     .eq('id', userId);
 
                 if (updateError) {
-                    await supabase.from('codes_points').delete().eq('code', uniqueCode);
+                    // Annulation (Rollback) de sécurité si la déduction échoue
+                    await db.from('codes_points').delete().eq('code', uniqueCode);
                     throw updateError;
                 }
 
-                alert(`Succès ! Code généré :\n\n👉 ${uniqueCode}`);
+                // Message de succès avec le code généré
+                alert(`Succès ! Votre code de ${pointsToSpend} points a été généré :\n\n👉 ${uniqueCode}`);
+                
+                // Actualiser l'affichage des points sur l'écran
                 await refreshPoints();
+
             } catch (err) {
-                alert("Erreur : " + err.message);
+                alert("Erreur lors de la génération : " + err.message);
             } finally {
                 btn.disabled = false;
             }
         });
 
-        // Fusionner
-        document.getElementById('btn-reconvert-to-points').addEventListener('click', async () => {
-            const btn = document.getElementById('btn-reconvert-to-points');
-            const inputCode = document.getElementById('code-to-reconvert').value.trim().toUpperCase();
-
-            if (!inputCode) {
-                alert("Veuillez entrer un code à reconvertir.");
-                return;
-            }
-
-            btn.disabled = true;
-
-            try {
-                const { data: pointsCredited, error } = await supabase.rpc('fusion_code_secure', {
-                    user_id_param: userId,
-                    input_code_param: inputCode
-                });
-
-                if (error) throw error;
-
-                alert(`Fusion réussie ! +${pointsCredited} points ajoutés.`);
-                document.getElementById('code-to-reconvert').value = "";
-                await refreshPoints();
-            } catch (err) {
-                alert("Erreur lors de la fusion : " + err.message);
-            } finally {
-                btn.disabled = false;
-            }
-        });
-
-        async function logout() {
-            await supabase.auth.signOut();
-            window.location.href = "index.html";
-        }
-
+        // Lancer la vérification au chargement de la page
         window.addEventListener('DOMContentLoaded', checkUserSession);
     </script>
 </body>
