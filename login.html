@@ -56,14 +56,16 @@
     document.getElementById('submitBtn').innerText = isLogin ? "SE CONNECTER" : "S'INSCRIRE";
     document.getElementById('toggleText').innerText = isLogin ? "Pas de compte ? Créer un compte" : "Déjà un compte ? Connexion";
   }
-
   function togglePassword() {
     const p = document.getElementById('password');
     const i = document.getElementById('eyeIcon');
-    p.type = (p.type === 'password') ? 'text' : 'password';
-    i.innerText = (p.type === 'text') ? '🙉' : '🙈';
-  }
-
+    if (p.type === 'password') {
+      p.type = 'text';
+      i.innerText = '🙉';
+    } else {
+      p.type = 'password';
+      i.innerText = '🙈';
+      
   document.getElementById('authForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     const submitBtn = document.getElementById('submitBtn');
