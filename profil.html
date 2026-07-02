@@ -25,7 +25,7 @@
             min-height: 100vh;
         }
 
-        /* --- BARRE SUPÉRIEURE AVEC LE BOUTON 3 BARRES --- */
+        /* --- NAVBAR AVEC BOUTON 3 BARRES --- */
         .navbar {
             background-color: var(--card-bg);
             border-bottom: 1px solid var(--border-color);
@@ -50,7 +50,6 @@
             background: none;
             border: none;
             color: var(--text-color);
-            font-size: 24px;
             cursor: pointer;
             display: flex;
             flex-direction: column;
@@ -65,7 +64,7 @@
             border-radius: 3px;
         }
 
-        /* --- MENU LATÉRAL COULISSANT --- */
+        /* --- MENU COULISSANT --- */
         .nav-menu {
             position: fixed;
             top: 60px;
@@ -247,7 +246,7 @@
                 <h1>Espace Personnel</h1>
                 <div class="subtitle">Shadow Market</div>
                 
-                <div class="user-email" id="user-email">Chargement de l'email...</div>
+                <div class="user-email" id="user-email">Chargement...</div>
 
                 <div class="points-box">
                     <span style="font-size: 32px;">💎</span>
@@ -287,13 +286,11 @@
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         let userId = null;
 
-        // Fonction Menu Burger (3 barres)
         function toggleMenu() {
             const menu = document.getElementById('side-menu');
             menu.classList.toggle('open');
         }
 
-        // Récupération stable de tes points
         async function refreshPoints() {
             if (!userId) return;
             try {
@@ -315,21 +312,18 @@
             }
         }
 
-        // Récupération de la session utilisateur avec affichage immédiat de l'email
         async function checkUserSession() {
             try {
                 const { data: { session }, error } = await supabase.auth.getSession();
                 if (error) throw error;
 
-                if (!session || !session.user) {
+                if (!session) {
                     window.location.href = "index.html"; 
                     return;
                 }
 
                 userId = session.user.id;
-                // Force l'affichage immédiat de l'email de l'utilisateur connecté
                 document.getElementById('user-email').textContent = `Email : ${session.user.email}`;
-                
                 await refreshPoints();
             } catch (err) {
                 console.error("Erreur session :", err.message);
@@ -337,7 +331,6 @@
             }
         }
 
-        // Échanger Points -> Code
         document.getElementById('btn-convert-to-code').addEventListener('click', async () => {
             const btn = document.getElementById('btn-convert-to-code');
             const pointsToSpend = parseInt(document.getElementById('points-tier-select').value);
@@ -391,7 +384,6 @@
             }
         });
 
-        // Reconvertir / Fusionner Code
         document.getElementById('btn-reconvert-to-points').addEventListener('click', async () => {
             const btn = document.getElementById('btn-reconvert-to-points');
             const inputCode = document.getElementById('code-to-reconvert').value.trim().toUpperCase();
@@ -426,7 +418,6 @@
             window.location.href = "index.html";
         }
 
-        // Fermeture automatique du menu au clic extérieur
         document.addEventListener('click', function(event) {
             const menu = document.getElementById('side-menu');
             const btn = document.getElementById('menu-btn');
