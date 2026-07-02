@@ -7,7 +7,8 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root { --bg: #0d0e12; --cyan: #00f2fe; --rose: #ff0055; --text: #fff; }
-        body { background: var(--bg); color: var(--text); font-family: sans-serif; margin: 0; display: flex; flex-direction: column; align-items: center; }
+        * { box-sizing: border-box; }
+        body { background: var(--bg); color: var(--text); font-family: sans-serif; margin: 0; display: flex; flex-direction: column; align-items: center; overflow-x: hidden; }
         
         .menu-toggle { position: absolute; top: 20px; left: 20px; cursor: pointer; z-index: 1000; }
         .menu-toggle span { display: block; width: 30px; height: 3px; background: var(--cyan); margin: 6px 0; }
@@ -43,7 +44,7 @@
         <a href="points.html">💎 Mes Points</a>
         <a href="bibliotheque.html">📚 Bibliothèque</a>
         <hr style="border: 0; border-top: 1px solid #333; margin: 20px 0;">
-        <a href="#" onclick="logoutUser()" style="color: var(--rose);">⏻ Déconnexion</a>
+        <a href="#" onclick="logoutUser(event)" style="color: var(--rose);">⏻ Déconnexion</a>
     </div>
 
     <div class="wrapper">
@@ -66,54 +67,102 @@
         </div>
     </div>
 
-    <div id="debug-log" style="position:fixed; bottom:0; left:0; width:100%; background:red; color:white; font-size:12px; padding:10px; max-height:150px; overflow-y:auto; z-index:9999; display:none;">
-        <strong>ERREURS :</strong><br>
-    </div>
-
     <script>
+        // Initialisation sécurisée
         const db = supabase.createClient(
             "https://jsuvimxjmjiljntmgbzu.supabase.co", 
             "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzdXZpbXhqbWppbGpudG1nYnp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI0Njk0NTgsImV4cCI6MjA5ODA0NTQ1OH0.F6aDK6oTyp3Tlb9fmkqpzgn4KGAxA5-ClIKlkqzfcR4"
         );
 
-        // --- Debug Script ---
-        window.onerror = (m) => { const l = document.getElementById('debug-log'); l.style.display = 'block'; l.innerHTML += `<div>• ${m}</div>`; };
-        window.addEventListener('unhandledrejection', e => { const l = document.getElementById('debug-log'); l.style.display = 'block'; l.innerHTML += `<div>• API: ${e.reason.message || e.reason}</div>`; });
-
         // --- Navigation ---
-        function toggleNav() { document.getElementById('nav').classList.toggle('open'); document.getElementById('navOverlay').classList.toggle('open'); }
-        function closeNav() { document.getElementById('nav').classList.remove('open'); document.getElementById('navOverlay').classList.remove('open'); }
+        function toggleNav() {
+            document.getElementById('nav').classList.toggle('open');
+            document.getElementById('navOverlay').classList.toggle('open');
+        }
+        function closeNav() {
+            document.getElementById('nav').classList.remove('open');
+            document.getElementById('navOverlay').classList.remove('open');
+        }
+        // Ferme le menu automatiquement quand on clique sur un lien de nav
+        document.querySelectorAll('#nav a').forEach(link => {
+            link.addEventListener('click', closeNav);
+        });
 
         async function init() {
             const { data: { user } } = await db.auth.getUser();
-            if(!user) { window.location.href = "login.html"; return; }
+            
+            if(!user) { 
+                window.location.href = "login.html"; 
+                return; 
+            }
+            
             document.getElementById('user-email').innerText = user.email;
-            const { data } = await db.from('profiles').select('loyalty_points').eq('id', user.id).maybeSingle();
+            
+            // Récupération des points
+            // ⚠️ FIX : .maybeSingle() au lieu de .single() pour ne pas planter
+            // si l'utilisateur n'a pas encore de ligne dans "profiles"
+            // (ex: juste après inscription, avant création du profil).
+            const { data, error } = await db
+                .from('profiles')
+                .select('loyalty_points')
+                .eq('id', user.id)
+                .maybeSingle();
+
+            if (error) {
+                console.error("Erreur récupération profil :", error.message);
+                document.getElementById('pts').innerText = "0";
+                return;
+            }
+
+            // data === null si aucun profil trouvé -> on affiche 0 sans planter
             document.getElementById('pts').innerText = data ? data.loyalty_points : 0;
         }
 
         async function echanger() {
             const btn = document.getElementById('btn-echanger');
+            const amount = document.getElementById('points-select').value;
+            
             btn.disabled = true; btn.innerText = "TRAITEMENT...";
-            const { error } = await db.rpc('convertir_points_en_code', { amount: parseInt(document.getElementById('points-select').value) });
-            if (error) alert("Erreur : " + error.message); else { alert("Échange validé !"); init(); }
-            btn.disabled = false; btn.innerText = "ÉCHANGER";
+            try {
+                const { error } = await db.rpc('convertir_points_en_code', { amount: parseInt(amount) });
+                if (error) throw error;
+                alert("Échange validé !");
+                await init();
+            } catch (err) {
+                alert("Erreur : " + err.message);
+            } finally {
+                btn.disabled = false; btn.innerText = "ÉCHANGER";
+            }
         }
 
         async function fusionner() {
             const btn = document.getElementById('btn-fusion');
             const code = document.getElementById('code-input').value.trim();
-            if(!code) return alert("Entrez un code");
+            if(!code) return alert("Veuillez entrer un code");
+
             btn.disabled = true; btn.innerText = "FUSION EN COURS...";
-            const { error } = await db.rpc('fusion_code_secure', { code_input: code });
-            if (error) alert("Erreur : " + error.message); else { alert("Fusion réussie !"); init(); }
-            btn.disabled = false; btn.innerText = "FUSIONNER";
+            try {
+                const { error } = await db.rpc('fusion_code_secure', { code_input: code });
+                if (error) throw error;
+                alert("Fusion réussie !");
+                document.getElementById('code-input').value = "";
+                await init();
+            } catch (err) {
+                alert("Erreur : " + err.message);
+            } finally {
+                btn.disabled = false; btn.innerText = "FUSIONNER";
+            }
         }
 
-        async function logoutUser() { 
-            closeNav();
-            await db.auth.signOut();
-            window.location.href = "login.html"; 
+        // Fonction de déconnexion
+        async function logoutUser(e) {
+            if (e) e.preventDefault(); // empêche le lien "#" de naviguer tout seul
+            try {
+                await db.auth.signOut();
+            } catch (err) {
+                console.error("Erreur signOut :", err.message);
+            }
+            window.location.href = "login.html";
         }
         
         window.addEventListener('DOMContentLoaded', init);
