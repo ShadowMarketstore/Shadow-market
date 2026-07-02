@@ -20,6 +20,10 @@
         
         .discount-tag { background: var(--rose); padding: 3px 8px; border-radius: 5px; font-size: 0.8rem; }
         .back-btn { display: block; text-align: center; margin-top: 20px; color: white; text-decoration: none; border: 1px solid var(--cyan); padding: 10px; border-radius: 5px; }
+
+        /* Style Modale */
+        #customModal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:2000; justify-content:center; align-items:center; }
+        .modal-box { background:#1a1c23; border:2px solid var(--cyan); padding:30px; border-radius:20px; text-align:center; width:80%; max-width:300px; }
     </style>
 </head>
 <body>
@@ -30,57 +34,51 @@
         <a href="profil.html" class="back-btn">⬅ Retour au Profil</a>
     </div>
 
-    <script>
-        const db = supabase.createClient(
-            "https://jsuvimxjmjiljntmgbzu.supabase.co", 
-            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzdXZpbXhqbWppbGpudG1nYnp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI0Njk0NTgsImV4cCI6MjA5ODA0NTQ1OH0.F6aDK6oTyp3Tlb9fmkqpzgn4KGAxA5-ClIKlkqzfcR4"
-        );
+    <!-- Modale -->
+    <div id="customModal">
+        <div class="modal-box">
+            <div style="font-size:3rem; margin-bottom:10px;">✅ 🎉</div>
+            <h3 id="modalTitle" style="color:white; margin:0;">Copié !</h3>
+            <p id="modalMsg" style="color:#aaa; margin:15px 0;"></p>
+            <button onclick="closeModal()" style="background:var(--cyan); border:none; padding:10px 20px; border-radius:5px; font-weight:bold; cursor:pointer;">OK</button>
+        </div>
+    </div>
 
-        // Fonction pour copier le code
+    <script>
+        const db = supabase.createClient("https://jsuvimxjmjiljntmgbzu.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzdXZpbXhqbWppbGpudG1nYnp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI0Njk0NTgsImV4cCI6MjA5ODA0NTQ1OH0.F6aDK6oTyp3Tlb9fmkqpzgn4KGAxA5-ClIKlkqzfcR4");
+
+        function showModal(title, msg) {
+            document.getElementById('modalTitle').innerText = title;
+            document.getElementById('modalMsg').innerText = msg;
+            document.getElementById('customModal').style.display = 'flex';
+        }
+        function closeModal() { document.getElementById('customModal').style.display = 'none'; }
+
         async function copyCode(code) {
-            try {
-                await navigator.clipboard.writeText(code);
-                alert("Code copié : " + code);
-            } catch (err) {
-                console.error("Erreur copie : ", err);
-            }
+            await navigator.clipboard.writeText(code);
+            showModal("Succès !", "Code copié : " + code);
         }
 
         async function chargerCodes() {
             const { data: { user } } = await db.auth.getUser();
             if (!user) return window.location.href = "login.html";
 
-            const { data, error } = await db
-                .from('coupons')
-                .select('code, discount_percent')
-                .eq('user_id', user.id)
-                .order('id', { ascending: false });
+            const { data, error } = await db.from('coupons').select('code, discount_percent').eq('user_id', user.id).order('id', { ascending: false });
 
             const listDiv = document.getElementById('codes-list');
-            
-            if (error) {
-                listDiv.innerHTML = "Erreur lors du chargement.";
-                return;
-            }
-
-            if (data.length === 0) {
-                listDiv.innerHTML = "<p style='text-align:center;'>Aucun code généré pour le moment.</p>";
-                return;
-            }
+            if (error) { listDiv.innerHTML = "Erreur chargement."; return; }
+            if (data.length === 0) { listDiv.innerHTML = "<p style='text-align:center;'>Aucun code généré.</p>"; return; }
 
             listDiv.innerHTML = data.map(c => `
                 <div class="code-card">
                     <div class="code-info">
                         <span class="code-text">${c.code}</span>
-                        <button class="copy-btn" onclick="copyCode('${c.code}')" title="Copier">
-                            <svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
-                        </button>
+                        <button class="copy-btn" onclick="copyCode('${c.code}')"><svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg></button>
                     </div>
                     <span class="discount-tag">${c.discount_percent}%</span>
                 </div>
             `).join('');
         }
-
         window.onload = chargerCodes;
     </script>
 </body>
