@@ -14,7 +14,7 @@
         .submit-btn { width: 100%; padding: 12px; background: #ff0055; color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; margin-top: 10px; text-transform: uppercase; }
         #toggleText { cursor: pointer; text-align: center; margin-top: 15px; font-size: 0.8rem; color: #aaa; text-decoration: underline; }
         .password-wrapper { position: relative; display: flex; align-items: center; }
-        #eyeIcon { position: absolute; right: 10px; cursor: pointer; user-select: none; }
+        #eyeIcon { position: absolute; right: 10px; cursor: pointer; user-select: none; font-size: 1.2rem; }
     </style>
 </head>
 <body>
@@ -30,7 +30,7 @@
       <label>Mot de passe</label>
       <div class="password-wrapper">
         <input type="password" id="password" required>
-        <span id="eyeIcon" onclick="togglePassword()">👀</span>
+        <span id="eyeIcon" onclick="togglePassword()">🙈</span>
       </div>
     </div>
     <button type="submit" class="submit-btn" id="submitBtn">SE CONNECTER</button>
@@ -39,11 +39,17 @@
 </div>
 
 <script>
-    const supabase = supabase.createClient('https://jsuvimxjmjiljntmgbzu.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzdXZpbXhqbWppbGpudG1nYnp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI0Njk0NTgsImV4cCI6MjA5ODA0NTQ1OH0.F6aDK6oTyp3Tlb9fmkqpzgn4KGAxA5-ClIKlkqzfcR4');
+    // ⚠️ FIX TDZ : le client Supabase est renommé "db" pour éviter le conflit
+    // de nom avec l'objet global "supabase" injecté par le CDN.
+    // (const supabase = supabase.createClient(...) plante avec
+    // "ReferenceError: Cannot access 'supabase' before initialization")
+    const db = supabase.createClient(
+        'https://jsuvimxjmjiljntmgbzu.supabase.co',
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzdXZpbXhqbWppbGpudG1nYnp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI0Njk0NTgsImV4cCI6MjA5ODA0NTQ1OH0.F6aDK6oTyp3Tlb9fmkqpzgn4KGAxA5-ClIKlkqzfcR4'
+    );
 
     let isLogin = true;
 
-    // 1. Fonction pour basculer Inscription/Connexion
     function toggleMode() {
         isLogin = !isLogin;
         document.getElementById('formTitle').innerText = isLogin ? "CONNEXION" : "CRÉER UN COMPTE";
@@ -51,34 +57,31 @@
         document.getElementById('toggleText').innerText = isLogin ? "Pas de compte ? Créer un compte" : "Déjà un compte ? Connexion";
     }
 
-    // 2. Fonction pour afficher/masquer le mot de passe
     function togglePassword() {
         const p = document.getElementById('password');
         const i = document.getElementById('eyeIcon');
-        if (p.type === 'password') { p.type = 'text'; i.innerText = '🙉'; } 
+        if (p.type === 'password') { p.type = 'text'; i.innerText = '🙉'; }
         else { p.type = 'password'; i.innerText = '🙈'; }
     }
 
-    // 3. Gestion de la soumission
     document.getElementById('authForm').addEventListener('submit', async (e) => {
         e.preventDefault();
-        const email = document.getElementById('email').value;
+        const email = document.getElementById('email').value.trim();
         const password = document.getElementById('password').value;
         const btn = document.getElementById('submitBtn');
-        
+
         btn.disabled = true;
         btn.innerText = "TRAITEMENT...";
 
         try {
             if (isLogin) {
-                const { error } = await supabase.auth.signInWithPassword({ email, password });
+                const { error } = await db.auth.signInWithPassword({ email, password });
                 if (error) throw error;
                 window.location.href = "profil.html";
             } else {
-                const { error } = await supabase.auth.signUp({ email, password });
+                const { error } = await db.auth.signUp({ email, password });
                 if (error) throw error;
-                alert("Compte créé ! Vérifie tes emails pour confirmer ou connecte-toi.");
-                // Optionnel : toggleMode(); // Revenir en mode connexion
+                alert("Inscription réussie !");
             }
         } catch (err) {
             alert("Erreur : " + err.message);
