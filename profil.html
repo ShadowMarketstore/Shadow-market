@@ -4,17 +4,46 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Espace Personnel - Shadow Market</title>
-    <script src="https://unpkg.com/@supabase/supabase-js@2" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        /* [Ton CSS reste inchangé] */
-        :root { --bg-color: #0d0e12; --accent-color: #00f2fe; --crimson-neon: #ff0055; }
-        body { background-color: var(--bg-color); color: #ffffff; font-family: sans-serif; }
-        .debug-console { border: 1px dashed var(--crimson-neon); padding: 10px; margin-top: 20px; font-size: 12px; }
+        :root { --bg-color: #0d0e12; --accent-color: #00f2fe; --crimson-neon: #ff0055; --text-muted: #a0a0ab; }
+        body { margin: 0; background: var(--bg-color); color: #fff; font-family: sans-serif; }
+        
+        /* Menu Hamburger */
+        .menu-toggle { position: absolute; top: 20px; left: 20px; cursor: pointer; z-index: 1000; }
+        .menu-toggle span { display: block; width: 30px; height: 3px; background: var(--accent-color); margin: 6px 0; transition: 0.3s; }
+        
+        /* Menu Coulissant */
+        .nav-menu { position: fixed; left: -100%; top: 0; width: 250px; height: 100%; background: #12141a; transition: 0.3s; padding: 60px 20px; z-index: 999; border-right: 2px solid var(--accent-color); }
+        .nav-menu.open { left: 0; }
+        .nav-menu a { display: block; color: #fff; text-decoration: none; padding: 15px 0; font-size: 18px; border-bottom: 1px solid #333; }
+
+        /* Conteneur Principal */
+        .wrapper { display: flex; flex-direction: column; align-items: center; padding-top: 80px; }
+        .card { width: 90%; max-width: 400px; border: 2px solid var(--accent-color); border-radius: 20px; padding: 20px; text-align: center; }
+        .debug-console { margin-top: 30px; width: 90%; max-width: 400px; padding: 10px; border: 1px dashed var(--crimson-neon); font-size: 11px; color: #ff99bb; }
     </style>
 </head>
 <body>
-    <div class="debug-console">
-        <div id="debug-log">Initialisation...</div>
+
+    <div class="menu-toggle" onclick="document.getElementById('nav').classList.toggle('open')">
+        <span></span><span></span><span></span>
+    </div>
+
+    <div id="nav" class="nav-menu">
+        <a href="index.html">🏠 Accueil</a>
+        <a href="profil.html">👤 Profil</a>
+        <a href="#" onclick="logout()">⏻ Déconnexion</a>
+    </div>
+
+    <div class="wrapper">
+        <div class="card">
+            <h2 style="color: var(--accent-color);">MON PROFIL</h2>
+            <div id="user-info">Chargement...</div>
+            <div style="font-size: 40px; margin: 20px;">💎 <span id="points-display">0</span></div>
+            <button onclick="logout()" style="width: 100%; padding: 10px; background: var(--crimson-neon); border: none; color: #fff; border-radius: 5px;">DÉCONNEXION</button>
+        </div>
+        <div class="debug-console" id="debug-log">Initialisation...</div>
     </div>
 
     <script>
@@ -23,36 +52,28 @@
 
         async function initApp() {
             const logBox = document.getElementById('debug-log');
-            
-            // Vérification de sécurité pour Supabase
-            if (typeof supabase === 'undefined' && (!window.supabase)) {
-                logBox.innerHTML = "⚠️ En attente de la bibliothèque Supabase...";
-                setTimeout(initApp, 500); // Réessaye dans 500ms
-                return;
-            }
-
             try {
-                const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-                logBox.innerHTML = "✅ Supabase chargé. Analyse de la session...";
-                
+                const client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
                 const { data: { session }, error } = await client.auth.getSession();
-                if (error) throw error;
                 
                 if (session) {
-                    logBox.innerHTML = "🚀 Session active : " + session.user.email;
+                    document.getElementById('user-info').textContent = session.user.email;
+                    const { data } = await client.from('profiles').select('loyalty_points').eq('id', session.user.id).single();
+                    document.getElementById('points-display').textContent = data ? data.loyalty_points : 0;
+                    logBox.textContent = "✅ Système en ligne.";
                 } else {
-                    logBox.innerHTML = "❌ Aucune session détectée.";
+                    logBox.textContent = "❌ Non connecté.";
                 }
             } catch (err) {
-                logBox.innerHTML = "💥 Erreur : " + err.message;
+                logBox.textContent = "💥 Erreur : " + err.message;
             }
         }
 
-        // Lancement retardé pour garantir la fin du chargement
-        window.addEventListener('DOMContentLoaded', () => {
-            setTimeout(initApp, 1000);
-        });
+        function logout() {
+            window.location.href = "index.html";
+        }
+
+        window.onload = initApp;
     </script>
 </body>
 </html>
-
