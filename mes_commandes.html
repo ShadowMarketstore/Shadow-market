@@ -9,7 +9,7 @@
         :root { --cyan: #00f3ff; --crimson: #dc143c; --red: #ff0000; --white: #ffffff; --bg: #000; }
         body { background: var(--bg); color: var(--white); font-family: sans-serif; padding: 20px; }
         
-        /* Design des cartes conforme à ton schéma */
+        /* Design des cartes */
         .order-card { border: 2px solid var(--cyan); padding: 15px; border-radius: 12px; margin-bottom: 20px; background: #080808; max-width: 450px; margin: auto; }
         .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         .product-name { font-size: 18px; font-weight: bold; color: var(--cyan); }
@@ -21,29 +21,28 @@
         .btn-download { background: var(--cyan); color: #000; }
         
         input { width: 100%; padding: 12px; background: #000; border: 1px solid var(--crimson); color: var(--white); border-radius: 8px; box-sizing: border-box; }
-        .diag-box { background: #1a0000; border: 1px solid var(--crimson); color: #ffcccc; padding: 10px; margin: 10px; font-size: 12px; border-radius: 8px; }
+        
+        /* Pop-up de succès - 1000312758.jpg */
+        .popup { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); display:flex; align-items:center; justify-content:center; z-index:9999; }
+        .popup-content { background:#080808; padding:30px; border-radius:20px; border:2px solid var(--cyan); text-align:center; width: 85%; max-width: 300px; color: #fff; }
+        .popup-btn { background: var(--cyan); border:none; padding:10px 20px; border-radius:5px; font-weight:bold; cursor:pointer; margin-top:20px; color:#000; width: 100%; }
     </style>
 </head>
 <body>
 
 <h2 style="color: var(--cyan); text-align: center;">MES COMMANDES</h2>
-<div id="diagnostic-area"></div>
 <div id="orders-list"></div>
 
 <script>
     const db = supabase.createClient("https://jsuvimxjmjiljntmgbzu.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzdXZpbXhqbWppbGpudG1nYnp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI0Njk0NTgsImV4cCI6MjA5ODA0NTQ1OH0.F6aDK6oTyp3Tlb9fmkqpzgn4KGAxA5-ClIKlkqzfcR4");
 
-    function showDiag(msg) {
-        document.getElementById('diagnostic-area').innerHTML += `<div class="diag-box">DIAG: ${msg}</div>`;
-    }
-
     async function loadOrders() {
         const { data: { user } } = await db.auth.getUser();
-        if (!user) { showDiag("Utilisateur non connecté"); return; }
+        if (!user) return;
 
-        const { data, error } = await db.from('pending_orders').select('*').eq('user_id', user.id);
+        const { data } = await db.from('pending_orders').select('*').eq('user_id', user.id);
         
-        if (error) { showDiag("Erreur: " + error.message); return; }
+        if (!data) return;
         
         const listDiv = document.getElementById('orders-list');
         listDiv.innerHTML = data.map(order => `
@@ -53,7 +52,7 @@
                     <span class="price-tag">${order.price}€</span>
                 </div>
                 
-                <button class="btn-pay" onclick="window.location.href='panier.html'">PAYER</button>
+                <button class="btn-pay" onclick="localStorage.setItem('cartItem', JSON.stringify({name:'${order.product_name}', price:${order.price}})); window.location.href='panier.html';">PAYER</button>
                 
                 <input type="text" id="code-${order.id}" placeholder="CODE-XXXXXXXX">
                 <button class="btn-validate" onclick="verifyCode('${order.id}')">VALIDER</button>
@@ -72,7 +71,17 @@
         if (data) {
             await db.from('pending_orders').update({ is_verified: true }).eq('id', id);
             document.getElementById(`dl-${id}`).style.display = 'block';
-            alert("Succès ! Téléchargement débloqué.");
+
+            // Affichage du pop-up style 1000312758.jpg
+            document.body.insertAdjacentHTML('beforeend', `
+                <div class="popup">
+                    <div class="popup-content">
+                        <div style="font-size: 50px;">✅ 🎉</div>
+                        <h2 style="margin: 10px 0;">Succès !</h2>
+                        <p>Fusion réussie !</p>
+                        <button class="popup-btn" onclick="this.parentElement.parentElement.remove()">OK</button>
+                    </div>
+                </div>`);
         } else {
             alert("Code invalide.");
         }
