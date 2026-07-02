@@ -9,19 +9,18 @@
         :root { --bg: #0d0e12; --cyan: #00f2fe; --rose: #ff0055; --text: #fff; }
         body { background: var(--bg); color: var(--text); font-family: sans-serif; margin: 0; display: flex; flex-direction: column; align-items: center; }
         
-        /* Menu Hamburger */
         .menu-toggle { position: absolute; top: 20px; left: 20px; cursor: pointer; z-index: 1000; }
         .menu-toggle span { display: block; width: 30px; height: 3px; background: var(--cyan); margin: 6px 0; }
         .nav-menu { position: fixed; left: -100%; top: 0; width: 250px; height: 100%; background: #090a0e; transition: 0.3s; padding: 80px 20px; z-index: 999; border-right: 2px solid var(--cyan); }
         .nav-menu.open { left: 0; }
         .nav-menu a { display: block; padding: 15px 0; color: white; text-decoration: none; border-bottom: 1px solid #222; }
+        .nav-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 998; }
+        .nav-overlay.open { display: block; }
 
-        /* Wrapper */
         .wrapper { width: 90%; max-width: 360px; margin-top: 80px; text-align: center; border: 2px solid var(--cyan); padding: 20px; border-radius: 20px; background: rgba(255,255,255,0.02); }
-        .user-email-display { font-size: 0.9rem; color: #aaa; margin-bottom: 15px; font-style: italic; }
+        .user-email-display { font-size: 0.9rem; color: #aaa; margin-bottom: 15px; font-style: italic; word-break: break-all; }
         .points-display { font-size: 3rem; font-weight: bold; color: var(--cyan); margin: 10px 0; }
         
-        /* Formulaires */
         .select-box, .input-box { width: 100%; padding: 12px; margin: 10px 0; background: #1a1c23; border: 1px solid #333; color: white; border-radius: 5px; box-sizing: border-box; }
         .btn-main { width: 100%; padding: 12px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; text-transform: uppercase; margin-top: 5px; transition: 0.3s; }
         .btn-main:disabled { opacity: 0.5; cursor: not-allowed; }
@@ -31,9 +30,11 @@
 </head>
 <body>
 
-    <div class="menu-toggle" onclick="document.getElementById('nav').classList.toggle('open')">
+    <div class="menu-toggle" onclick="toggleNav()">
         <span></span><span></span><span></span>
     </div>
+
+    <div id="navOverlay" class="nav-overlay" onclick="closeNav()"></div>
 
     <div id="nav" class="nav-menu">
         <a href="index.html">🏠 Accueil</a>
@@ -42,7 +43,7 @@
         <a href="points.html">💎 Mes Points</a>
         <a href="bibliotheque.html">📚 Bibliothèque</a>
         <hr style="border: 0; border-top: 1px solid #333; margin: 20px 0;">
-        <a href="#" onclick="logout()" style="color: var(--rose);">⏻ Déconnexion</a>
+        <a href="#" onclick="logoutUser()" style="color: var(--rose);">⏻ Déconnexion</a>
     </div>
 
     <div class="wrapper">
@@ -63,59 +64,59 @@
             <input type="text" id="code-input" class="input-box" placeholder="Ex: SHADOW-PT-XXXXXX">
             <button id="btn-fusion" class="btn-main btn-fusion" onclick="fusionner()">FUSIONNER</button>
         </div>
+    </div>
 
-        <div class="legal-info" style="margin-top: 25px; padding: 10px; border-top: 1px solid #333; font-size: 10px; color: #888; text-align: left;">
-            <p>⚠️ <strong>Conditions :</strong></p>
-            <p>• Points : durée de vie de 6 mois.</p>
-            <p>• Codes : durée de vie de 3 mois.</p>
-            <p style="color: #00f2fe; text-shadow: 0 0 5px #00f2fe;">
-                <strong>NB :</strong> Les codes sont à usage unique mais vous pouvez les donner à un ami.
-            </p>
-        </div>
+    <div id="debug-log" style="position:fixed; bottom:0; left:0; width:100%; background:red; color:white; font-size:12px; padding:10px; max-height:150px; overflow-y:auto; z-index:9999; display:none;">
+        <strong>ERREURS :</strong><br>
     </div>
 
     <script>
-        const supabase = supabase.createClient("https://jsuvimxjmjiljntmgbzu.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzdXZpbXhqbWppbGpudG1nYnp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI0Njk0NTgsImV4cCI6MjA5ODA0NTQ1OH0.F6aDK6oTyp3Tlb9fmkqpzgn4KGAxA5-ClIKlkqzfcR4");
+        const db = supabase.createClient(
+            "https://jsuvimxjmjiljntmgbzu.supabase.co", 
+            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzdXZpbXhqbWppbGpudG1nYnp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI0Njk0NTgsImV4cCI6MjA5ODA0NTQ1OH0.F6aDK6oTyp3Tlb9fmkqpzgn4KGAxA5-ClIKlkqzfcR4"
+        );
+
+        // --- Debug Script ---
+        window.onerror = (m) => { const l = document.getElementById('debug-log'); l.style.display = 'block'; l.innerHTML += `<div>• ${m}</div>`; };
+        window.addEventListener('unhandledrejection', e => { const l = document.getElementById('debug-log'); l.style.display = 'block'; l.innerHTML += `<div>• API: ${e.reason.message || e.reason}</div>`; });
+
+        // --- Navigation ---
+        function toggleNav() { document.getElementById('nav').classList.toggle('open'); document.getElementById('navOverlay').classList.toggle('open'); }
+        function closeNav() { document.getElementById('nav').classList.remove('open'); document.getElementById('navOverlay').classList.remove('open'); }
 
         async function init() {
-            const { data: { user } } = await supabase.auth.getUser();
+            const { data: { user } } = await db.auth.getUser();
             if(!user) { window.location.href = "login.html"; return; }
-            
             document.getElementById('user-email').innerText = user.email;
-            
-            const { data, error } = await supabase.from('profiles').select('loyalty_points').eq('id', user.id).single();
-            if(data) document.getElementById('pts').innerText = data.loyalty_points;
+            const { data } = await db.from('profiles').select('loyalty_points').eq('id', user.id).maybeSingle();
+            document.getElementById('pts').innerText = data ? data.loyalty_points : 0;
         }
 
         async function echanger() {
             const btn = document.getElementById('btn-echanger');
-            const amount = document.getElementById('points-select').value;
-            
             btn.disabled = true; btn.innerText = "TRAITEMENT...";
-            const { error } = await supabase.rpc('convertir_points_en_code', { amount: parseInt(amount) });
-            
-            if(error) alert("Erreur : " + error.message); else { alert("Échange validé !"); init(); }
+            const { error } = await db.rpc('convertir_points_en_code', { amount: parseInt(document.getElementById('points-select').value) });
+            if (error) alert("Erreur : " + error.message); else { alert("Échange validé !"); init(); }
             btn.disabled = false; btn.innerText = "ÉCHANGER";
         }
 
         async function fusionner() {
             const btn = document.getElementById('btn-fusion');
             const code = document.getElementById('code-input').value.trim();
-            if(!code) return alert("Veuillez entrer un code");
-
+            if(!code) return alert("Entrez un code");
             btn.disabled = true; btn.innerText = "FUSION EN COURS...";
-            const { error } = await supabase.rpc('fusion_code_secure', { code_input: code });
-            
-            if(error) alert("Erreur : " + error.message); else { alert("Fusion réussie !"); init(); }
+            const { error } = await db.rpc('fusion_code_secure', { code_input: code });
+            if (error) alert("Erreur : " + error.message); else { alert("Fusion réussie !"); init(); }
             btn.disabled = false; btn.innerText = "FUSIONNER";
         }
 
-        async function logout() { 
-            await supabase.auth.signOut();
-            window.location.href = "index.html"; 
+        async function logoutUser() { 
+            closeNav();
+            await db.auth.signOut();
+            window.location.href = "login.html"; 
         }
         
-        window.onload = init;
+        window.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
 </html>
