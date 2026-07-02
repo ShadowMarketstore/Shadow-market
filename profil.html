@@ -7,13 +7,13 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
-            --bg-color: #0a0a0c;
-            --card-bg: #111115;
+            --bg-color: #0d0e12;
+            --card-bg: #0d0e12;
             --accent-color: #00f2fe;
             --crimson-neon: #ff0055;
             --text-color: #ffffff;
             --text-muted: #a0a0ab;
-            --border-color: #22222b;
+            --border-color: #1a1c23;
         }
 
         body {
@@ -26,113 +26,210 @@
             display: flex;
             justify-content: center;
             align-items: center;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 440px;
-            padding: 20px;
             box-sizing: border-box;
         }
 
-        .card {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 20px;
-            padding: 40px 30px;
-            text-align: center;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+        /* --- LE CADRE NÉON CYAN AUTOUR DE LA PAGE --- */
+        .neon-wrapper {
+            width: 100%;
+            max-width: 450px;
+            min-height: 95vh;
+            margin: 10px;
+            border: 3px solid var(--accent-color);
+            border-radius: 24px;
+            box-shadow: inset 0 0 15px rgba(0, 242, 254, 0.2), 0 0 20px rgba(0, 242, 254, 0.2);
+            padding: 25px 20px;
+            position: relative;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
         }
 
-        h1 {
-            font-size: 28px;
-            margin: 0 0 8px 0;
+        /* --- LE BOUTON 3 BARRES (TOP GAUCHE) --- */
+        .menu-toggle {
+            background: none;
+            border: none;
+            color: var(--text-color);
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            position: absolute;
+            top: 25px;
+            left: 20px;
+            z-index: 1000;
+            padding: 5px;
+        }
+
+        .menu-toggle span {
+            display: block;
+            width: 28px;
+            height: 3px;
+            background-color: var(--accent-color);
+            border-radius: 2px;
+            box-shadow: 0 0 8px rgba(0, 242, 254, 0.8);
+        }
+
+        /* --- PANNEAU DU MENU COULISSANT --- */
+        .nav-menu {
+            position: fixed;
+            top: 0;
+            left: -100%;
+            width: 260px;
+            height: 100vh;
+            background-color: #090a0e;
+            border-right: 2px solid var(--accent-color);
+            box-shadow: 10px 0 25px rgba(0,0,0,0.8);
+            transition: left 0.3s ease;
+            padding: 80px 20px 20px 20px;
+            box-sizing: border-box;
+            z-index: 999;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .nav-menu.open {
+            left: 0;
+        }
+
+        .menu-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .menu-item a {
+            display: block;
+            padding: 12px 15px;
+            color: var(--text-muted);
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .menu-item a:hover, .menu-item.active a {
+            color: #fff;
+            background: rgba(0, 242, 254, 0.08);
+            border-left: 4px solid var(--accent-color);
+        }
+
+        .menu-footer {
+            margin-top: auto;
+            padding-bottom: 20px;
+        }
+
+        /* --- TITRE PRINCIPAL --- */
+        .main-title {
+            text-align: center;
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--accent-color);
             text-transform: uppercase;
             letter-spacing: 2px;
+            margin: 40px 0 30px 0;
+            line-height: 1.2;
+            text-shadow: 0 0 10px rgba(0, 242, 254, 0.4);
         }
 
-        .subtitle {
-            color: var(--accent-color);
-            font-size: 14px;
-            font-weight: bold;
-            letter-spacing: 3px;
-            margin-bottom: 30px;
-            text-transform: uppercase;
-        }
-
+        /* --- AFFICHAGE DE L'EMAIL --- */
         .user-email {
+            text-align: center;
             font-size: 15px;
-            color: var(--text-color);
-            margin-bottom: 30px;
-            background-color: #0a0a0c;
-            padding: 12px;
-            border-radius: 10px;
-            border: 1px solid var(--border-color);
+            color: #ffffff;
+            margin-bottom: 25px;
+            font-weight: 500;
             word-break: break-all;
         }
 
+        /* --- BOITE DE POINTS --- */
         .points-box {
             border: 2px solid var(--accent-color);
-            border-radius: 20px;
-            padding: 30px 20px;
-            margin-bottom: 35px;
-            background: rgba(0, 242, 254, 0.02);
-            box-shadow: 0 0 20px rgba(0, 242, 254, 0.15);
+            border-radius: 18px;
+            padding: 20px;
+            margin-bottom: 30px;
+            background: rgba(0, 242, 254, 0.01);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            position: relative;
+        }
+
+        .diamond-icon {
+            font-size: 42px;
+            filter: drop-shadow(0 0 10px rgba(0, 242, 254, 0.6));
         }
 
         .points-count {
-            font-size: 64px;
+            font-size: 52px;
             font-weight: 800;
             color: #ffffff;
-            text-shadow: 0 0 15px rgba(0, 242, 254, 0.6);
-            margin: 10px 0;
+            text-shadow: 0 0 15px rgba(0, 242, 254, 0.7);
         }
 
         .points-label {
-            font-size: 13px;
+            text-align: center;
+            font-size: 12px;
             color: var(--text-muted);
-            line-height: 1.5;
+            line-height: 1.4;
+            margin-top: -20px;
+            margin-bottom: 30px;
+            padding: 0 10px;
         }
 
-        .shop-section {
-            text-align: left;
-            border-top: 1px solid var(--border-color);
-            padding-top: 30px;
+        /* --- FORMULAIRES & BOUTONS --- */
+        .shop-container {
+            background: #12141a;
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid var(--border-color);
         }
 
         .shop-title {
             font-size: 14px;
             font-weight: bold;
             color: var(--accent-color);
-            margin-bottom: 25px;
+            margin-bottom: 20px;
             text-transform: uppercase;
             letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .form-group {
-            margin-bottom: 25px;
+            margin-bottom: 15px;
         }
 
         label {
             display: block;
-            font-size: 12px;
+            font-size: 11px;
             color: var(--text-muted);
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
 
+        .flex-row {
+            display: flex;
+            gap: 10px;
+        }
+
         select, input {
-            width: 100%;
-            padding: 16px;
-            background-color: #0a0a0c;
+            flex: 1;
+            padding: 14px;
+            background-color: #090a0e;
             border: 1px solid var(--border-color);
-            border-radius: 12px;
+            border-radius: 10px;
             color: #ffffff;
-            font-size: 15px;
+            font-size: 14px;
             outline: none;
             box-sizing: border-box;
-            transition: border-color 0.3s;
         }
 
         select:focus, input:focus {
@@ -140,82 +237,94 @@
         }
 
         .btn {
-            width: 100%;
-            padding: 16px;
+            padding: 14px 20px;
             background-color: var(--accent-color);
             border: none;
-            border-radius: 12px;
-            color: #0a0a0c;
-            font-size: 15px;
+            border-radius: 10px;
+            color: #000000;
+            font-size: 14px;
             font-weight: bold;
             text-transform: uppercase;
-            letter-spacing: 1px;
             cursor: pointer;
-            transition: opacity 0.3s;
-            margin-bottom: 15px;
+            transition: background 0.2s;
         }
 
-        .btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
+        .btn-full {
+            width: 100%;
+            margin-top: 5px;
         }
 
         .btn-logout {
             background-color: transparent;
             color: var(--crimson-neon);
             border: 1px solid var(--crimson-neon);
+            margin-top: 20px;
         }
 
         hr {
             border: 0;
             border-top: 1px solid var(--border-color);
-            margin: 30px 0;
+            margin: 20px 0;
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <div class="card">
-            <h1>Espace Personnel</h1>
-            <div class="subtitle">Shadow Market</div>
-            
-            <div class="user-email" id="user-email">Chargement de l'email...</div>
+    <div class="neon-wrapper">
+        <button class="menu-toggle" id="menu-btn" onclick="toggleMenu()">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
 
-            <div class="points-box">
-                <span style="font-size: 36px;">💎</span>
-                <div class="points-count" id="points-display">...</div>
-                <div class="points-label">💡 Échangez vos points contre des codes ou fusionnez-les !</div>
+        <nav class="nav-menu" id="side-menu">
+            <ul class="menu-list">
+                <li class="menu-item"><a href="index.html">🏠 Accueil</a></li>
+                <li class="menu-item"><a href="#">🛒 Boutique</a></li>
+                <li class="menu-item active"><a href="profil.html">👤 Mon Profil</a></li>
+                <li class="menu-item"><a href="#">📦 Mes Commandes</a></li>
+                <li class="menu-item"><a href="#">💎 Mes Points</a></li>
+            </ul>
+            <div class="menu-footer">
+                <button class="btn btn-full btn-logout" onclick="logout()">⏻ Déconnexion</button>
             </div>
+        </nav>
 
-            <div class="shop-section">
-                <div class="shop-title">💎 Boutique de points & Fusion</div>
-                
-                <!-- SECTION 1 : CONVERSION -->
-                <div class="form-group">
-                    <label for="points-tier-select">1. Convertir mes points en code promo</label>
+        <div class="main-title">Espace<br>Personnel</div>
+        
+        <div class="user-email" id="user-email">Email : Chargement...</div>
+
+        <div class="points-box">
+            <span class="diamond-icon">💎</span>
+            <div class="points-count" id="points-display">...</div>
+        </div>
+        <div class="points-label">💡 Échangez vos points contre des codes ou fusionnez-les !</div>
+
+        <div class="shop-container">
+            <div class="shop-title">💎 Boutique de points & Fusion</div>
+            
+            <div class="form-group">
+                <label for="points-tier-select">1. Convertir mes points en code promo</label>
+                <div class="flex-row">
                     <select id="points-tier-select">
                         <option value="2">2 Points</option>
                         <option value="5">5 Points</option>
                         <option value="10">10 Points</option>
                     </select>
+                    <button class="btn" id="btn-convert-to-code">Échanger</button>
                 </div>
-                <button class="btn" id="btn-convert-to-code">Échanger</button>
+            </div>
 
-                <hr>
+            <hr>
 
-                <!-- SECTION 2 : RECONVERSION -->
-                <div class="form-group">
-                    <label for="code-to-reconvert">2. Reconvertir un code en points (Fusion)</label>
-                    <input type="text" id="code-to-reconvert" placeholder="Ex: SHADOW-PT-XXXXXX">
-                </div>
-                <button class="btn" id="btn-reconvert-to-points" style="background-color: var(--crimson-neon); color: #ffffff;">Fusionner</button>
-                
-                <hr>
-                
-                <button class="btn btn-logout" onclick="logout()">⏻ Déconnexion</button>
+            <div class="form-group">
+                <label for="code-to-reconvert">2. Reconvertir un code en points (Fusion)</label>
+                <input type="text" id="code-to-reconvert" placeholder="Ex: SHADOW-PT-XXXXXX" style="margin-bottom: 10px;">
+                <button class="btn btn-full" id="btn-reconvert-to-points" style="background-color: var(--crimson-neon); color: #ffffff;">Fusionner</button>
             </div>
         </div>
+
+        <button class="btn btn-full btn-logout" onclick="logout()">⏻ Déconnexion</button>
     </div>
 
     <script>
@@ -225,7 +334,11 @@
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         let userId = null;
 
-        // Fonction stable de récupération des points
+        function toggleMenu() {
+            const menu = document.getElementById('side-menu');
+            menu.classList.toggle('open');
+        }
+
         async function refreshPoints() {
             if (!userId) return;
             try {
@@ -247,7 +360,6 @@
             }
         }
 
-        // Fonction stable de vérification de la session
         async function checkUserSession() {
             try {
                 const { data: { session }, error } = await supabase.auth.getSession();
@@ -267,7 +379,6 @@
             }
         }
 
-        // Action : Convertir des points en code
         document.getElementById('btn-convert-to-code').addEventListener('click', async () => {
             const btn = document.getElementById('btn-convert-to-code');
             const pointsToSpend = parseInt(document.getElementById('points-tier-select').value);
@@ -321,7 +432,6 @@
             }
         });
 
-        // Action : Fusionner un code existant
         document.getElementById('btn-reconvert-to-points').addEventListener('click', async () => {
             const btn = document.getElementById('btn-reconvert-to-points');
             const inputCode = document.getElementById('code-to-reconvert').value.trim().toUpperCase();
@@ -351,11 +461,18 @@
             }
         });
 
-        // Déconnexion
         async function logout() {
             await supabase.auth.signOut();
             window.location.href = "index.html";
         }
+
+        document.addEventListener('click', function(event) {
+            const menu = document.getElementById('side-menu');
+            const btn = document.getElementById('menu-btn');
+            if (!menu.contains(event.target) && !btn.contains(event.target) && menu.classList.contains('open')) {
+                menu.classList.remove('open');
+            }
+        });
 
         window.addEventListener('DOMContentLoaded', checkUserSession);
     </script>
