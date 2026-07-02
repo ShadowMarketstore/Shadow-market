@@ -10,17 +10,23 @@
         body { margin: 0; background: var(--bg-color); color: #fff; font-family: sans-serif; }
         
         /* Menu Hamburger */
-        .menu-toggle { position: absolute; top: 20px; left: 20px; cursor: pointer; z-index: 1000; }
-        .menu-toggle span { display: block; width: 30px; height: 3px; background: var(--accent-color); margin: 6px 0; transition: 0.3s; }
+        .menu-toggle { position: absolute; top: 20px; left: 20px; cursor: pointer; z-index: 1000; display: flex; flex-direction: column; gap: 6px; }
+        .menu-toggle span { display: block; width: 30px; height: 3px; background: var(--accent-color); transition: 0.3s; }
         
         /* Menu Coulissant */
-        .nav-menu { position: fixed; left: -100%; top: 0; width: 250px; height: 100%; background: #12141a; transition: 0.3s; padding: 60px 20px; z-index: 999; border-right: 2px solid var(--accent-color); }
+        .nav-menu { position: fixed; left: -100%; top: 0; width: 250px; height: 100%; background: #12141a; transition: 0.3s; padding: 80px 20px; z-index: 999; border-right: 2px solid var(--accent-color); }
         .nav-menu.open { left: 0; }
         .nav-menu a { display: block; color: #fff; text-decoration: none; padding: 15px 0; font-size: 18px; border-bottom: 1px solid #333; }
 
         /* Conteneur Principal */
         .wrapper { display: flex; flex-direction: column; align-items: center; padding-top: 80px; }
-        .card { width: 90%; max-width: 400px; border: 2px solid var(--accent-color); border-radius: 20px; padding: 20px; text-align: center; }
+        .card { width: 90%; max-width: 400px; border: 2px solid var(--accent-color); border-radius: 20px; padding: 20px; text-align: center; background: #0d0e12; }
+        
+        /* Éléments Boutique */
+        .input-style { width: 100%; padding: 10px; margin: 10px 0; background: #1a1c23; border: 1px solid #333; color: white; border-radius: 5px; box-sizing: border-box; }
+        .btn-main { width: 100%; padding: 12px; background: var(--accent-color); border: none; font-weight: bold; border-radius: 5px; cursor: pointer; }
+        .btn-danger { background: var(--crimson-neon); color: white; margin-top: 10px; }
+        
         .debug-console { margin-top: 30px; width: 90%; max-width: 400px; padding: 10px; border: 1px dashed var(--crimson-neon); font-size: 11px; color: #ff99bb; }
     </style>
 </head>
@@ -39,10 +45,19 @@
     <div class="wrapper">
         <div class="card">
             <h2 style="color: var(--accent-color);">MON PROFIL</h2>
-            <div id="user-info">Chargement...</div>
+            <div id="user-info" style="margin-bottom: 15px;">Chargement...</div>
             <div style="font-size: 40px; margin: 20px;">💎 <span id="points-display">0</span></div>
-            <button onclick="logout()" style="width: 100%; padding: 10px; background: var(--crimson-neon); border: none; color: #fff; border-radius: 5px;">DÉCONNEXION</button>
+            
+            <hr style="border: 0; border-top: 1px solid #333; margin: 20px 0;">
+            
+            <label>Convertir en code</label>
+            <button class="btn-main" onclick="alert('Fonction à activer')">ÉCHANGER</button>
+            
+            <label style="display:block; margin-top:15px;">Fusionner un code</label>
+            <input type="text" class="input-style" placeholder="Ex: SHADOW-PT-XXXXXX">
+            <button class="btn-main btn-danger">FUSIONNER</button>
         </div>
+        
         <div class="debug-console" id="debug-log">Initialisation...</div>
     </div>
 
