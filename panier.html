@@ -77,7 +77,7 @@
             calculerTotal();
         }
 
-        // Diagnostic appliqué ici
+        // Système anti-bug : Recherche par tableau plutôt que par ligne stricte
         async function appliquerCreateur() {
             const codeSaisi = document.getElementById('code-createur-input').value.trim();
             const msg = document.getElementById('msg-createur');
@@ -91,21 +91,20 @@
                 const { data, error } = await db
                     .from('creators')
                     .select('commission_rate')
-                    .eq('code', codeSaisi)
-                    .single();
+                    .eq('code', codeSaisi); // Suppression de .single()
 
                 if (error) {
-                    // Affiche la vraie erreur de la base de données
                     msg.innerText = "Erreur Supabase : " + error.message;
                     msg.style.color = "#ff3333";
                     tauxCreateur = 0;
-                } else if (!data) {
-                    msg.innerText = "Code introuvable dans la table 'creators'.";
+                } else if (!data || data.length === 0) {
+                    msg.innerText = "Code créateur invalide.";
                     msg.style.color = "#ff3333";
                     tauxCreateur = 0;
                 } else {
-                    tauxCreateur = parseFloat(data.commission_rate); 
-                    msg.innerText = `Code appliqué ! Remise de ${(tauxCreateur * 100).toFixed(0)}%.`;
+                    // On prend le premier résultat trouvé dans le tableau
+                    tauxCreateur = parseFloat(data[0].commission_rate); 
+                    msg.innerText = `Code créateur appliqué ! Remise de ${(tauxCreateur * 100).toFixed(0)}%.`;
                     msg.style.color = "#00ff00";
                 }
                 calculerTotal();
@@ -117,7 +116,7 @@
             }
         }
 
-        // Diagnostic appliqué ici
+        // Système anti-bug : Évite le crash "Cannot coerce result"
         async function appliquerPoints() {
             const codeSaisi = document.getElementById('code-points-input').value.trim();
             const msg = document.getElementById('msg-points');
@@ -132,20 +131,19 @@
                     .from('codes_points')
                     .select('reduction_value, used')
                     .eq('code', codeSaisi)
-                    .eq('used', false)
-                    .single();
+                    .eq('used', false); // Suppression de .single()
 
                 if (error) {
-                    // Affiche la vraie erreur de la base de données
                     msg.innerText = "Erreur Supabase : " + error.message;
                     msg.style.color = "#ff3333";
                     remisePoints = 0;
-                } else if (!data) {
-                    msg.innerText = "Code inexistant ou déjà utilisé dans 'codes_points'.";
+                } else if (!data || data.length === 0) {
+                    msg.innerText = "Code invalide ou déjà utilisé.";
                     msg.style.color = "#ff3333";
                     remisePoints = 0;
                 } else {
-                    remisePoints = parseFloat(data.reduction_value); 
+                    // On prend la première ligne disponible sans faire planter le script
+                    remisePoints = parseFloat(data[0].reduction_value); 
                     msg.innerText = `Code appliqué ! Remise de ${(remisePoints * 100).toFixed(0)}%.`;
                     msg.style.color = "#00ff00";
                 }
