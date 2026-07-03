@@ -78,6 +78,22 @@
             color: #00ffff;
         }
 
+        /* Popup néon (cohérent avec index.html) */
+        #popup-overlay {
+          position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+          background: rgba(0,0,0,0.75); z-index: 5000;
+          display: none; align-items: center; justify-content: center;
+        }
+        #popup-box {
+          background: #0a0a0a; border: 2px solid #00ffff; border-radius: 15px;
+          box-shadow: 0 0 20px #00ffff; padding: 25px; width: 85%; max-width: 340px;
+          text-align: center;
+        }
+        #popup-box p { font-size: 1.05em; margin: 0 0 20px 0; word-break: break-word; }
+        #popup-box button {
+          background: #DC143C; color: #fff; border: none; padding: 10px 25px;
+          border-radius: 8px; font-weight: bold; cursor: pointer; text-transform: uppercase;
+        }
     </style>
 </head>
 <body>
@@ -89,28 +105,37 @@
         <button class="back-btn" onclick="window.location.href='index.html'">Retour à l'accueil</button>
     </div>
 
+    <!-- Modale popup réutilisable -->
+    <div id="popup-overlay">
+      <div id="popup-box">
+        <p id="popup-message"></p>
+        <button onclick="closePopup()">OK</button>
+      </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        const supabase = supabase.createClient('https://jsuvimxjmjiljntmgbzu.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzdXZpbXhqbWppbGpudG1nYnp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI0Njk0NTgsImV4cCI6MjA5ODA0NTQ1OH0.F6aDK6oTyp3Tlb9fmkqpzgn4KGAxA5-ClIKlkqzfcR4');
+        // Client Supabase renommé "db" pour éviter la collision de namespace (bug TDZ)
+        const db = supabase.createClient('https://jsuvimxjmjiljntmgbzu.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzdXZpbXhqbWppbGpudG1nYnp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI0Njk0NTgsImV4cCI6MjA5ODA0NTQ1OH0.F6aDK6oTyp3Tlb9fmkqpzgn4KGAxA5-ClIKlkqzfcR4');
         
         async function sendComment() {
             const messageInput = document.getElementById('msg');
             const message = messageInput.value;
 
             if (!message.trim()) {
-                alert("Veuillez écrire un message.");
+                showPopup("Veuillez écrire un message.");
                 return;
             }
 
             try {
                 // 1. Récupère l'utilisateur connecté
-                const { data: { user }, error: userError } = await supabase.auth.getUser();
+                const { data: { user }, error: userError } = await db.auth.getUser();
                 
                 let userName = 'Anonyme'; // Par défaut si non connecté
 
                 if (user) {
                     // 2. Cherche son username dans la table profiles
-                    const { data: profile } = await supabase
+                    const { data: profile } = await db
                         .from('profiles')
                         .select('username')
                         .eq('id', user.id)
@@ -122,19 +147,29 @@
                 }
 
                 // 3. Envoie dans la base de données
-                const { error: insertError } = await supabase
+                const { error: insertError } = await db
                     .from('comments')
                     .insert([{ user_name: userName, message: message }]);
 
                 if (insertError) throw insertError;
 
-                alert('Merci ' + userName + ', votre message a bien été envoyé !');
+                showPopup('Merci ' + userName + ', votre message a bien été envoyé !');
                 messageInput.value = ''; // Vide le champ après envoi
 
             } catch (error) {
                 console.error("Erreur lors de l'envoi:", error);
-                alert("Une erreur est survenue lors de l'envoi.");
+                showPopup("Une erreur est survenue lors de l'envoi.");
             }
+        }
+
+        // Popup néon (identique à index.html pour cohérence UI)
+        function showPopup(message) {
+          const overlay = document.getElementById('popup-overlay');
+          document.getElementById('popup-message').textContent = message;
+          overlay.style.display = 'flex';
+        }
+        function closePopup() {
+          document.getElementById('popup-overlay').style.display = 'none';
         }
     </script>
 </body>
