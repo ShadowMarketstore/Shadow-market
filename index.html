@@ -8,42 +8,15 @@
     body { font-family: 'Segoe UI', sans-serif; background: #000; color: #fff; margin: 0; padding-bottom: 120px; }
     
     #header-wrapper { 
-      width: 90%; 
-      margin: 20px auto; 
-      border: 3px solid #00ffff; 
-      border-radius: 15px; 
-      padding: 15px; 
-      box-shadow: 0 0 15px #00ffff; 
-      display: flex; 
-      flex-direction: column; 
-      background: #0a0a0a; 
+      width: 90%; margin: 20px auto; border: 3px solid #00ffff; border-radius: 15px; 
+      padding: 15px; box-shadow: 0 0 15px #00ffff; display: flex; flex-direction: column; background: #0a0a0a; 
     }
-    
-    .controls-container { 
-      display: flex; 
-      gap: 15px; 
-      margin-bottom: 15px; 
-      align-items: center; 
-      width: 100%;
-    }
+    .controls-container { display: flex; gap: 15px; margin-bottom: 15px; align-items: center; width: 100%; }
     #search-bar { 
-      flex-grow: 1; 
-      padding: 10px; 
-      border-radius: 10px; 
-      border: 2px solid #00ffff; 
-      background: #0a0a0a; 
-      color: #00ffff; 
-      font-family: 'Courier New', monospace; 
-      box-sizing: border-box;
+      flex-grow: 1; padding: 10px; border-radius: 10px; border: 2px solid #00ffff; 
+      background: #0a0a0a; color: #00ffff; font-family: 'Courier New', monospace; box-sizing: border-box;
     }
-    .hamburger { 
-      font-size: 35px; 
-      color: #00ffff; 
-      cursor: pointer; 
-      text-shadow: 0 0 10px #00ffff; 
-      line-height: 1;
-    }
-
+    .hamburger { font-size: 35px; color: #00ffff; cursor: pointer; text-shadow: 0 0 10px #00ffff; line-height: 1; }
     #main-logo { width: 100%; height: auto; display: block; margin: 0 auto; border-radius: 10px; }
 
     #side-menu { position: fixed; top: 0; right: -250px; width: 250px; height: 100%; background: #111; border-left: 2px solid #00ffff; transition: 0.3s; z-index: 2000; padding-top: 60px; }
@@ -54,35 +27,24 @@
 
     .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; padding: 10px; margin-bottom: 80px; }
     .product-card { position: relative; border: 2px solid #00ffff; border-radius: 15px; padding: 10px; background: #111; display: flex; flex-direction: column; }
-    .badge { position: absolute; top: 10px; left: 10px; background: #000; color: #fff; border: 1px solid #00ffff; padding: 2px 8px; font-size: 0.8em; z-index: 10; }
+    .badge { position: absolute; top: 10px; left: 10px; background: #000; color: #FFD700; border: 1px solid #DC143C; padding: 2px 8px; font-size: 0.8em; font-weight: bold; z-index: 10; border-radius: 6px; }
     .product-img { width: 100%; height: 140px; background-size: cover; background-position: center; border-radius: 8px; border: 1.5px solid #DC143C; margin-bottom: 10px; }
     .product-card h3 { font-size: 1em; margin: 5px 0; word-break: break-word; }
     .stock-text { color: #00ffff; font-weight: bold; font-size: 0.9em; margin: 5px 0; }
     .price-old { color: #888; text-decoration: line-through; font-size: 0.9em; min-height: 1.2em; }
-    .price-new { font-weight: bold; font-size: 1.3em; margin: 5px 0; }
+    .price-new { font-weight: bold; font-size: 1.3em; margin: 5px 0; color: #fff; }
     .buy-btn { width: 100%; background: #DC143C; color: white; border: none; padding: 10px; font-weight: bold; cursor: pointer; border-radius: 5px; margin-top: auto; }
     .buy-btn:disabled { background: #444; color: #888; cursor: not-allowed; }
 
+    /* Nav flottante inférieure — INTACTE, ne pas modifier */
     .floating-nav { position: fixed; bottom: 10px; left: 10px; right: 10px; background: #111; padding: 15px 20px; border-radius: 30px; border: 2px solid #00ffff; display: flex; justify-content: space-around; align-items: center; z-index: 1000; }
     .cart-badge { background: #00ffff; color: #000; font-size: 12px; padding: 2px 6px; border-radius: 50%; font-weight: bold; min-width: 10px; text-align: center; display: inline-block; }
 
-    /* --- Popup / Modale néon (Amethyst + Gold pour variantes) --- */
-    #popup-overlay {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.75); z-index: 5000;
-      display: none; align-items: center; justify-content: center;
-    }
-    #popup-box {
-      background: #0a0a0a; border: 2px solid #00ffff; border-radius: 15px;
-      box-shadow: 0 0 20px #00ffff; padding: 25px; width: 85%; max-width: 340px;
-      text-align: center; animation: popupIn 0.2s ease-out;
-    }
+    #popup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.75); z-index: 5000; display: none; align-items: center; justify-content: center; }
+    #popup-box { background: #0a0a0a; border: 2px solid #00ffff; border-radius: 15px; box-shadow: 0 0 20px #00ffff; padding: 25px; width: 85%; max-width: 340px; text-align: center; animation: popupIn 0.2s ease-out; }
     #popup-box p { font-size: 1.05em; margin: 0 0 20px 0; word-break: break-word; }
     #popup-box .popup-code { color: #FFD700; font-weight: bold; font-size: 1.2em; letter-spacing: 1px; }
-    #popup-box button {
-      background: #DC143C; color: #fff; border: none; padding: 10px 25px;
-      border-radius: 8px; font-weight: bold; cursor: pointer; text-transform: uppercase;
-    }
+    #popup-box button { background: #DC143C; color: #fff; border: none; padding: 10px 25px; border-radius: 8px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
     @keyframes popupIn { from { transform: scale(0.85); opacity: 0; } to { transform: scale(1); opacity: 1; } }
   </style>
 </head>
@@ -111,7 +73,6 @@
 
   <div class="products-grid" id="products-container"></div>
 
-  <!-- Modale popup réutilisable -->
   <div id="popup-overlay">
     <div id="popup-box">
       <p id="popup-message"></p>
@@ -119,6 +80,7 @@
     </div>
   </div>
 
+  <!-- NAV INFÉRIEURE — zone non modifiée -->
   <nav class="floating-nav">
     <a href="login.html" style="font-size: 24px; text-decoration: none;">👤</a>
     <div style="font-size: 24px; cursor: pointer;" onclick="window.location.href='panier.html'">🧺<span class="cart-badge" id="cart-count">0</span></div>
@@ -129,48 +91,58 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    // Client Supabase renommé "db" pour éviter la collision de namespace (bug TDZ connu)
-    const db = supabase.createClient('https://jsuvimxjmjiljntmgbzu.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzdXZpbXhqbWppbGpudG1nYnp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI0Njk0NTgsImV4cCI6MjA5ODA0NTQ1OH0.F6aDK6oTyp3Tlb9fmkqpzgn4KGAxA5-ClIKlkqzfcR4');
+    // Client Supabase renommé "db" pour éviter la collision de namespace connue
+    const db = supabase.createClient(
+      'https://jsuvimxjmjiljntmgbzu.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzdXZpbXhqbWppbGpudG1nYnp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI0Njk0NTgsImV4cCI6MjA5ODA0NTQ1OH0.F6aDK6oTyp3Tlb9fmkqpzgn4KGAxA5-ClIKlkqzfcR4'
+    );
     let allProducts = [];
+    const CART_KEY = 'shadow_cart';
 
-    // ================= CHARGEMENT PRODUITS =================
+    // ================= CHARGEMENT PRODUITS DEPUIS SUPABASE =================
     async function loadData() {
-      const { data, error } = await db.from('products').select('*');
-      if (data) {
-        allProducts = data;
-        renderProducts(allProducts);
-      } else {
+      const { data, error } = await db
+        .from('products')
+        .select('id, name, image_url, price, discount_price, stock_quantity, category');
+
+      if (error) {
         console.error("Erreur de chargement:", error);
+        return;
       }
+      allProducts = data || [];
+      renderProducts(allProducts);
     }
 
     // ================= AFFICHAGE PRODUITS =================
     function renderProducts(list) {
       const container = document.getElementById('products-container');
       container.innerHTML = '';
-      
+
       list.forEach(p => {
         const card = document.createElement('div');
         card.className = 'product-card';
-        
-        const isOutOfStock = p.stock_quantity <= 0;
+
+        const isOutOfStock = !p.stock_quantity || p.stock_quantity <= 0;
+
+        // Calcul du pourcentage de réduction : ((discount_price - price) / discount_price) * 100
         let discountHtml = '';
         let oldPriceHtml = '<div class="price-old"></div>';
-        
         if (p.discount_price && p.price && p.discount_price > p.price) {
-            const discount = Math.round(((p.discount_price - p.price) / p.discount_price) * 100);
-            discountHtml = `<div class="badge">-${discount}%</div>`;
-            oldPriceHtml = `<div class="price-old">${p.discount_price} EUR</div>`;
+          const discount = Math.round(((p.discount_price - p.price) / p.discount_price) * 100);
+          discountHtml = `<div class="badge">-${discount}%</div>`;
+          oldPriceHtml = `<div class="price-old">${Number(p.discount_price).toFixed(2)} €</div>`;
         }
 
-        const priceDisplay = p.price !== null && p.price !== undefined ? p.price + ' EUR' : 'Gratuit';
-        const stockDisplay = p.stock_quantity !== null && p.stock_quantity !== undefined ? p.stock_quantity : '0';
+        const priceDisplay = (p.price !== null && p.price !== undefined)
+          ? `${Number(p.price).toFixed(2)} €`
+          : 'Gratuit';
+        const stockDisplay = isOutOfStock ? '0' : p.stock_quantity;
 
         card.innerHTML = `
             ${discountHtml}
             <div class="product-img" style="background-image: url('${p.image_url || ''}')"></div>
             <h3>${p.name || 'Produit inconnu'}</h3>
-            <div class="stock-text">Stock : ${isOutOfStock ? '0' : stockDisplay}</div>
+            <div class="stock-text">Stock : ${stockDisplay}</div>
             ${oldPriceHtml}
             <div class="price-new">${priceDisplay}</div>
             <button class="buy-btn" ${isOutOfStock ? 'disabled' : ''}>
@@ -178,11 +150,8 @@
             </button>
         `;
 
-        // Écouteur sur le bouton d'achat (évite les soucis d'échappement JSON en attribut onclick)
         const btn = card.querySelector('.buy-btn');
-        if (!isOutOfStock) {
-          btn.addEventListener('click', () => addToCart(p));
-        }
+        if (!isOutOfStock) btn.addEventListener('click', () => addToCart(p));
 
         container.appendChild(card);
       });
@@ -204,44 +173,29 @@
       document.getElementById('side-menu').style.right = '-250px';
     }
 
-    // ================= PANIER (localStorage) =================
-    const CART_KEY = 'shadow_cart';
-
+    // ================= PANIER DYNAMIQUE (localStorage) =================
     function getCart() {
-      try {
-        return JSON.parse(localStorage.getItem(CART_KEY)) || [];
-      } catch (e) {
-        return [];
-      }
+      try { return JSON.parse(localStorage.getItem(CART_KEY)) || []; }
+      catch (e) { return []; }
     }
 
     function saveCart(cart) {
       localStorage.setItem(CART_KEY, JSON.stringify(cart));
-      updateCartCount();
+      updateCartCount(); // mise à jour instantanée, sans rechargement
     }
 
-    // Ajoute un produit au panier (ou incrémente sa quantité s'il existe déjà)
     function addToCart(product) {
       const cart = getCart();
       const existing = cart.find(item => item.id === product.id);
-
       if (existing) {
         existing.quantity += 1;
       } else {
-        cart.push({
-          id: product.id,
-          name: product.name,
-          price: product.price,
-          image_url: product.image_url,
-          quantity: 1
-        });
+        cart.push({ id: product.id, name: product.name, price: product.price, image_url: product.image_url, quantity: 1 });
       }
-
       saveCart(cart);
       showPopup(`"${product.name}" a été ajouté au panier !`);
     }
 
-    // Met à jour le badge du panier flottant en lisant le localStorage
     function updateCartCount() {
       const cart = getCart();
       const total = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
@@ -249,68 +203,54 @@
       if (badge) badge.textContent = total;
     }
 
+    // Synchronise le compteur si le panier est modifié depuis un autre onglet/page
+    window.addEventListener('storage', (e) => {
+      if (e.key === CART_KEY) updateCartCount();
+    });
+
     // ================= POPUP NÉON =================
     function showPopup(message) {
-      const overlay = document.getElementById('popup-overlay');
-      const msg = document.getElementById('popup-message');
-      msg.innerHTML = message;
-      overlay.style.display = 'flex';
+      document.getElementById('popup-message').innerHTML = message;
+      document.getElementById('popup-overlay').style.display = 'flex';
     }
-
     function closePopup() {
       document.getElementById('popup-overlay').style.display = 'none';
     }
 
-    // ================= SYSTÈME DE RÉCOMPENSE (PUB → CODE) =================
-    // Simule l'affichage d'une pub, puis génère un code unique et le stocke
+    // ================= RÉCOMPENSE PUB → CODE =================
     function watchAdForCode() {
       showPopup('Chargement de la publicité...');
-
       setTimeout(() => {
         const code = generateRewardCode();
-
-        // Sauvegarde des codes générés (historique)
         const codes = JSON.parse(localStorage.getItem('shadow_codes')) || [];
         codes.push({ code, date: new Date().toISOString() });
         localStorage.setItem('shadow_codes', JSON.stringify(codes));
-
         showPopup(`Merci d'avoir regardé la pub !<br><br>Votre code : <span class="popup-code">${code}</span>`);
-      }, 2000); // délai simulant la durée de la publicité
+      }, 2000);
     }
 
     function generateRewardCode() {
       const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
       let suffix = '';
-      for (let i = 0; i < 6; i++) {
-        suffix += chars.charAt(Math.floor(Math.random() * chars.length));
-      }
+      for (let i = 0; i < 6; i++) suffix += chars.charAt(Math.floor(Math.random() * chars.length));
       return `SHADOW-${suffix}`;
     }
 
-    // ================= PAIEMENT (prêt pour Stripe / PayPal) =================
-    // Fonction à connecter à l'API de paiement choisie.
-    // Exemple d'intégration Stripe Checkout (à adapter côté serveur pour la session) :
+    // ================= PAIEMENT (prêt Stripe/PayPal) =================
     async function processPayment() {
       const cart = getCart();
-      if (cart.length === 0) {
-        showPopup("Votre panier est vide.");
-        return;
-      }
+      if (cart.length === 0) { showPopup("Votre panier est vide."); return; }
 
       const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-
       try {
-        // --- Exemple : appel à un endpoint serveur qui crée une session de paiement ---
         // const response = await fetch('/api/create-checkout-session', {
-        //   method: 'POST',
-        //   headers: { 'Content-Type': 'application/json' },
+        //   method: 'POST', headers: { 'Content-Type': 'application/json' },
         //   body: JSON.stringify({ items: cart, total })
         // });
         // const session = await response.json();
-        // window.location.href = session.url; // Redirection sécurisée vers Stripe/PayPal
+        // window.location.href = session.url;
 
-        // Placeholder tant que l'API n'est pas branchée :
-        showPopup(`Redirection vers le paiement sécurisé...<br>Total : ${total.toFixed(2)} EUR`);
+        showPopup(`Redirection vers le paiement sécurisé...<br>Total : ${total.toFixed(2)} €`);
       } catch (error) {
         console.error("Erreur de paiement:", error);
         showPopup("Une erreur est survenue lors du paiement.");
@@ -323,4 +263,4 @@
     };
   </script>
 </body>
-  </html>
+</html>
