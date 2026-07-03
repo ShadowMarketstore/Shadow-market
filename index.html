@@ -7,20 +7,53 @@
   <style>
     body { font-family: 'Segoe UI', sans-serif; background: #000; color: #fff; margin: 0; padding-bottom: 120px; }
     
-    #header-wrapper { width: 90%; margin: 20px auto; border: 3px solid #00ffff; border-radius: 15px; padding: 5px; box-shadow: 0 0 15px #00ffff; display: flex; justify-content: center; background: #0a0a0a; }
-    #main-logo { width: 100%; max-height: 200px; object-fit: contain; }
+    #header-wrapper { 
+      width: 90%; 
+      margin: 20px auto; 
+      border: 3px solid #00ffff; 
+      border-radius: 15px; 
+      padding: 15px; 
+      box-shadow: 0 0 15px #00ffff; 
+      display: flex; 
+      flex-direction: column; 
+      background: #0a0a0a; 
+    }
     
-    .controls-container { display: flex; gap: 10px; padding: 0 20px; margin: 20px 0; align-items: center; }
-    #search-bar { flex-grow: 1; padding: 12px; border-radius: 10px; border: 2px solid #00ffff; background: #0a0a0a; color: #00ffff; font-family: 'Courier New', monospace; }
-    .hamburger { font-size: 30px; color: #00ffff; cursor: pointer; text-shadow: 0 0 10px #00ffff; }
+    .controls-container { 
+      display: flex; 
+      gap: 15px; 
+      margin-bottom: 15px; 
+      align-items: center; 
+      width: 100%;
+    }
+    #search-bar { 
+      flex-grow: 1; 
+      padding: 10px; 
+      border-radius: 10px; 
+      border: 2px solid #00ffff; 
+      background: #0a0a0a; 
+      color: #00ffff; 
+      font-family: 'Courier New', monospace; 
+      box-sizing: border-box;
+    }
+    .hamburger { 
+      font-size: 35px; 
+      color: #00ffff; 
+      cursor: pointer; 
+      text-shadow: 0 0 10px #00ffff; 
+      line-height: 1;
+    }
+
+    /* CORRECTION ICI : Le logo reprend sa taille imposante d'origine */
+    #main-logo { width: 100%; height: auto; display: block; margin: 0 auto; border-radius: 10px; }
 
     #side-menu { position: fixed; top: 0; right: -250px; width: 250px; height: 100%; background: #111; border-left: 2px solid #00ffff; transition: 0.3s; z-index: 2000; padding-top: 60px; }
     .menu-item { padding: 20px; color: #fff; text-decoration: none; display: block; cursor: pointer; border-bottom: 1px solid #333; }
     #sub-menu { display: none; background: #1a1a1a; padding-left: 20px; }
 
-    .section-title { text-align: center; color: #00ffff; font-size: 1.6em; margin: 20px 0; text-transform: uppercase; font-weight: bold; text-shadow: 0 0 10px #00ffff; }
+    .section-title { text-align: center; color: #00ffff; font-size: 1.4em; margin: 20px 0; text-transform: uppercase; font-weight: bold; text-shadow: 0 0 10px #00ffff; }
 
-    .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; padding: 10px; }
+    .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; padding: 10px; margin-bottom: 80px; }
     .product-card { position: relative; border: 2px solid #00ffff; border-radius: 15px; padding: 10px; background: #111; display: flex; flex-direction: column; }
     .badge { position: absolute; top: 10px; left: 10px; background: #000; color: #fff; border: 1px solid #00ffff; padding: 2px 8px; font-size: 0.8em; z-index: 10; }
     .product-img { width: 100%; height: 140px; background-size: cover; background-position: center; border-radius: 8px; border: 1.5px solid #DC143C; margin-bottom: 10px; }
@@ -48,14 +81,15 @@
     <div class="menu-item" onclick="document.getElementById('side-menu').style.right = '-250px'" style="color: #DC143C;">Fermer</div>
   </div>
 
-  <div id="header-wrapper"><img id="main-logo" src="https://jsuvimxjmjiljntmgbzu.supabase.co/storage/v1/object/public/logos/site-logo.png"></div>
-
-  <div class="controls-container">
-    <input type="text" id="search-bar" placeholder="Rechercher..." onkeyup="searchProducts()">
-    <div class="hamburger" onclick="document.getElementById('side-menu').style.right = '0'">☰</div>
+  <div id="header-wrapper">
+    <div class="controls-container">
+      <input type="text" id="search-bar" placeholder="Rechercher..." onkeyup="searchProducts()">
+      <div class="hamburger" onclick="document.getElementById('side-menu').style.right = '0'">☰</div>
+    </div>
+    <img id="main-logo" src="https://jsuvimxjmjiljntmgbzu.supabase.co/storage/v1/object/public/logos/site-logo.png">
   </div>
 
-  <h2 class="section-title">Produits disponibles</h2>
+  <h2 class="section-title">PRODUITS DISPONIBLES MAINTENANT</h2>
 
   <div class="products-grid" id="products-container"></div>
 
@@ -69,11 +103,9 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    // J'AI REMIS LE NOM EXACT DE TA VARIABLE QUI FONCTIONNAIT : supabaseClient
     const supabaseClient = supabase.createClient('https://jsuvimxjmjiljntmgbzu.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzdXZpbXhqbWppbGpudG1nYnp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI0Njk0NTgsImV4cCI6MjA5ODA0NTQ1OH0.F6aDK6oTyp3Tlb9fmkqpzgn4KGAxA5-ClIKlkqzfcR4');
     let allProducts = [];
 
-    // TA FONCTION EXACTE POUR CHARGER LA DONNÉE
     async function loadData() {
       const { data, error } = await supabaseClient.from('products').select('*');
       if (data) {
@@ -84,7 +116,6 @@
       }
     }
 
-    // TA FONCTION EXACTE POUR CREER LES CARTES, JUSTE AVEC LE NOUVEAU STYLE
     function renderProducts(list) {
       const container = document.getElementById('products-container');
       container.innerHTML = '';
@@ -93,24 +124,24 @@
         const card = document.createElement('div');
         card.className = 'product-card';
         
-        const isOutOfStock = p.stock <= 0;
+        const isOutOfStock = p.stock_quantity <= 0;
         let discountHtml = '';
         let oldPriceHtml = '<div class="price-old"></div>';
         
-        if (p.old_price && p.price && p.old_price > p.price) {
-            const discount = Math.round(((p.old_price - p.price) / p.old_price) * 100);
+        if (p.discount_price && p.price && p.discount_price > p.price) {
+            const discount = Math.round(((p.discount_price - p.price) / p.discount_price) * 100);
             discountHtml = `<div class="badge">-${discount}%</div>`;
-            oldPriceHtml = `<div class="price-old">${p.old_price} EUR</div>`;
+            oldPriceHtml = `<div class="price-old">${p.discount_price} EUR</div>`;
         }
 
         const priceDisplay = p.price !== null && p.price !== undefined ? p.price + ' EUR' : 'Gratuit';
-        const stockDisplay = p.stock !== null && p.stock !== undefined ? p.stock : '0';
+        const stockDisplay = p.stock_quantity !== null && p.stock_quantity !== undefined ? p.stock_quantity : '0';
 
         card.innerHTML = `
             ${discountHtml}
             <div class="product-img" style="background-image: url('${p.image_url || ''}')"></div>
             <h3>${p.name || 'Produit inconnu'}</h3>
-            <div class="stock-text">Stock : ${isOutOfStock ? 'Épuisé' : stockDisplay}</div>
+            <div class="stock-text">Stock : ${isOutOfStock ? '0' : stockDisplay}</div>
             ${oldPriceHtml}
             <div class="price-new">${priceDisplay}</div>
             <button class="buy-btn" ${isOutOfStock ? 'disabled' : ''} onclick="alert('Ajouté au panier')">
