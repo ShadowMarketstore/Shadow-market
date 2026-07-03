@@ -2,7 +2,6 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <!-- Meta tag pour l'adaptation aux écrans -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mes Commandes — Shadow Market</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -10,13 +9,11 @@
         :root { 
             --bg: #000000; 
             --cyan: #00f3ff; 
-            --crimson-neon: #ff004f; /* Crimson Néon */
-            --success-green: #28a745; /* Vert ✅ */
+            --success-green: #28a745; 
             --white: #ffffff; 
             --gray: #444444; 
         }
         
-        /* Centrage parfait sur tout appareil */
         body { 
             background: var(--bg); 
             color: var(--white); 
@@ -28,23 +25,32 @@
             align-items: center; 
             padding: 20px;
         }
-        
-        .container { width: 100%; max-width: 450px; }
-        
-        .order-card { 
-            border: 2px solid var(--cyan); 
-            padding: 20px; 
-            border-radius: 15px; 
-            margin-bottom: 20px; 
-            background: #080808; 
+
+        /* Bouton Retour */
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: var(--cyan);
+            text-decoration: none;
+            font-size: 18px;
+            font-weight: bold;
+            border: 1px solid var(--cyan);
+            padding: 5px 10px;
+            border-radius: 5px;
         }
         
-        .product-name { font-size: 18px; font-weight: bold; color: var(--cyan); margin-bottom: 15px; }
+        .container { width: 100%; max-width: 450px; margin-top: 50px; }
+        
+        .order-card { border: 2px solid var(--cyan); padding: 20px; border-radius: 15px; margin-bottom: 20px; background: #080808; }
+        
+        /* Nom du produit en Cyan Néon */
+        .product-name { font-size: 18px; font-weight: bold; color: var(--cyan); margin-bottom: 15px; text-align: center; }
         
         input { width: 100%; padding: 12px; background: #000; border: 1px solid var(--cyan); color: var(--white); border-radius: 8px; box-sizing: border-box; margin-bottom: 10px; }
         
-        /* Bouton Valider : Crimson Néon */
-        .btn-validate { width: 100%; padding: 12px; background: var(--crimson-neon); border: none; color: white; font-weight: bold; cursor: pointer; border-radius: 5px; }
+        /* Bouton Valider en Cyan Néon */
+        .btn-validate { width: 100%; padding: 12px; background: var(--cyan); border: none; color: #000; font-weight: bold; cursor: pointer; border-radius: 5px; }
         
         /* Bouton Télécharger : Gris par défaut, Vert ✅ après */
         .btn-download { width: 100%; padding: 12px; background: var(--gray); color: #ccc; border: none; font-weight: bold; cursor: pointer; border-radius: 5px; margin-top: 10px; }
@@ -52,6 +58,8 @@
     </style>
 </head>
 <body>
+
+<a href="profil.html" class="back-btn">← Retour</a>
 
 <div class="container">
     <h2 style="color: var(--cyan); text-align: center;">MES COMMANDES</h2>
@@ -105,3 +113,4 @@
 </script>
 </body>
 </html>
+
