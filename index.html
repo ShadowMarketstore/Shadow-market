@@ -7,22 +7,19 @@
   <style>
     body { font-family: 'Segoe UI', sans-serif; background: #000; color: #fff; margin: 0; padding-bottom: 120px; }
     
-    /* Header & Nav */
     #header-wrapper { width: 90%; margin: 20px auto; border: 3px solid #00ffff; border-radius: 15px; padding: 5px; box-shadow: 0 0 15px #00ffff; display: flex; justify-content: center; background: #0a0a0a; }
     #main-logo { width: 100%; max-height: 200px; object-fit: contain; }
+    
     .controls-container { display: flex; gap: 10px; padding: 0 20px; margin: 20px 0; align-items: center; }
     #search-bar { flex-grow: 1; padding: 12px; border-radius: 10px; border: 2px solid #00ffff; background: #0a0a0a; color: #00ffff; font-family: 'Courier New', monospace; }
     .hamburger { font-size: 30px; color: #00ffff; cursor: pointer; text-shadow: 0 0 10px #00ffff; }
 
-    /* Menu latéral */
     #side-menu { position: fixed; top: 0; right: -250px; width: 250px; height: 100%; background: #111; border-left: 2px solid #00ffff; transition: 0.3s; z-index: 2000; padding-top: 60px; }
     .menu-item { padding: 20px; color: #fff; text-decoration: none; display: block; cursor: pointer; border-bottom: 1px solid #333; }
     #sub-menu { display: none; background: #1a1a1a; padding-left: 20px; }
 
-    /* Titre Section */
     .section-title { text-align: center; color: #00ffff; font-size: 1.6em; margin: 20px 0; text-transform: uppercase; font-weight: bold; text-shadow: 0 0 10px #00ffff; }
 
-    /* Cartes Produits */
     .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; padding: 10px; }
     .product-card { position: relative; border: 2px solid #00ffff; border-radius: 15px; padding: 10px; background: #111; display: flex; flex-direction: column; }
     .badge { position: absolute; top: 10px; left: 10px; background: #000; color: #fff; border: 1px solid #00ffff; padding: 2px 8px; font-size: 0.8em; z-index: 10; }
@@ -34,14 +31,12 @@
     .buy-btn { width: 100%; background: #DC143C; color: white; border: none; padding: 10px; font-weight: bold; cursor: pointer; border-radius: 5px; margin-top: auto; }
     .buy-btn:disabled { background: #444; color: #888; cursor: not-allowed; }
 
-    /* Navigation Bas */
     .floating-nav { position: fixed; bottom: 10px; left: 10px; right: 10px; background: #111; padding: 15px 20px; border-radius: 30px; border: 2px solid #00ffff; display: flex; justify-content: space-around; align-items: center; z-index: 1000; }
     .cart-badge { background: #00ffff; color: #000; font-size: 12px; padding: 2px 6px; border-radius: 50%; font-weight: bold; }
   </style>
 </head>
 <body>
 
-  <!-- Menu latéral -->
   <div id="side-menu">
     <div class="menu-item" onclick="toggleSubMenu()">Catégories ▼</div>
     <div id="sub-menu">
@@ -74,73 +69,72 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    const supabase = supabase.createClient('https://jsuvimxjmjiljntmgbzu.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzdXZpbXhqbWppbGpudG1nYnp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI0Njk0NTgsImV4cCI6MjA5ODA0NTQ1OH0.F6aDK6oTyp3Tlb9fmkqpzgn4KGAxA5-ClIKlkqzfcR4');
+    // J'AI REMIS LE NOM EXACT DE TA VARIABLE QUI FONCTIONNAIT : supabaseClient
+    const supabaseClient = supabase.createClient('https://jsuvimxjmjiljntmgbzu.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzdXZpbXhqbWppbGpudG1nYnp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI0Njk0NTgsImV4cCI6MjA5ODA0NTQ1OH0.F6aDK6oTyp3Tlb9fmkqpzgn4KGAxA5-ClIKlkqzfcR4');
     let allProducts = [];
 
+    // TA FONCTION EXACTE POUR CHARGER LA DONNÉE
     async function loadData() {
-        try {
-            const { data, error } = await supabase.from('products').select('*');
-            if (error) throw error;
-            allProducts = data || [];
-            renderProducts(allProducts);
-        } catch (err) {
-            console.error("Erreur de chargement des produits :", err);
-            document.getElementById('products-container').innerHTML = "<p style='text-align:center; width:100%;'>Erreur lors du chargement des produits.</p>";
-        }
+      const { data, error } = await supabaseClient.from('products').select('*');
+      if (data) {
+        allProducts = data;
+        renderProducts(allProducts);
+      } else {
+        console.error("Erreur de chargement:", error);
+      }
     }
 
+    // TA FONCTION EXACTE POUR CREER LES CARTES, JUSTE AVEC LE NOUVEAU STYLE
     function renderProducts(list) {
-        const container = document.getElementById('products-container');
+      const container = document.getElementById('products-container');
+      container.innerHTML = '';
+      
+      list.forEach(p => {
+        const card = document.createElement('div');
+        card.className = 'product-card';
         
-        if (list.length === 0) {
-            container.innerHTML = "<p style='text-align:center; width:100%;'>Aucun produit trouvé.</p>";
-            return;
+        const isOutOfStock = p.stock <= 0;
+        let discountHtml = '';
+        let oldPriceHtml = '<div class="price-old"></div>';
+        
+        if (p.old_price && p.price && p.old_price > p.price) {
+            const discount = Math.round(((p.old_price - p.price) / p.old_price) * 100);
+            discountHtml = `<div class="badge">-${discount}%</div>`;
+            oldPriceHtml = `<div class="price-old">${p.old_price} EUR</div>`;
         }
 
-        container.innerHTML = list.map(p => {
-            const isOutOfStock = p.stock <= 0;
-            let discountHtml = '';
-            let oldPriceHtml = '<div class="price-old"></div>'; // Maintient l'espace vide si pas d'ancien prix
-            
-            // SÉCURITÉ : On vérifie que old_price existe et est supérieur à price avant de calculer
-            if (p.old_price && p.price && p.old_price > p.price) {
-                const discount = Math.round(((p.old_price - p.price) / p.old_price) * 100);
-                discountHtml = `<div class="badge">-${discount}%</div>`;
-                oldPriceHtml = `<div class="price-old">${p.old_price} EUR</div>`;
-            }
+        const priceDisplay = p.price !== null && p.price !== undefined ? p.price + ' EUR' : 'Gratuit';
+        const stockDisplay = p.stock !== null && p.stock !== undefined ? p.stock : '0';
 
-            // Gestion des valeurs nulles pour éviter les crashs d'affichage
-            const priceDisplay = p.price !== null && p.price !== undefined ? p.price + ' EUR' : 'Gratuit';
-            const stockDisplay = p.stock !== null && p.stock !== undefined ? p.stock : '0';
-
-            return `
-            <div class="product-card">
-                ${discountHtml}
-                <div class="product-img" style="background-image: url('${p.image_url || ''}')"></div>
-                <h3>${p.name || 'Produit inconnu'}</h3>
-                <div class="stock-text">Stock : ${isOutOfStock ? 'Épuisé' : stockDisplay}</div>
-                ${oldPriceHtml}
-                <div class="price-new">${priceDisplay}</div>
-                <button class="buy-btn" ${isOutOfStock ? 'disabled' : ''} onclick="alert('Ajouté au panier. (Prêt pour intégration du système de code pub)')">
-                    ${isOutOfStock ? 'ÉPUISÉ' : 'AJOUTER AU PANIER'}
-                </button>
-            </div>`;
-        }).join('');
+        card.innerHTML = `
+            ${discountHtml}
+            <div class="product-img" style="background-image: url('${p.image_url || ''}')"></div>
+            <h3>${p.name || 'Produit inconnu'}</h3>
+            <div class="stock-text">Stock : ${isOutOfStock ? 'Épuisé' : stockDisplay}</div>
+            ${oldPriceHtml}
+            <div class="price-new">${priceDisplay}</div>
+            <button class="buy-btn" ${isOutOfStock ? 'disabled' : ''} onclick="alert('Ajouté au panier')">
+                ${isOutOfStock ? 'ÉPUISÉ' : 'AJOUTER AU PANIER'}
+            </button>
+        `;
+        container.appendChild(card);
+      });
     }
 
     function searchProducts() {
-        const query = document.getElementById('search-bar').value.toLowerCase();
-        renderProducts(allProducts.filter(p => (p.name || '').toLowerCase().includes(query)));
+      const query = document.getElementById('search-bar').value.toLowerCase();
+      renderProducts(allProducts.filter(p => (p.name || '').toLowerCase().includes(query)));
     }
 
     function toggleSubMenu() {
-        const sub = document.getElementById('sub-menu');
-        sub.style.display = (sub.style.display === 'block') ? 'none' : 'block';
+      const sub = document.getElementById('sub-menu');
+      sub.style.display = (sub.style.display === 'block') ? 'none' : 'block';
     }
 
     function filterCategory(cat) {
-        if (cat === 'Tous') renderProducts(allProducts);
-        else renderProducts(allProducts.filter(p => p.category === cat));
+      if (cat === 'Tous') renderProducts(allProducts);
+      else renderProducts(allProducts.filter(p => p.category === cat));
+      document.getElementById('side-menu').style.right = '-250px';
     }
 
     window.onload = loadData;
