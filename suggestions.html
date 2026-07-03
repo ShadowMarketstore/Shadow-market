@@ -5,95 +5,37 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Suggestions - Shadow Market</title>
     <style>
-        body { 
-            font-family: 'Segoe UI', sans-serif; 
-            background: #000; 
-            color: #fff; 
-            margin: 0; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: center; 
-            min-height: 100vh; 
-            padding: 20px; 
-            box-sizing: border-box; 
-        }
+        body { font-family: 'Segoe UI', sans-serif; background: #000; color: #fff; margin: 0; padding: 20px; box-sizing: border-box; padding-bottom: 60px; }
 
         #suggestion-container { 
-            width: 100%; 
-            max-width: 500px; 
-            background: #0a0a0a; 
-            padding: 30px; 
-            border: 2px solid #00ffff; 
-            border-radius: 15px; 
-            box-shadow: 0 0 15px #00ffff; 
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
+            width: 100%; max-width: 500px; margin: 0 auto 30px auto; background: #0a0a0a; padding: 25px; 
+            border: 2px solid #00ffff; border-radius: 15px; box-shadow: 0 0 15px #00ffff; 
+            display: flex; flex-direction: column; gap: 15px;
         }
-
-        h2 {
-            text-align: center;
-            color: #00ffff;
-            text-transform: uppercase;
-            text-shadow: 0 0 10px #00ffff;
-            margin-top: 0;
-        }
-
+        h2 { text-align: center; color: #00ffff; text-transform: uppercase; text-shadow: 0 0 10px #00ffff; margin: 0; }
         textarea { 
-            width: 100%; 
-            height: 150px; 
-            background: #111; 
-            color: #00ffff; 
-            border: 2px solid #00ffff; 
-            border-radius: 10px; 
-            padding: 15px;
-            font-family: 'Courier New', monospace;
-            box-sizing: border-box;
-            resize: none;
+            width: 100%; height: 120px; background: #111; color: #00ffff; border: 2px solid #00ffff; 
+            border-radius: 10px; padding: 15px; font-family: 'Courier New', monospace; box-sizing: border-box; resize: none;
         }
+        textarea:focus { outline: none; border-color: #DC143C; box-shadow: 0 0 10px #DC143C; }
+        button { width: 100%; padding: 15px; background: #DC143C; color: white; font-weight: bold; font-size: 1.1em; border: none; border-radius: 10px; cursor: pointer; text-transform: uppercase; }
+        .back-btn { background: #111; border: 2px solid #00ffff; color: #00ffff; }
 
-        textarea:focus {
-            outline: none;
-            border-color: #DC143C;
-            box-shadow: 0 0 10px #DC143C;
+        /* Section commentaires — style épuré */
+        #comments-section { width: 100%; max-width: 500px; margin: 0 auto; }
+        #comments-section h3 { color: #FFD700; text-transform: uppercase; font-size: 1em; letter-spacing: 1px; margin: 0 0 15px 4px; }
+        .comment-item { 
+            background: #0a0a0a; border-left: 3px solid #00ffff; border-radius: 8px; 
+            padding: 12px 15px; margin-bottom: 10px; 
         }
+        .comment-author { color: #00ffff; font-weight: bold; font-size: 0.9em; }
+        .comment-text { color: #ddd; font-size: 0.95em; margin-top: 4px; line-height: 1.4; word-break: break-word; }
+        .comment-empty { color: #666; text-align: center; font-size: 0.9em; padding: 20px 0; }
 
-        button { 
-            width: 100%; 
-            padding: 15px; 
-            background: #DC143C; 
-            color: white;
-            font-weight: bold;
-            font-size: 1.1em;
-            border: none; 
-            border-radius: 10px; 
-            cursor: pointer; 
-            text-transform: uppercase;
-        }
-
-        .back-btn {
-            background: #111;
-            border: 2px solid #00ffff;
-            color: #00ffff;
-        }
-
-        /* Popup néon (cohérent avec index.html) */
-        #popup-overlay {
-          position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-          background: rgba(0,0,0,0.75); z-index: 5000;
-          display: none; align-items: center; justify-content: center;
-        }
-        #popup-box {
-          background: #0a0a0a; border: 2px solid #00ffff; border-radius: 15px;
-          box-shadow: 0 0 20px #00ffff; padding: 25px; width: 85%; max-width: 340px;
-          text-align: center;
-        }
+        #popup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.75); z-index: 5000; display: none; align-items: center; justify-content: center; }
+        #popup-box { background: #0a0a0a; border: 2px solid #00ffff; border-radius: 15px; box-shadow: 0 0 20px #00ffff; padding: 25px; width: 85%; max-width: 340px; text-align: center; }
         #popup-box p { font-size: 1.05em; margin: 0 0 20px 0; word-break: break-word; }
-        #popup-box button {
-          background: #DC143C; color: #fff; border: none; padding: 10px 25px;
-          border-radius: 8px; font-weight: bold; cursor: pointer; text-transform: uppercase;
-        }
+        #popup-box button { background: #DC143C; color: #fff; border: none; padding: 10px 25px; border-radius: 8px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
     </style>
 </head>
 <body>
@@ -105,7 +47,13 @@
         <button class="back-btn" onclick="window.location.href='index.html'">Retour à l'accueil</button>
     </div>
 
-    <!-- Modale popup réutilisable -->
+    <div id="comments-section">
+        <h3>Derniers retours</h3>
+        <div id="comments-list">
+            <div class="comment-empty">Chargement...</div>
+        </div>
+    </div>
+
     <div id="popup-overlay">
       <div id="popup-box">
         <p id="popup-message"></p>
@@ -115,46 +63,31 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        // Client Supabase renommé "db" pour éviter la collision de namespace (bug TDZ)
-        const db = supabase.createClient('https://jsuvimxjmjiljntmgbzu.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzdXZpbXhqbWppbGpudG1nYnp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI0Njk0NTgsImV4cCI6MjA5ODA0NTQ1OH0.F6aDK6oTyp3Tlb9fmkqpzgn4KGAxA5-ClIKlkqzfcR4');
-        
+        const db = supabase.createClient(
+          'https://jsuvimxjmjiljntmgbzu.supabase.co',
+          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzdXZpbXhqbWppbGpudG1nYnp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI0Njk0NTgsImV4cCI6MjA5ODA0NTQ1OH0.F6aDK6oTyp3Tlb9fmkqpzgn4KGAxA5-ClIKlkqzfcR4'
+        );
+
         async function sendComment() {
             const messageInput = document.getElementById('msg');
             const message = messageInput.value;
-
-            if (!message.trim()) {
-                showPopup("Veuillez écrire un message.");
-                return;
-            }
+            if (!message.trim()) { showPopup("Veuillez écrire un message."); return; }
 
             try {
-                // 1. Récupère l'utilisateur connecté
-                const { data: { user }, error: userError } = await db.auth.getUser();
-                
-                let userName = 'Anonyme'; // Par défaut si non connecté
+                const { data: { user } } = await db.auth.getUser();
+                let userName = 'Anonyme';
 
                 if (user) {
-                    // 2. Cherche son username dans la table profiles
-                    const { data: profile } = await db
-                        .from('profiles')
-                        .select('username')
-                        .eq('id', user.id)
-                        .single();
-                    
-                    if (profile && profile.username) {
-                        userName = profile.username;
-                    }
+                    const { data: profile } = await db.from('profiles').select('username').eq('id', user.id).single();
+                    if (profile && profile.username) userName = profile.username;
                 }
 
-                // 3. Envoie dans la base de données
-                const { error: insertError } = await db
-                    .from('comments')
-                    .insert([{ user_name: userName, message: message }]);
-
+                const { error: insertError } = await db.from('comments').insert([{ user_name: userName, message: message }]);
                 if (insertError) throw insertError;
 
                 showPopup('Merci ' + userName + ', votre message a bien été envoyé !');
-                messageInput.value = ''; // Vide le champ après envoi
+                messageInput.value = '';
+                loadComments(); // rafraîchit la liste sans recharger la page
 
             } catch (error) {
                 console.error("Erreur lors de l'envoi:", error);
@@ -162,15 +95,37 @@
             }
         }
 
-        // Popup néon (identique à index.html pour cohérence UI)
+        // Charge et affiche les derniers commentaires (style épuré)
+        async function loadComments() {
+            const list = document.getElementById('comments-list');
+            const { data, error } = await db
+                .from('comments')
+                .select('user_name, message, created_at')
+                .order('created_at', { ascending: false })
+                .limit(10);
+
+            if (error || !data || data.length === 0) {
+                list.innerHTML = '<div class="comment-empty">Aucun retour pour le moment.</div>';
+                return;
+            }
+
+            list.innerHTML = data.map(c => `
+                <div class="comment-item">
+                    <div class="comment-author">${c.user_name || 'Anonyme'}</div>
+                    <div class="comment-text">${c.message}</div>
+                </div>
+            `).join('');
+        }
+
         function showPopup(message) {
-          const overlay = document.getElementById('popup-overlay');
           document.getElementById('popup-message').textContent = message;
-          overlay.style.display = 'flex';
+          document.getElementById('popup-overlay').style.display = 'flex';
         }
         function closePopup() {
           document.getElementById('popup-overlay').style.display = 'none';
         }
+
+        window.onload = loadComments;
     </script>
 </body>
 </html>
