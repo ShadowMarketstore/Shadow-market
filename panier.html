@@ -46,10 +46,10 @@
     <button class="btn-paiement" onclick="versPaiement()">PASSER AU PAIEMENT</button>
 
     <script>
-        // Initialisation du client Supabase
+        // Initialisation du client Supabase avec tes clés corrigées
         const db = supabase.createClient(
           'https://jsuvimxjmjiljntmgbzu.supabase.co',
-          'sb_publishable_Ngm29impwbTLGhuqyCxSJA_E1jXc1DX'
+          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzdXZpbXhqbWppbGpudG1nYnp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI0Njk0NTgsImV4cCI6MjA5ODA0NTQ1OH0.F6aDK6oTyp3Tlb9fmkqpzgn4KGAxA5-ClIKlkqzfcR4'
         );
 
         let prixBaseTotal = 0;
@@ -78,7 +78,7 @@
             calculerTotal();
         }
 
-        // NOUVELLE FONCTION : Vérifie le code créateur dans la table codes_promo
+        // Vérification du code créateur dans la table 'creators'
         async function appliquerCreateur() {
             const codeSaisi = document.getElementById('code-createur-input').value.trim();
             const msg = document.getElementById('msg-createur');
@@ -94,8 +94,8 @@
 
             try {
                 const { data, error } = await db
-                    .from('codes_promo')
-                    .select('taux_reduction')
+                    .from('creators')
+                    .select('commission_rate')
                     .eq('code', codeSaisi)
                     .single();
 
@@ -104,7 +104,7 @@
                     msg.innerText = "Code créateur invalide.";
                     msg.style.color = "#ff3333";
                 } else {
-                    tauxCreateur = parseFloat(data.taux_reduction); 
+                    tauxCreateur = parseFloat(data.commission_rate); 
                     msg.innerText = `Code créateur appliqué ! Remise de ${(tauxCreateur * 100).toFixed(0)}%.`;
                     msg.style.color = "#00ff00";
                 }
@@ -118,7 +118,7 @@
             }
         }
 
-        // Fonction inchangée : Vérifie dans la table codes_points
+        // Vérification dans la table 'codes_points'
         async function appliquerPoints() {
             const codeSaisi = document.getElementById('code-points-input').value.trim();
             const msg = document.getElementById('msg-points');
