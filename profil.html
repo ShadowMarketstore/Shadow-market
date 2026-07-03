@@ -28,9 +28,9 @@
         .btn-echanger { background: var(--cyan); color: #000; }
         .btn-fusion { background: var(--rose); color: white; }
 
-        /* Style Modale */
         #customModal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:2000; justify-content:center; align-items:center; }
         .modal-box { background:#1a1c23; border:2px solid var(--cyan); padding:30px; border-radius:20px; text-align:center; width:80%; max-width:300px; }
+        #modalMsg { color:#aaa; margin:15px 0; white-space: pre-line; }
     </style>
 </head>
 <body>
@@ -41,7 +41,6 @@
     <div id="nav" class="nav-menu">
         <a href="index.html">🏠 Accueil</a>
         <a href="profil.html">👤 Profil</a>
-        <!-- LIEN CORRIGÉ CI-DESSOUS -->
         <a href="mes_commandes.html">📦 Mes Commandes</a>
         <a href="points.html">💎 Mes Points</a>
         <a href="bibliotheque.html">📚 Bibliothèque</a>
@@ -49,12 +48,11 @@
         <a href="#" onclick="logoutUser(event)" style="color: var(--rose);">⏻ Déconnexion</a>
     </div>
 
-    <!-- Fenêtre Modale Custom -->
     <div id="customModal">
         <div class="modal-box">
             <div style="font-size:3rem; margin-bottom:10px;">✅ 🎉</div>
             <h3 id="modalTitle" style="color:white; margin:0;">Succès !</h3>
-            <p id="modalMsg" style="color:#aaa; margin:15px 0;"></p>
+            <p id="modalMsg"></p>
             <button onclick="closeModal()" style="background:var(--cyan); border:none; padding:10px 20px; border-radius:5px; font-weight:bold; cursor:pointer;">OK</button>
         </div>
     </div>
@@ -82,7 +80,6 @@
     <script>
         const db = supabase.createClient("https://jsuvimxjmjiljntmgbzu.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzdXZpbXhqbWppbGpudG1nYnp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI0Njk0NTgsImV4cCI6MjA5ODA0NTQ1OH0.F6aDK6oTyp3Tlb9fmkqpzgn4KGAxA5-ClIKlkqzfcR4");
 
-        // Fonctions Modale
         function showModal(title, msg) {
             document.getElementById('modalTitle').innerText = title;
             document.getElementById('modalMsg').innerText = msg;
@@ -90,7 +87,6 @@
         }
         function closeModal() { document.getElementById('customModal').style.display = 'none'; }
 
-        // Navigation
         function toggleNav() { document.getElementById('nav').classList.toggle('open'); document.getElementById('navOverlay').classList.toggle('open'); }
         function closeNav() { document.getElementById('nav').classList.remove('open'); document.getElementById('navOverlay').classList.remove('open'); }
 
@@ -98,8 +94,7 @@
             const { data: { user } } = await db.auth.getUser();
             if(!user) { window.location.href = "login.html"; return; }
             document.getElementById('user-email').innerText = user.email;
-            
-            const { data, error } = await db.from('profiles').select('loyalty_points').eq('id', user.id).maybeSingle();
+            const { data } = await db.from('profiles').select('loyalty_points').eq('id', user.id).maybeSingle();
             document.getElementById('pts').innerText = data ? data.loyalty_points : 0;
         }
 
@@ -110,7 +105,7 @@
             try {
                 const { data: codeGenere, error } = await db.rpc('convert_points_en_code', { amount: parseInt(amount) });
                 if (error) throw error;
-                showModal("Félicitations !", "Code généré avec succès : " + codeGenere);
+                showModal("Félicitations !", `Code généré : ${codeGenere}\n\nVous pouvez récupérer votre code dans le salon points.`);
                 await init();
             } catch (err) { showModal("Erreur", err.message); }
             finally { btn.disabled = false; btn.innerText = "ÉCHANGER"; }
