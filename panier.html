@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mon Panier - Shadow Market</title>
-    <!-- Ajout du CDN Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         body { background: #050505; color: white; font-family: sans-serif; padding: 20px; }
@@ -29,7 +28,7 @@
     <!-- Code Créateur -->
     <div class="promo-section">
         <input type="text" id="code-createur-input" placeholder="Code créateur...">
-        <button class="btn-promo" onclick="appliquerCreateur()">Appliquer</button>
+        <button class="btn-promo" id="btn-createur" onclick="appliquerCreateur()">Appliquer</button>
     </div>
     <p id="msg-createur" style="font-size: 0.8em; margin-top: 5px;"></p>
 
@@ -57,8 +56,6 @@
         let tauxCreateur = 0;
         let remisePoints = 0; 
 
-        const codesCreateurs = { "SHADOW10": 0.10, "NINJA20": 0.20 };
-
         function chargerPanier() {
             let panier = JSON.parse(localStorage.getItem('monPanier')) || [];
             let liste = document.getElementById('panier-liste');
@@ -81,15 +78,47 @@
             calculerTotal();
         }
 
-        function appliquerCreateur() {
-            const code = document.getElementById('code-createur-input').value.toUpperCase();
+        // NOUVELLE FONCTION : Vérifie le code créateur dans la table codes_promo
+        async function appliquerCreateur() {
+            const codeSaisi = document.getElementById('code-createur-input').value.trim();
             const msg = document.getElementById('msg-createur');
-            tauxCreateur = codesCreateurs[code] || 0;
-            msg.innerText = tauxCreateur > 0 ? "Code appliqué !" : "Code invalide";
-            msg.style.color = tauxCreateur > 0 ? "#00ff00" : "#ff3333";
-            calculerTotal();
+            const btn = document.getElementById('btn-createur');
+
+            if (!codeSaisi) {
+                msg.innerText = "Veuillez entrer un code.";
+                return;
+            }
+
+            btn.disabled = true;
+            msg.innerText = "Vérification...";
+
+            try {
+                const { data, error } = await db
+                    .from('codes_promo')
+                    .select('taux_reduction')
+                    .eq('code', codeSaisi)
+                    .single();
+
+                if (error || !data) {
+                    tauxCreateur = 0;
+                    msg.innerText = "Code créateur invalide.";
+                    msg.style.color = "#ff3333";
+                } else {
+                    tauxCreateur = parseFloat(data.taux_reduction); 
+                    msg.innerText = `Code créateur appliqué ! Remise de ${(tauxCreateur * 100).toFixed(0)}%.`;
+                    msg.style.color = "#00ff00";
+                }
+                calculerTotal();
+            } catch (err) {
+                console.error("Erreur créateur:", err);
+                msg.innerText = "Erreur de connexion";
+                msg.style.color = "#ff3333";
+            } finally {
+                btn.disabled = false;
+            }
         }
 
+        // Fonction inchangée : Vérifie dans la table codes_points
         async function appliquerPoints() {
             const codeSaisi = document.getElementById('code-points-input').value.trim();
             const msg = document.getElementById('msg-points');
@@ -104,7 +133,6 @@
             msg.innerText = "Vérification...";
 
             try {
-                // Requête vérifiant le code et qu'il n'est pas utilisé
                 const { data, error } = await db
                     .from('codes_points')
                     .select('reduction_value, used')
@@ -120,10 +148,10 @@
                     remisePoints = parseFloat(data.reduction_value); 
                     msg.innerText = `Code appliqué ! Remise de ${(remisePoints * 100).toFixed(0)}%.`;
                     msg.style.color = "#00ff00";
-                    calculerTotal();
                 }
+                calculerTotal();
             } catch (err) {
-                console.error(err);
+                console.error("Erreur points:", err);
                 msg.innerText = "Erreur de connexion au serveur";
                 msg.style.color = "#ff3333";
             } finally {
