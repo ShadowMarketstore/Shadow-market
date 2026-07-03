@@ -44,7 +44,6 @@
       line-height: 1;
     }
 
-    /* CORRECTION ICI : Le logo reprend sa taille imposante d'origine */
     #main-logo { width: 100%; height: auto; display: block; margin: 0 auto; border-radius: 10px; }
 
     #side-menu { position: fixed; top: 0; right: -250px; width: 250px; height: 100%; background: #111; border-left: 2px solid #00ffff; transition: 0.3s; z-index: 2000; padding-top: 60px; }
@@ -65,7 +64,26 @@
     .buy-btn:disabled { background: #444; color: #888; cursor: not-allowed; }
 
     .floating-nav { position: fixed; bottom: 10px; left: 10px; right: 10px; background: #111; padding: 15px 20px; border-radius: 30px; border: 2px solid #00ffff; display: flex; justify-content: space-around; align-items: center; z-index: 1000; }
-    .cart-badge { background: #00ffff; color: #000; font-size: 12px; padding: 2px 6px; border-radius: 50%; font-weight: bold; }
+    .cart-badge { background: #00ffff; color: #000; font-size: 12px; padding: 2px 6px; border-radius: 50%; font-weight: bold; min-width: 10px; text-align: center; display: inline-block; }
+
+    /* --- Popup / Modale néon (Amethyst + Gold pour variantes) --- */
+    #popup-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.75); z-index: 5000;
+      display: none; align-items: center; justify-content: center;
+    }
+    #popup-box {
+      background: #0a0a0a; border: 2px solid #00ffff; border-radius: 15px;
+      box-shadow: 0 0 20px #00ffff; padding: 25px; width: 85%; max-width: 340px;
+      text-align: center; animation: popupIn 0.2s ease-out;
+    }
+    #popup-box p { font-size: 1.05em; margin: 0 0 20px 0; word-break: break-word; }
+    #popup-box .popup-code { color: #FFD700; font-weight: bold; font-size: 1.2em; letter-spacing: 1px; }
+    #popup-box button {
+      background: #DC143C; color: #fff; border: none; padding: 10px 25px;
+      border-radius: 8px; font-weight: bold; cursor: pointer; text-transform: uppercase;
+    }
+    @keyframes popupIn { from { transform: scale(0.85); opacity: 0; } to { transform: scale(1); opacity: 1; } }
   </style>
 </head>
 <body>
@@ -93,9 +111,17 @@
 
   <div class="products-grid" id="products-container"></div>
 
+  <!-- Modale popup réutilisable -->
+  <div id="popup-overlay">
+    <div id="popup-box">
+      <p id="popup-message"></p>
+      <button onclick="closePopup()">OK</button>
+    </div>
+  </div>
+
   <nav class="floating-nav">
     <a href="login.html" style="font-size: 24px; text-decoration: none;">👤</a>
-    <div style="font-size: 24px; cursor: pointer;" onclick="window.location.href='panier.html'">🧺<span class="cart-badge">16</span></div>
+    <div style="font-size: 24px; cursor: pointer;" onclick="window.location.href='panier.html'">🧺<span class="cart-badge" id="cart-count">0</span></div>
     <a href="commande.html" style="font-size: 24px; text-decoration: none;">🛒</a>
     <a href="index.html" style="font-size: 24px; text-decoration: none;">🏠</a>
     <a href="suggestions.html" style="font-size: 24px; text-decoration: none;">💬</a>
@@ -103,11 +129,13 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    const supabaseClient = supabase.createClient('https://jsuvimxjmjiljntmgbzu.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzdXZpbXhqbWppbGpudG1nYnp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI0Njk0NTgsImV4cCI6MjA5ODA0NTQ1OH0.F6aDK6oTyp3Tlb9fmkqpzgn4KGAxA5-ClIKlkqzfcR4');
+    // Client Supabase renommé "db" pour éviter la collision de namespace (bug TDZ connu)
+    const db = supabase.createClient('https://jsuvimxjmjiljntmgbzu.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzdXZpbXhqbWppbGpudG1nYnp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI0Njk0NTgsImV4cCI6MjA5ODA0NTQ1OH0.F6aDK6oTyp3Tlb9fmkqpzgn4KGAxA5-ClIKlkqzfcR4');
     let allProducts = [];
 
+    // ================= CHARGEMENT PRODUITS =================
     async function loadData() {
-      const { data, error } = await supabaseClient.from('products').select('*');
+      const { data, error } = await db.from('products').select('*');
       if (data) {
         allProducts = data;
         renderProducts(allProducts);
@@ -116,6 +144,7 @@
       }
     }
 
+    // ================= AFFICHAGE PRODUITS =================
     function renderProducts(list) {
       const container = document.getElementById('products-container');
       container.innerHTML = '';
@@ -144,10 +173,17 @@
             <div class="stock-text">Stock : ${isOutOfStock ? '0' : stockDisplay}</div>
             ${oldPriceHtml}
             <div class="price-new">${priceDisplay}</div>
-            <button class="buy-btn" ${isOutOfStock ? 'disabled' : ''} onclick="alert('Ajouté au panier')">
+            <button class="buy-btn" ${isOutOfStock ? 'disabled' : ''}>
                 ${isOutOfStock ? 'ÉPUISÉ' : 'AJOUTER AU PANIER'}
             </button>
         `;
+
+        // Écouteur sur le bouton d'achat (évite les soucis d'échappement JSON en attribut onclick)
+        const btn = card.querySelector('.buy-btn');
+        if (!isOutOfStock) {
+          btn.addEventListener('click', () => addToCart(p));
+        }
+
         container.appendChild(card);
       });
     }
@@ -168,8 +204,123 @@
       document.getElementById('side-menu').style.right = '-250px';
     }
 
-    window.onload = loadData;
+    // ================= PANIER (localStorage) =================
+    const CART_KEY = 'shadow_cart';
+
+    function getCart() {
+      try {
+        return JSON.parse(localStorage.getItem(CART_KEY)) || [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function saveCart(cart) {
+      localStorage.setItem(CART_KEY, JSON.stringify(cart));
+      updateCartCount();
+    }
+
+    // Ajoute un produit au panier (ou incrémente sa quantité s'il existe déjà)
+    function addToCart(product) {
+      const cart = getCart();
+      const existing = cart.find(item => item.id === product.id);
+
+      if (existing) {
+        existing.quantity += 1;
+      } else {
+        cart.push({
+          id: product.id,
+          name: product.name,
+          price: product.price,
+          image_url: product.image_url,
+          quantity: 1
+        });
+      }
+
+      saveCart(cart);
+      showPopup(`"${product.name}" a été ajouté au panier !`);
+    }
+
+    // Met à jour le badge du panier flottant en lisant le localStorage
+    function updateCartCount() {
+      const cart = getCart();
+      const total = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
+      const badge = document.getElementById('cart-count');
+      if (badge) badge.textContent = total;
+    }
+
+    // ================= POPUP NÉON =================
+    function showPopup(message) {
+      const overlay = document.getElementById('popup-overlay');
+      const msg = document.getElementById('popup-message');
+      msg.innerHTML = message;
+      overlay.style.display = 'flex';
+    }
+
+    function closePopup() {
+      document.getElementById('popup-overlay').style.display = 'none';
+    }
+
+    // ================= SYSTÈME DE RÉCOMPENSE (PUB → CODE) =================
+    // Simule l'affichage d'une pub, puis génère un code unique et le stocke
+    function watchAdForCode() {
+      showPopup('Chargement de la publicité...');
+
+      setTimeout(() => {
+        const code = generateRewardCode();
+
+        // Sauvegarde des codes générés (historique)
+        const codes = JSON.parse(localStorage.getItem('shadow_codes')) || [];
+        codes.push({ code, date: new Date().toISOString() });
+        localStorage.setItem('shadow_codes', JSON.stringify(codes));
+
+        showPopup(`Merci d'avoir regardé la pub !<br><br>Votre code : <span class="popup-code">${code}</span>`);
+      }, 2000); // délai simulant la durée de la publicité
+    }
+
+    function generateRewardCode() {
+      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+      let suffix = '';
+      for (let i = 0; i < 6; i++) {
+        suffix += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      return `SHADOW-${suffix}`;
+    }
+
+    // ================= PAIEMENT (prêt pour Stripe / PayPal) =================
+    // Fonction à connecter à l'API de paiement choisie.
+    // Exemple d'intégration Stripe Checkout (à adapter côté serveur pour la session) :
+    async function processPayment() {
+      const cart = getCart();
+      if (cart.length === 0) {
+        showPopup("Votre panier est vide.");
+        return;
+      }
+
+      const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+      try {
+        // --- Exemple : appel à un endpoint serveur qui crée une session de paiement ---
+        // const response = await fetch('/api/create-checkout-session', {
+        //   method: 'POST',
+        //   headers: { 'Content-Type': 'application/json' },
+        //   body: JSON.stringify({ items: cart, total })
+        // });
+        // const session = await response.json();
+        // window.location.href = session.url; // Redirection sécurisée vers Stripe/PayPal
+
+        // Placeholder tant que l'API n'est pas branchée :
+        showPopup(`Redirection vers le paiement sécurisé...<br>Total : ${total.toFixed(2)} EUR`);
+      } catch (error) {
+        console.error("Erreur de paiement:", error);
+        showPopup("Une erreur est survenue lors du paiement.");
+      }
+    }
+
+    window.onload = () => {
+      loadData();
+      updateCartCount();
+    };
   </script>
 </body>
-</html>
-
+  </html>
