@@ -4,52 +4,245 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mon Panier - Shadow Market</title>
+    <!-- Chargement de la bibliothèque officielle Supabase JS -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        body { background: #050505; color: white; font-family: sans-serif; padding: 20px; }
-        .item-card { border: 1px solid #00ffff; padding: 15px; margin-bottom: 10px; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; background: #111; }
-        .item-info { flex-grow: 1; margin-left: 15px; }
-        .remove-btn { color: #ff3333; font-size: 1.5em; cursor: pointer; border: none; background: none; font-weight: bold; padding: 0 10px; }
+        :root {
+            --bg-color: #050505;
+            --panel-bg: #111116;
+            --cyan-neon: #00ffff;
+            --crimson-neon: #ff3333;
+            --text-color: #ffffff;
+            --text-muted: #888899;
+            --border-color: #2b2b36;
+        }
+
+        body { 
+            background: var(--bg-color); 
+            color: var(--text-color); 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            padding: 20px; 
+            margin: 0;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-color);
+            border-bottom: 2px solid var(--cyan-neon);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
+        }
+
+        .cart-wrapper {
+            max-width: 600px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .item-container {
+            border: 1px solid var(--cyan-neon);
+            border-radius: 8px;
+            background: #111;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 255, 255, 0.05);
+            transition: transform 0.2s ease;
+        }
+
+        .item-card { 
+            padding: 15px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            background: #111;
+            border-bottom: 1px dashed rgba(0, 255, 255, 0.1);
+        }
+
+        .item-info { 
+            flex-grow: 1; 
+            margin-left: 15px; 
+        }
+
+        .item-title {
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: var(--text-color);
+        }
+
+        .item-price {
+            color: var(--cyan-neon);
+            font-size: 0.95rem;
+            font-weight: bold;
+            margin-top: 3px;
+        }
+
+        .remove-btn { 
+            color: var(--crimson-neon); 
+            font-size: 1.5em; 
+            cursor: pointer; 
+            border: none; 
+            background: none; 
+            font-weight: bold; 
+            padding: 0 10px; 
+            transition: transform 0.2s ease;
+        }
         
-        .promo-section { margin-top: 15px; display: flex; gap: 5px; }
-        input[type="text"] { padding: 10px; background: #222; border: 1px solid #00ffff; color: white; border-radius: 4px; width: 60%; }
-        .btn-promo { padding: 10px; background: #00ffff; color: #000; border: none; cursor: pointer; font-weight: bold; border-radius: 4px; }
-        .btn-promo:disabled { opacity: 0.5; cursor: not-allowed; }
+        .remove-btn:hover {
+            transform: scale(1.2);
+        }
+
+        /* Styles pour le menu déroulant (Description) */
+        .desc-toggle-btn {
+            background: rgba(0, 255, 255, 0.05);
+            border: none;
+            color: var(--cyan-neon);
+            width: 100%;
+            padding: 8px 15px;
+            text-align: left;
+            font-size: 0.85rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            outline: none;
+            font-weight: 500;
+        }
+
+        .desc-toggle-btn:hover {
+            background: rgba(0, 255, 255, 0.1);
+        }
+
+        .desc-content {
+            display: none;
+            padding: 12px 15px;
+            background: #09090d;
+            font-size: 0.85rem;
+            color: #ccc;
+            line-height: 1.4;
+            border-top: 1px solid rgba(0, 255, 255, 0.05);
+        }
+
+        .desc-content.open {
+            display: block;
+        }
+
+        /* Sections des Codes Promos */
+        .promo-section { 
+            margin-top: 15px; 
+            display: flex; 
+            gap: 10px; 
+        }
+
+        input[type="text"] { 
+            padding: 12px; 
+            background: #111; 
+            border: 1px solid var(--cyan-neon); 
+            color: white; 
+            border-radius: 6px; 
+            width: 70%; 
+            font-size: 0.95rem;
+            outline: none;
+        }
+
+        input[type="text"]:focus {
+            box-shadow: 0 0 8px rgba(0, 255, 255, 0.3);
+        }
+
+        .btn-promo { 
+            padding: 12px; 
+            background: var(--cyan-neon); 
+            color: #000; 
+            border: none; 
+            cursor: pointer; 
+            font-weight: bold; 
+            border-radius: 6px; 
+            font-size: 0.95rem;
+            flex-grow: 1;
+            transition: opacity 0.2s ease;
+        }
+
+        .btn-promo:hover {
+            opacity: 0.9;
+        }
+
+        .btn-promo:disabled { 
+            opacity: 0.5; 
+            cursor: not-allowed; 
+        }
+
+        .promo-msg {
+            font-size: 0.85rem; 
+            margin-top: 6px; 
+            font-weight: 500;
+        }
         
-        .btn-paiement { width: 100%; padding: 15px; background: #ff3333; border: none; color: white; font-weight: bold; cursor: pointer; margin-top: 20px; font-size: 1.1em; }
-        .total-section { font-size: 1.4em; font-weight: bold; margin-top: 20px; text-align: center; color: #00ffff; }
+        .btn-paiement { 
+            width: 100%; 
+            padding: 15px; 
+            background: var(--crimson-neon); 
+            border: none; 
+            color: white; 
+            font-weight: bold; 
+            cursor: pointer; 
+            margin-top: 25px; 
+            font-size: 1.1em; 
+            border-radius: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 15px rgba(255, 51, 51, 0.2);
+            transition: opacity 0.2s ease;
+        }
+
+        .btn-paiement:hover {
+            opacity: 0.95;
+        }
+
+        .total-section { 
+            font-size: 1.5em; 
+            font-weight: bold; 
+            margin-top: 25px; 
+            text-align: center; 
+            color: var(--cyan-neon); 
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
+        }
     </style>
 </head>
 <body>
 
-    <h1>Mon Panier</h1>
-    <div id="panier-liste"></div>
-    
-    <!-- Code Créateur -->
-    <div class="promo-section">
-        <input type="text" id="code-createur-input" placeholder="Code créateur...">
-        <button class="btn-promo" id="btn-createur" onclick="appliquerCreateur()">Appliquer</button>
-    </div>
-    <p id="msg-createur" style="font-size: 0.8em; margin-top: 5px;"></p>
+    <div class="cart-wrapper">
+        <h1>Mon Panier</h1>
+        <div id="panier-liste"></div>
+        
+        <!-- Code Créateur -->
+        <div class="promo-section">
+            <input type="text" id="code-createur-input" placeholder="Code créateur...">
+            <button class="btn-promo" id="btn-createur" onclick="appliquerCreateur()">Appliquer</button>
+        </div>
+        <p id="msg-createur" class="promo-msg"></p>
 
-    <!-- Code Points -->
-    <div class="promo-section">
-        <input type="text" id="code-points-input" placeholder="Code points...">
-        <button class="btn-promo" id="btn-points" onclick="appliquerPoints()">Appliquer</button>
-    </div>
-    <p id="msg-points" style="font-size: 0.8em; margin-top: 5px;"></p>
+        <!-- Code Points -->
+        <div class="promo-section">
+            <input type="text" id="code-points-input" placeholder="Code points...">
+            <button class="btn-promo" id="btn-points" onclick="appliquerPoints()">Appliquer</button>
+        </div>
+        <p id="msg-points" class="promo-msg"></p>
 
-    <div class="total-section">
-        Total : <span id="total-somme">0.00</span> €
-    </div>
+        <div class="total-section">
+            Total : <span id="total-somme">0.00</span> €
+        </div>
 
-    <button class="btn-paiement" onclick="versPaiement()">PASSER AU PAIEMENT</button>
+        <button class="btn-paiement" onclick="versPaiement()">PASSER AU PAIEMENT</button>
+    </div>
 
     <script>
-        // CORRECTION DE LA CLÉ API COMPLETE ET EXACTE : "jsuvimxjmjiljntmgbzu"
+        // Initialisation de l'API Supabase avec tes clés de production exactes
         const db = supabase.createClient(
           'https://jsuvimxjmjiljntmgbzu.supabase.co',
-          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzdXZpbXhqbWppbGpudG1nYnp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI4Njk0NTgsImV4cCI6MjA5ODA0NTQ1OH0.F6aDK6oTyp3Tlb9fmkqpzgn4KGAxA5-ClIKlkqzfcR4'
+          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzdXZpbXhqbWppbGpudG1nYnp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI0Njk0NTgsImV4cCI6MjA5ODA0NTQ1OH0.F6aDK6oTyp3Tlb9fmkqpzgn4KGAxA5-ClIKlkqzfcR4'
         );
 
         let prixBaseTotal = 0;
@@ -62,21 +255,57 @@
             prixBaseTotal = 0;
             liste.innerHTML = '';
 
+            if (panier.length === 0) {
+                liste.innerHTML = `<p style="text-align: center; color: var(--text-muted); padding: 20px;">Votre panier est vide.</p>`;
+                calculerTotal();
+                return;
+            }
+
             panier.forEach((p, index) => {
                 const prix = parseFloat(p.price) || 0;
                 prixBaseTotal += prix;
+
+                // Extraction de la description avec une valeur de repli si absente
+                const description = p.description || "Aucune description fournie pour cette optimisation.";
+
+                // Ajout du produit avec son bouton et sa zone de description collapsible
                 liste.innerHTML += `
-                    <div class="item-card">
-                        <div class="item-info">
-                            <strong>${p.name || 'Produit'}</strong><br>${prix.toFixed(2)} €
+                    <div class="item-container">
+                        <div class="item-card">
+                            <div class="item-info">
+                                <div class="item-title">${p.name || 'Optimisation Shadow'}</div>
+                                <div class="item-price">${prix.toFixed(2)} €</div>
+                            </div>
+                            <button class="remove-btn" onclick="supprimerArticle(${index})">×</button>
                         </div>
-                        <button class="remove-btn" onclick="supprimerArticle(${index})">X</button>
+                        <button class="desc-toggle-btn" onclick="toggleDescription(${index})">
+                            <span>📋 Description du produit</span>
+                            <span id="arrow-${index}">▼</span>
+                        </button>
+                        <div id="desc-${index}" class="desc-content">
+                            ${description}
+                        </div>
                     </div>
                 `;
             });
             calculerTotal();
         }
 
+        // Fonction pour ouvrir/fermer le menu déroulant de description
+        function toggleDescription(index) {
+            const descDiv = document.getElementById(`desc-${index}`);
+            const arrow = document.getElementById(`arrow-${index}`);
+            
+            if (descDiv.classList.contains('open')) {
+                descDiv.classList.remove('open');
+                arrow.innerText = "▼";
+            } else {
+                descDiv.classList.add('open');
+                arrow.innerText = "▲";
+            }
+        }
+
+        // Vérification robuste sans .single() pour les créateurs
         async function appliquerCreateur() {
             const codeSaisi = document.getElementById('code-createur-input').value.trim();
             const msg = document.getElementById('msg-createur');
@@ -85,15 +314,17 @@
             if (!codeSaisi) { return; }
             btn.disabled = true;
             msg.innerText = "Vérification...";
+            msg.style.color = "#aaa";
 
             try {
+                // Recherche insensible à la casse (.ilike) sans utiliser .single()
                 const { data, error } = await db
                     .from('creators')
                     .select('commission_rate')
                     .ilike('code', codeSaisi);
 
                 if (error) {
-                    msg.innerText = "Erreur Supabase : " + error.message;
+                    msg.innerText = "Erreur de connexion : " + error.message;
                     msg.style.color = "#ff3333";
                     tauxCreateur = 0;
                 } else if (!data || data.length === 0) {
@@ -101,19 +332,22 @@
                     msg.style.color = "#ff3333";
                     tauxCreateur = 0;
                 } else {
+                    // Lecture du premier élément du tableau de façon sécurisée
                     tauxCreateur = parseFloat(data[0].commission_rate); 
-                    msg.innerText = `Code appliqué ! Remise de ${(tauxCreateur * 100).toFixed(0)}%.`;
+                    msg.innerText = `Code appliqué ! Remise de ${(tauxCreateur * 100).toFixed(0)}% activée.`;
                     msg.style.color = "#00ff00";
                 }
                 calculerTotal();
             } catch (err) {
-                msg.innerText = "Erreur système : " + err.message;
+                msg.innerText = "Erreur technique.";
                 msg.style.color = "#ff3333";
+                console.error(err);
             } finally {
                 btn.disabled = false;
             }
         }
 
+        // Vérification robuste sans .single() pour les codes points
         async function appliquerPoints() {
             const codeSaisi = document.getElementById('code-points-input').value.trim();
             const msg = document.getElementById('msg-points');
@@ -122,8 +356,10 @@
             if (!codeSaisi) { return; }
             btn.disabled = true;
             msg.innerText = "Vérification...";
+            msg.style.color = "#aaa";
 
             try {
+                // Recherche insensible à la casse, non-utilisée, sans bloquer sur les doublons (.single() banni)
                 const { data, error } = await db
                     .from('codes_points')
                     .select('reduction_value, used')
@@ -131,7 +367,7 @@
                     .eq('used', false);
 
                 if (error) {
-                    msg.innerText = "Erreur Supabase : " + error.message;
+                    msg.innerText = "Erreur de connexion : " + error.message;
                     msg.style.color = "#ff3333";
                     remisePoints = 0;
                 } else if (!data || data.length === 0) {
@@ -139,14 +375,16 @@
                     msg.style.color = "#ff3333";
                     remisePoints = 0;
                 } else {
+                    // Récupération de la valeur du premier code valide trouvé
                     remisePoints = parseFloat(data[0].reduction_value); 
-                    msg.innerText = `Code appliqué ! Remise de ${(remisePoints * 100).toFixed(0)}%.`;
+                    msg.innerText = `Code appliqué ! Remise de ${(remisePoints * 100).toFixed(0)}% activée.`;
                     msg.style.color = "#00ff00";
                 }
                 calculerTotal();
             } catch (err) {
-                msg.innerText = "Erreur système : " + err.message;
+                msg.innerText = "Erreur technique.";
                 msg.style.color = "#ff3333";
+                console.error(err);
             } finally {
                 btn.disabled = false;
             }
