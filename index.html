@@ -5,30 +5,29 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Shadow Market</title>
   <style>
-    body { font-family: 'Segoe UI', Roboto, sans-serif; background: #000; color: #fff; margin: 0; padding-bottom: 120px; }
+    body { font-family: 'Segoe UI', sans-serif; background: #000; color: #fff; margin: 0; padding-bottom: 120px; }
     
-    /* Header et Logo */
-    #header-wrapper { width: 90%; margin: 20px auto; border: 3px solid #00ffff; border-radius: 15px; padding: 5px; box-shadow: 0 0 15px #00ffff; display: flex; justify-content: center; background: #0a0a0a; }
+    #header-wrapper { width: 90%; margin: 20px auto; border: 3px solid #00ffff; border-radius: 15px; padding: 5px; box-shadow: 0 0 15px #00ffff, inset 0 0 10px #00ffff; display: flex; justify-content: center; background: #0a0a0a; }
     #main-logo { width: 100%; max-height: 200px; object-fit: contain; }
 
-    /* Barre de recherche et Menu */
-    .controls { display: flex; gap: 10px; padding: 0 20px; margin-bottom: 20px; }
-    #search-bar { flex-grow: 1; padding: 10px; border-radius: 20px; border: 1px solid #00ffff; background: #111; color: #fff; }
-    .hamburger { cursor: pointer; font-size: 24px; color: #00ffff; }
+    /* Nouveaux styles pour recherche et menu */
+    .controls-container { display: flex; gap: 10px; padding: 0 20px; margin: 20px 0; align-items: center; }
+    #search-bar { flex-grow: 1; padding: 12px; border-radius: 10px; border: 2px solid #00ffff; background: #0a0a0a; color: #00ffff; font-family: 'Courier New', Courier, monospace; }
+    .hamburger { font-size: 30px; color: #00ffff; cursor: pointer; text-shadow: 0 0 10px #00ffff; }
 
-    /* Menu Side */
+    /* Menu latéral */
     #side-menu { position: fixed; top: 0; right: -250px; width: 250px; height: 100%; background: #111; border-left: 2px solid #00ffff; transition: 0.3s; z-index: 2000; padding-top: 60px; }
-    .menu-item { padding: 20px; color: #fff; text-decoration: none; display: block; cursor: pointer; border-bottom: 1px solid #333; }
+    .menu-item { padding: 20px; color: #fff; text-decoration: none; display: block; cursor: pointer; border-bottom: 1px solid #333; font-family: 'Courier New', sans-serif; }
     
-    .section-title { text-align: center; color: #00ffff; font-size: 1.6em; margin: 20px 0; text-transform: uppercase; font-weight: bold; }
-    
-    /* Grille produits */
+    .section-title { text-align: center; color: #00ffff; font-size: 1.6em; margin: 20px 0; text-transform: uppercase; font-weight: bold; text-shadow: 0 0 10px #00ffff; }
+
     .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; padding: 10px; }
-    .product-card { border: 2px solid #00ffff; border-radius: 15px; padding: 10px; background: #111; display: flex; flex-direction: column; }
-    .product-img { width: 100%; height: 150px; background-size: contain; background-position: center; background-repeat: no-repeat; border-radius: 8px; border: 1px solid #DC143C; }
-    .buy-btn { background: #DC143C; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; margin-top: 10px; }
+    .product-card { position: relative; border: 2px solid #00ffff; border-radius: 15px; padding: 10px; background: #111; display: flex; flex-direction: column; min-height: 350px; }
+    .product-img { width: 100%; height: 160px; background-size: contain; background-position: center; background-repeat: no-repeat; border-radius: 8px; border: 1.5px solid #DC143C; background-color: #000; }
+    .buy-btn { width: 100%; background: #DC143C; color: white; border: none; padding: 12px; font-weight: bold; cursor: pointer; border-radius: 5px; margin-top: auto; }
     
     .floating-nav { position: fixed; bottom: 20px; left: 5%; right: 5%; background: #111; padding: 15px 25px; border-radius: 40px; border: 1px solid #00ffff; display: flex; justify-content: space-between; align-items: center; z-index: 1000; }
+    .nav-link { text-decoration: none; font-size: 24px; }
   </style>
 </head>
 <body>
@@ -38,26 +37,30 @@
     <div class="menu-item" onclick="filterCategory('Free')">Free</div>
     <div class="menu-item" onclick="filterCategory('Premium')">Premium</div>
     <div class="menu-item" onclick="filterCategory('Elite')">Elite</div>
-    <div class="menu-item" onclick="closeMenu()">Fermer</div>
+    <div class="menu-item" onclick="closeMenu()" style="color: #DC143C;">Fermer</div>
   </div>
 
   <div id="header-wrapper">
     <img id="main-logo" src="" alt="Shadow Market">
   </div>
 
-  <div class="controls">
+  <div class="controls-container">
     <input type="text" id="search-bar" placeholder="Rechercher (ex: Fortnite)..." onkeyup="searchProducts()">
     <div class="hamburger" onclick="document.getElementById('side-menu').style.right = '0'">☰</div>
   </div>
 
-  <h2 class="section-title">Produits</h2>
-  <div class="products-grid" id="products-container"></div>
+  <h2 class="section-title">Produits disponibles maintenant</h2>
+
+  <main>
+    <div class="products-grid" id="products-container"></div>
+  </main>
 
   <nav class="floating-nav">
-    <a href="login.html">👤</a>
-    <a href="panier.html">🧺</a>
-    <a href="index.html">🏠</a>
-    <a href="#" onclick="alert('Suggestions bientôt disponible')">💬</a>
+    <a href="login.html" class="nav-link">👤</a>
+    <a href="panier.html" class="nav-link">🧺</a>
+    <a href="commande.html" class="nav-link">🛒</a>
+    <a href="index.html" class="nav-link">🏠</a>
+    <a href="#" onclick="alert('Suggestions bientôt disponible')" class="nav-link">💬</a>
   </nav>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -66,6 +69,7 @@
     let allProducts = [];
 
     async function loadData() {
+      document.getElementById('main-logo').src = 'https://jsuvimxjmjiljntmgbzu.supabase.co/storage/v1/object/public/logos/site-logo.png?t=' + new Date().getTime();
       const { data } = await supabaseClient.from('products').select('*');
       allProducts = data || [];
       renderProducts(allProducts);
@@ -80,8 +84,8 @@
         card.innerHTML = `
             <div class="product-img" style="background-image: url('${p.image_url}')"></div>
             <h3>${p.name}</h3>
-            <span class="current-price">${p.price} €</span>
-            <button class="buy-btn" onclick="alert('Ajouté')">AJOUTER</button>
+            <span style="font-size: 1.2em; font-weight: bold; margin: 10px 0;">${p.price} €</span>
+            <button class="buy-btn" onclick="alert('Ajouté au panier')">AJOUTER</button>
         `;
         container.appendChild(card);
       });
@@ -89,7 +93,6 @@
 
     function searchProducts() {
       const query = document.getElementById('search-bar').value.toLowerCase();
-      // On cherche après le "Shadow_"
       const filtered = allProducts.filter(p => p.name.toLowerCase().includes(query));
       renderProducts(filtered);
     }
