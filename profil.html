@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -65,9 +66,12 @@
         <div class="boutique-box">
             <label>1. CONVERTIR MES POINTS</label>
             <select id="points-select" class="select-box">
-                <option value="2">2 Points</option><option value="5">5 Points</option>
-                <option value="10">10 Points</option><option value="20">20 Points</option>
-                <option value="50">50 Points</option><option value="100">100 Points</option>
+                <option value="2">2 Points</option>
+                <option value="5">5 Points</option>
+                <option value="10">10 Points</option>
+                <option value="20">20 Points</option>
+                <option value="50">50 Points</option>
+                <option value="100">100 Points</option>
             </select>
             <button id="btn-echanger" class="btn-main btn-echanger" onclick="echanger()">ÉCHANGER</button>
             
@@ -78,7 +82,8 @@
     </div>
 
     <script>
-        const db = supabase.createClient("https://jsuvimxjmjiljntmgbzu.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzdXZpbXhqbWppbGpudG1nYnp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI0Njk0NTgsImV4cCI6MjA5ODA0NTQ1OH0.F6aDK6oTyp3Tlb9fmkqpzgn4KGAxA5-ClIKlkqzfcR4");
+        // CORRECTION : Utilisation de la constante db uniforme pour éviter les collisions de namespace
+        const db = supabase.createClient("https://jsuvimxjmjiljntmgbzu.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzdXZpbXhqbWimdbp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI0Njk0NTgsImV4cCI6MjA5ODA0NTQ1OH0.F6aDK6oTyp3Tlb9fmkqpzgn4KGAxA5-ClIKlkqzfcR4");
 
         function showModal(title, msg) {
             document.getElementById('modalTitle').innerText = title;
@@ -103,12 +108,25 @@
             const amount = document.getElementById('points-select').value;
             btn.disabled = true; btn.innerText = "TRAITEMENT...";
             try {
-                const { data: codeGenere, error } = await db.rpc('convert_points_en_code', { amount: parseInt(amount) });
+                // CORRECTION : Appel harmonisé de la fonction RPC convert_points_en_code
+                const { data, error } = await db.rpc('convert_points_en_code', { amount: parseInt(amount) });
                 if (error) throw error;
-                showModal("Félicitations !", `Code généré : ${codeGenere}\n\nVous pouvez récupérer votre code dans le salon points.`);
+
+                // CORRECTION : Extraction ultra robuste de la valeur de retour (au cas où Supabase renvoie un tableau ou un objet)
+                let codeGenere = data;
+                if (Array.isArray(data) && data.length > 0) {
+                    codeGenere = data[0];
+                } else if (data && typeof data === 'object') {
+                    codeGenere = data.code || data.result || JSON.stringify(data);
+                }
+
+                showModal("Félicitations !", `Code généré : ${codeGenere}\n\nVous pouvez l'utiliser directement sur votre panier.`);
                 await init();
-            } catch (err) { showModal("Erreur", err.message); }
-            finally { btn.disabled = false; btn.innerText = "ÉCHANGER"; }
+            } catch (err) { 
+                showModal("Erreur", err.message); 
+            } finally { 
+                btn.disabled = false; btn.innerText = "ÉCHANGER"; 
+            }
         }
 
         async function fusionner() {
@@ -122,8 +140,11 @@
                 showModal("Succès !", "Fusion réussie !");
                 document.getElementById('code-input').value = "";
                 await init();
-            } catch (err) { showModal("Erreur", err.message); }
-            finally { btn.disabled = false; btn.innerText = "FUSIONNER"; }
+            } catch (err) { 
+                showModal("Erreur", err.message); 
+            } finally { 
+                btn.disabled = false; btn.innerText = "FUSIONNER"; 
+            }
         }
 
         async function logoutUser(e) { e.preventDefault(); await db.auth.signOut(); window.location.href = "login.html"; }
