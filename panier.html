@@ -235,7 +235,7 @@
         </div>
         <p id="msg-createur" class="promo-msg"></p>
 
-        <!-- Code de Réduction (Vérifie désormais la table 'coupons' de manière globale) -->
+        <!-- Code de Réduction (Cible la table 'coupons' avec is_active et discount_percent) -->
         <div class="promo-section">
             <input type="text" id="code-points-input" placeholder="Code réduction...">
             <button class="btn-promo" id="btn-points" onclick="appliquerPoints()">Appliquer</button>
@@ -250,7 +250,7 @@
     </div>
 
     <script>
-        // Initialisation de la base Supabase avec les paramètres réels
+        // Initialisation de la base Supabase
         const db = supabase.createClient(
           'https://jsuvimxjmjiljntmgbzu.supabase.co',
           'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzdXZpbXhqbWppbGpudG1nYnp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI0Njk0NTgsImV4cCI6MjA5ODA0NTQ1OH0.F6aDK6oTyp3Tlb9fmkqpzgn4KGAxA5-ClIKlkqzfcR4'
@@ -354,7 +354,7 @@
             }
         }
 
-        // Vérification globale des codes dans la table 'coupons'
+        // Vérification des codes dans la table 'coupons' avec les bonnes colonnes !
         async function appliquerPoints() {
             const codeSaisi = document.getElementById('code-points-input').value.trim();
             const msg = document.getElementById('msg-points');
@@ -366,43 +366,29 @@
             msg.style.color = "#aaa";
 
             try {
-                // IMPORTANT : Recherche globale dans la table 'coupons' sans associer à un utilisateur spécifique.
-                // Cela permet le partage d'ami à ami !
+                // Étape 1 & 2 : On cherche le code et on vérifie que is_active est true
                 const { data, error } = await db
                     .from('coupons')
-                    .select('*')
+                    .select('discount_percent, is_active')
                     .ilike('code', codeSaisi)
-                    .eq('used', false); 
+                    .eq('is_active', true); 
 
                 if (error) {
                     msg.innerText = "Erreur Supabase : " + error.message;
                     msg.style.color = "#ff3333";
                     remisePoints = 0;
                 } else if (!data || data.length === 0) {
-                    msg.innerText = "Code invalide ou déjà utilisé.";
+                    // Si on a aucun retour, soit le code n'existe pas, soit il est à FALSE
+                    msg.innerText = "Code invalide, expiré ou déjà utilisé.";
                     msg.style.color = "#ff3333";
                     remisePoints = 0;
                 } else {
+                    // Étape 3 : On récupère la valeur depuis discount_percent
                     const coupon = data[0];
-                    let valeurReduction = 0;
                     
-                    // Détection intelligente de la colonne de réduction
-                    if (coupon.reduction_value !== undefined) {
-                        valeurReduction = parseFloat(coupon.reduction_value);
-                    } else if (coupon.reduction !== undefined) {
-                        valeurReduction = parseFloat(coupon.reduction);
-                    } else if (coupon.discount_value !== undefined) {
-                        valeurReduction = parseFloat(coupon.discount_value);
-                    } else if (coupon.amount !== undefined) {
-                        valeurReduction = parseFloat(coupon.amount);
-                    }
-
-                    // Formatage de la réduction (ex: 15% -> 0.15)
-                    if (valeurReduction > 1) {
-                        valeurReduction = valeurReduction / 100;
-                    }
-
-                    remisePoints = valeurReduction; 
+                    // On convertit le chiffre entier en pourcentage (ex: 20 devient 0.20)
+                    remisePoints = parseFloat(coupon.discount_percent) / 100; 
+                    
                     msg.innerText = `Code appliqué ! Remise de ${(remisePoints * 100).toFixed(0)}% activée.`;
                     msg.style.color = "#00ff00";
                 }
