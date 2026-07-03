@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Suggestions - Shadow Market</title>
+    <style>
+        body { background: #000; color: #fff; padding: 20px; font-family: sans-serif; }
+        .comment-box { border-bottom: 1px solid #333; padding: 10px 0; }
+        textarea { width: 100%; height: 80px; background: #111; color: #fff; border: 1px solid #00ffff; }
+        button { background: #00ffff; border: none; padding: 10px 20px; cursor: pointer; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <h2>Suggestions & Retours</h2>
+    <textarea id="msg" placeholder="Votre message..."></textarea>
+    <input type="text" id="username" placeholder="Votre nom">
+    <button onclick="sendComment()">Envoyer</button>
+    <div id="comments-list"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const supabase = supabase.createClient('https://jsuvimxjmjiljntmgbzu.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzdXZpbXhqbWppbGpudG1nYnp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI0Njk0NTgsImV4cCI6MjA5ODA0NTQ1OH0.F6aDK6oTyp3Tlb9fmkqpzgn4KGAxA5-ClIKlkqzfcR4');
+        
+        async function loadComments() {
+            const { data } = await supabase.from('comments').select('*').order('created_at', { ascending: false });
+            document.getElementById('comments-list').innerHTML = data.map(c => `
+                <div class="comment-box"><strong>${c.user_name}</strong>: ${c.message}</div>
+            `).join('');
+        }
+
+        async function sendComment() {
+            const m = document.getElementById('msg').value;
+            const u = document.getElementById('username').value;
+            await supabase.from('comments').insert([{ user_name: u, message: m, product_id: 0 }]);
+            loadComments();
+        }
+        loadComments();
+    </script>
+</body>
+</html>
+
