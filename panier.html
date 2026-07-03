@@ -46,7 +46,6 @@
     <button class="btn-paiement" onclick="versPaiement()">PASSER AU PAIEMENT</button>
 
     <script>
-        // Initialisation du client Supabase avec tes clés corrigées
         const db = supabase.createClient(
           'https://jsuvimxjmjiljntmgbzu.supabase.co',
           'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzdXZpbXhqbWppbGpudG1nYnp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI0Njk0NTgsImV4cCI6MjA5ODA0NTQ1OH0.F6aDK6oTyp3Tlb9fmkqpzgn4KGAxA5-ClIKlkqzfcR4'
@@ -78,17 +77,13 @@
             calculerTotal();
         }
 
-        // Vérification du code créateur dans la table 'creators'
+        // Diagnostic appliqué ici
         async function appliquerCreateur() {
             const codeSaisi = document.getElementById('code-createur-input').value.trim();
             const msg = document.getElementById('msg-createur');
             const btn = document.getElementById('btn-createur');
 
-            if (!codeSaisi) {
-                msg.innerText = "Veuillez entrer un code.";
-                return;
-            }
-
+            if (!codeSaisi) { return; }
             btn.disabled = true;
             msg.innerText = "Vérification...";
 
@@ -99,36 +94,36 @@
                     .eq('code', codeSaisi)
                     .single();
 
-                if (error || !data) {
-                    tauxCreateur = 0;
-                    msg.innerText = "Code créateur invalide.";
+                if (error) {
+                    // Affiche la vraie erreur de la base de données
+                    msg.innerText = "Erreur Supabase : " + error.message;
                     msg.style.color = "#ff3333";
+                    tauxCreateur = 0;
+                } else if (!data) {
+                    msg.innerText = "Code introuvable dans la table 'creators'.";
+                    msg.style.color = "#ff3333";
+                    tauxCreateur = 0;
                 } else {
                     tauxCreateur = parseFloat(data.commission_rate); 
-                    msg.innerText = `Code créateur appliqué ! Remise de ${(tauxCreateur * 100).toFixed(0)}%.`;
+                    msg.innerText = `Code appliqué ! Remise de ${(tauxCreateur * 100).toFixed(0)}%.`;
                     msg.style.color = "#00ff00";
                 }
                 calculerTotal();
             } catch (err) {
-                console.error("Erreur créateur:", err);
-                msg.innerText = "Erreur de connexion";
+                msg.innerText = "Erreur système : " + err.message;
                 msg.style.color = "#ff3333";
             } finally {
                 btn.disabled = false;
             }
         }
 
-        // Vérification dans la table 'codes_points'
+        // Diagnostic appliqué ici
         async function appliquerPoints() {
             const codeSaisi = document.getElementById('code-points-input').value.trim();
             const msg = document.getElementById('msg-points');
             const btn = document.getElementById('btn-points');
 
-            if (!codeSaisi) {
-                msg.innerText = "Veuillez entrer un code.";
-                return;
-            }
-
+            if (!codeSaisi) { return; }
             btn.disabled = true;
             msg.innerText = "Vérification...";
 
@@ -140,10 +135,15 @@
                     .eq('used', false)
                     .single();
 
-                if (error || !data) {
-                    remisePoints = 0;
-                    msg.innerText = "Code invalide ou déjà utilisé.";
+                if (error) {
+                    // Affiche la vraie erreur de la base de données
+                    msg.innerText = "Erreur Supabase : " + error.message;
                     msg.style.color = "#ff3333";
+                    remisePoints = 0;
+                } else if (!data) {
+                    msg.innerText = "Code inexistant ou déjà utilisé dans 'codes_points'.";
+                    msg.style.color = "#ff3333";
+                    remisePoints = 0;
                 } else {
                     remisePoints = parseFloat(data.reduction_value); 
                     msg.innerText = `Code appliqué ! Remise de ${(remisePoints * 100).toFixed(0)}%.`;
@@ -151,8 +151,7 @@
                 }
                 calculerTotal();
             } catch (err) {
-                console.error("Erreur points:", err);
-                msg.innerText = "Erreur de connexion au serveur";
+                msg.innerText = "Erreur système : " + err.message;
                 msg.style.color = "#ff3333";
             } finally {
                 btn.disabled = false;
