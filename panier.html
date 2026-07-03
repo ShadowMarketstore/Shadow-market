@@ -90,7 +90,6 @@
             calculerTotal();
         }
 
-        // MISE À JOUR : Adaptation pour cibler ton système automatisé 'codes_points'
         async function appliquerPoints() {
             const codeSaisi = document.getElementById('code-points-input').value.trim();
             const msg = document.getElementById('msg-points');
@@ -98,33 +97,30 @@
 
             if (!codeSaisi) {
                 msg.innerText = "Veuillez entrer un code.";
-                msg.style.color = "#ff3333";
                 return;
             }
 
             btn.disabled = true;
             msg.innerText = "Vérification...";
-            msg.style.color = "#aaa";
 
             try {
-                // Requête ciblant 'codes_points' où le code correspond et n'est pas utilisé (used = false)
+                // Requête vérifiant le code et qu'il n'est pas utilisé
                 const { data, error } = await db
                     .from('codes_points')
-                    .select('*')
+                    .select('reduction_value, used')
                     .eq('code', codeSaisi)
                     .eq('used', false)
                     .single();
 
                 if (error || !data) {
                     remisePoints = 0;
-                    msg.innerText = "Code points invalide, expiré ou déjà utilisé";
+                    msg.innerText = "Code invalide ou déjà utilisé.";
                     msg.style.color = "#ff3333";
                 } else {
-                    // 1 point = 1% de remise (ex: 25 points donne 0.25 de réduction)
-                    remisePoints = parseFloat(data.points) / 100; 
-                    
-                    msg.innerText = `Code appliqué ! Remise de ${(remisePoints * 100).toFixed(0)}% activée.`;
+                    remisePoints = parseFloat(data.reduction_value); 
+                    msg.innerText = `Code appliqué ! Remise de ${(remisePoints * 100).toFixed(0)}%.`;
                     msg.style.color = "#00ff00";
+                    calculerTotal();
                 }
             } catch (err) {
                 console.error(err);
@@ -133,8 +129,6 @@
             } finally {
                 btn.disabled = false;
             }
-
-            calculerTotal();
         }
 
         function calculerTotal() {
