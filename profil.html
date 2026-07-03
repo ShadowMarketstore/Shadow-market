@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -82,8 +81,8 @@
     </div>
 
     <script>
-        // CORRECTION : Utilisation de la constante db uniforme pour éviter les collisions de namespace
-        const db = supabase.createClient("https://jsuvimxjmjiljntmgbzu.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzdXZpbXhqbWimdbp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI0Njk0NTgsImV4cCI6MjA5ODA0NTQ1OH0.F6aDK6oTyp3Tlb9fmkqpzgn4KGAxA5-ClIKlkqzfcR4");
+        // CORRECTION DE LA CLÉ API COMPLETE ET EXACTE : "jsuvimxjmjiljntmgbzu"
+        const db = supabase.createClient("https://jsuvimxjmjiljntmgbzu.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzdXZpbXhqbWppbGpudG1nYnp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI0Njk0NTgsImV4cCI6MjA5ODA0NTQ1OH0.F6aDK6oTyp3Tlb9fmkqpzgn4KGAxA5-ClIKlkqzfcR4");
 
         function showModal(title, msg) {
             document.getElementById('modalTitle').innerText = title;
@@ -108,11 +107,9 @@
             const amount = document.getElementById('points-select').value;
             btn.disabled = true; btn.innerText = "TRAITEMENT...";
             try {
-                // CORRECTION : Appel harmonisé de la fonction RPC convert_points_en_code
                 const { data, error } = await db.rpc('convert_points_en_code', { amount: parseInt(amount) });
                 if (error) throw error;
 
-                // CORRECTION : Extraction ultra robuste de la valeur de retour (au cas où Supabase renvoie un tableau ou un objet)
                 let codeGenere = data;
                 if (Array.isArray(data) && data.length > 0) {
                     codeGenere = data[0];
