@@ -51,6 +51,7 @@
             overflow: hidden;
             box-shadow: 0 4px 15px rgba(0, 255, 255, 0.05);
             transition: transform 0.2s ease;
+            margin-bottom: 15px;
         }
 
         .item-card { 
@@ -62,6 +63,16 @@
             border-bottom: 1px dashed rgba(0, 255, 255, 0.1);
         }
 
+        /* Style des images de produits */
+        .product-img {
+            width: 55px;
+            height: 55px;
+            object-fit: cover;
+            border-radius: 6px;
+            border: 1px solid var(--cyan-neon);
+            box-shadow: 0 0 8px rgba(0, 255, 255, 0.2);
+        }
+
         .item-info { 
             flex-grow: 1; 
             margin-left: 15px; 
@@ -69,7 +80,7 @@
 
         .item-title {
             font-weight: bold;
-            font-size: 1.1rem;
+            font-size: 1.05rem;
             color: var(--text-color);
         }
 
@@ -82,7 +93,7 @@
 
         .remove-btn { 
             color: var(--crimson-neon); 
-            font-size: 1.5em; 
+            font-size: 1.6em; 
             cursor: pointer; 
             border: none; 
             background: none; 
@@ -95,13 +106,13 @@
             transform: scale(1.2);
         }
 
-        /* Styles pour le menu déroulant (Description) */
+        /* Styles pour la description déroulante */
         .desc-toggle-btn {
-            background: rgba(0, 255, 255, 0.05);
+            background: rgba(0, 255, 255, 0.03);
             border: none;
             color: var(--cyan-neon);
             width: 100%;
-            padding: 8px 15px;
+            padding: 10px 15px;
             text-align: left;
             font-size: 0.85rem;
             cursor: pointer;
@@ -113,7 +124,7 @@
         }
 
         .desc-toggle-btn:hover {
-            background: rgba(0, 255, 255, 0.1);
+            background: rgba(0, 255, 255, 0.08);
         }
 
         .desc-content {
@@ -130,7 +141,7 @@
             display: block;
         }
 
-        /* Sections des Codes Promos */
+        /* Sections des Codes */
         .promo-section { 
             margin-top: 15px; 
             display: flex; 
@@ -224,9 +235,9 @@
         </div>
         <p id="msg-createur" class="promo-msg"></p>
 
-        <!-- Code Points -->
+        <!-- Code de Réduction (Vérifie désormais la table 'coupons' de manière globale) -->
         <div class="promo-section">
-            <input type="text" id="code-points-input" placeholder="Code points...">
+            <input type="text" id="code-points-input" placeholder="Code réduction...">
             <button class="btn-promo" id="btn-points" onclick="appliquerPoints()">Appliquer</button>
         </div>
         <p id="msg-points" class="promo-msg"></p>
@@ -239,7 +250,7 @@
     </div>
 
     <script>
-        // Initialisation de l'API Supabase avec tes clés de production exactes
+        // Initialisation de la base Supabase avec les paramètres réels
         const db = supabase.createClient(
           'https://jsuvimxjmjiljntmgbzu.supabase.co',
           'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzdXZpbXhqbWppbGpudG1nYnp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI0Njk0NTgsImV4cCI6MjA5ODA0NTQ1OH0.F6aDK6oTyp3Tlb9fmkqpzgn4KGAxA5-ClIKlkqzfcR4'
@@ -265,13 +276,13 @@
                 const prix = parseFloat(p.price) || 0;
                 prixBaseTotal += prix;
 
-                // Extraction de la description avec une valeur de repli si absente
                 const description = p.description || "Aucune description fournie pour cette optimisation.";
+                const imageUrl = p.image_url || "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=150";
 
-                // Ajout du produit avec son bouton et sa zone de description collapsible
                 liste.innerHTML += `
                     <div class="item-container">
                         <div class="item-card">
+                            <img src="${imageUrl}" class="product-img" onerror="this.src='https://images.unsplash.com/photo-1542751371-adc38448a05e?w=150'">
                             <div class="item-info">
                                 <div class="item-title">${p.name || 'Optimisation Shadow'}</div>
                                 <div class="item-price">${prix.toFixed(2)} €</div>
@@ -291,7 +302,6 @@
             calculerTotal();
         }
 
-        // Fonction pour ouvrir/fermer le menu déroulant de description
         function toggleDescription(index) {
             const descDiv = document.getElementById(`desc-${index}`);
             const arrow = document.getElementById(`arrow-${index}`);
@@ -305,7 +315,7 @@
             }
         }
 
-        // Vérification robuste sans .single() pour les créateurs
+        // Vérification des codes créateurs (table 'creators')
         async function appliquerCreateur() {
             const codeSaisi = document.getElementById('code-createur-input').value.trim();
             const msg = document.getElementById('msg-createur');
@@ -317,7 +327,6 @@
             msg.style.color = "#aaa";
 
             try {
-                // Recherche insensible à la casse (.ilike) sans utiliser .single()
                 const { data, error } = await db
                     .from('creators')
                     .select('commission_rate')
@@ -332,7 +341,6 @@
                     msg.style.color = "#ff3333";
                     tauxCreateur = 0;
                 } else {
-                    // Lecture du premier élément du tableau de façon sécurisée
                     tauxCreateur = parseFloat(data[0].commission_rate); 
                     msg.innerText = `Code appliqué ! Remise de ${(tauxCreateur * 100).toFixed(0)}% activée.`;
                     msg.style.color = "#00ff00";
@@ -341,13 +349,12 @@
             } catch (err) {
                 msg.innerText = "Erreur technique.";
                 msg.style.color = "#ff3333";
-                console.error(err);
             } finally {
                 btn.disabled = false;
             }
         }
 
-        // Vérification robuste sans .single() pour les codes points
+        // Vérification globale des codes dans la table 'coupons'
         async function appliquerPoints() {
             const codeSaisi = document.getElementById('code-points-input').value.trim();
             const msg = document.getElementById('msg-points');
@@ -359,15 +366,16 @@
             msg.style.color = "#aaa";
 
             try {
-                // Recherche insensible à la casse, non-utilisée, sans bloquer sur les doublons (.single() banni)
+                // IMPORTANT : Recherche globale dans la table 'coupons' sans associer à un utilisateur spécifique.
+                // Cela permet le partage d'ami à ami !
                 const { data, error } = await db
-                    .from('codes_points')
-                    .select('reduction_value, used')
+                    .from('coupons')
+                    .select('*')
                     .ilike('code', codeSaisi)
-                    .eq('used', false);
+                    .eq('used', false); 
 
                 if (error) {
-                    msg.innerText = "Erreur de connexion : " + error.message;
+                    msg.innerText = "Erreur Supabase : " + error.message;
                     msg.style.color = "#ff3333";
                     remisePoints = 0;
                 } else if (!data || data.length === 0) {
@@ -375,8 +383,26 @@
                     msg.style.color = "#ff3333";
                     remisePoints = 0;
                 } else {
-                    // Récupération de la valeur du premier code valide trouvé
-                    remisePoints = parseFloat(data[0].reduction_value); 
+                    const coupon = data[0];
+                    let valeurReduction = 0;
+                    
+                    // Détection intelligente de la colonne de réduction
+                    if (coupon.reduction_value !== undefined) {
+                        valeurReduction = parseFloat(coupon.reduction_value);
+                    } else if (coupon.reduction !== undefined) {
+                        valeurReduction = parseFloat(coupon.reduction);
+                    } else if (coupon.discount_value !== undefined) {
+                        valeurReduction = parseFloat(coupon.discount_value);
+                    } else if (coupon.amount !== undefined) {
+                        valeurReduction = parseFloat(coupon.amount);
+                    }
+
+                    // Formatage de la réduction (ex: 15% -> 0.15)
+                    if (valeurReduction > 1) {
+                        valeurReduction = valeurReduction / 100;
+                    }
+
+                    remisePoints = valeurReduction; 
                     msg.innerText = `Code appliqué ! Remise de ${(remisePoints * 100).toFixed(0)}% activée.`;
                     msg.style.color = "#00ff00";
                 }
@@ -412,4 +438,3 @@
     </script>
 </body>
 </html>
-
