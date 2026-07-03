@@ -2,32 +2,61 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
+    <!-- Meta tag pour l'adaptation aux écrans -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mes Commandes — Shadow Market</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        :root { --bg: #000000; --cyan: #00f3ff; --white: #ffffff; --gray: #444444; }
-        body { background: var(--bg); color: var(--white); font-family: sans-serif; padding: 20px; }
+        :root { 
+            --bg: #000000; 
+            --cyan: #00f3ff; 
+            --crimson-neon: #ff004f; /* Crimson Néon */
+            --success-green: #28a745; /* Vert ✅ */
+            --white: #ffffff; 
+            --gray: #444444; 
+        }
         
-        .order-card { border: 2px solid var(--cyan); padding: 20px; border-radius: 15px; margin-bottom: 20px; background: #080808; max-width: 450px; margin: auto; }
+        /* Centrage parfait sur tout appareil */
+        body { 
+            background: var(--bg); 
+            color: var(--white); 
+            font-family: sans-serif; 
+            margin: 0; 
+            min-height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            padding: 20px;
+        }
+        
+        .container { width: 100%; max-width: 450px; }
+        
+        .order-card { 
+            border: 2px solid var(--cyan); 
+            padding: 20px; 
+            border-radius: 15px; 
+            margin-bottom: 20px; 
+            background: #080808; 
+        }
+        
         .product-name { font-size: 18px; font-weight: bold; color: var(--cyan); margin-bottom: 15px; }
         
         input { width: 100%; padding: 12px; background: #000; border: 1px solid var(--cyan); color: var(--white); border-radius: 8px; box-sizing: border-box; margin-bottom: 10px; }
         
-        .btn-validate { width: 100%; padding: 12px; background: #ff0000; border: none; color: white; font-weight: bold; cursor: pointer; border-radius: 5px; }
+        /* Bouton Valider : Crimson Néon */
+        .btn-validate { width: 100%; padding: 12px; background: var(--crimson-neon); border: none; color: white; font-weight: bold; cursor: pointer; border-radius: 5px; }
         
-        /* Bouton Télécharger (Grisé par défaut) */
-        .btn-download { width: 100%; padding: 12px; background: var(--cyan); color: #000; border: none; font-weight: bold; cursor: pointer; border-radius: 5px; margin-top: 10px; text-align: center; display: block; }
-        .btn-download:disabled { background: var(--gray); color: #aaa; cursor: not-allowed; }
-
-        .popup { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); display:flex; align-items:center; justify-content:center; z-index:9999; }
-        .popup-content { background:#080808; padding:30px; border-radius:20px; border:2px solid var(--cyan); text-align:center; width: 85%; max-width: 300px; color: #fff; }
-        .popup-btn { background: var(--cyan); border:none; padding:10px 20px; border-radius:5px; font-weight:bold; cursor:pointer; margin-top:20px; color:#000; width: 100%; }
+        /* Bouton Télécharger : Gris par défaut, Vert ✅ après */
+        .btn-download { width: 100%; padding: 12px; background: var(--gray); color: #ccc; border: none; font-weight: bold; cursor: pointer; border-radius: 5px; margin-top: 10px; }
+        .btn-download.active { background: var(--success-green); color: white; }
     </style>
 </head>
 <body>
 
-<h2 style="color: var(--cyan); text-align: center;">MES COMMANDES</h2>
-<div id="orders-list"></div>
+<div class="container">
+    <h2 style="color: var(--cyan); text-align: center;">MES COMMANDES</h2>
+    <div id="orders-list"></div>
+</div>
 
 <script>
     const db = supabase.createClient("https://jsuvimxjmjiljntmgbzu.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzdXZpbXhqbWppbGpudG1nYnp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI0Njk0NTgsImV4cCI6MjA5ODA0NTQ1OH0.F6aDK6oTyp3Tlb9fmkqpzgn4KGAxA5-ClIKlkqzfcR4");
@@ -36,50 +65,40 @@
         const { data: { user } } = await db.auth.getUser();
         if (!user) return;
 
-        // On récupère toutes les commandes du user
         const { data } = await db.from('pending_orders').select('*').eq('user_id', user.id);
         
         const listDiv = document.getElementById('orders-list');
         listDiv.innerHTML = data.map(order => `
-            <div class="order-card" id="card-${order.id}">
+            <div class="order-card">
                 <div class="product-name">${order.product_name}</div>
                 <input type="text" id="code-${order.id}" placeholder="CODE-XXXXXXXX">
-                <button class="btn-validate" onclick="verifyCode('${order.id}', '${order.filename}')">VALIDER</button>
-                <button class="btn-download" id="dl-${order.id}" disabled onclick="downloadFile('${order.filename}')">TÉLÉCHARGER</button>
+                <button class="btn-validate" onclick="verifyCode('${order.id}')">VALIDER</button>
+                <button class="btn-download ${order.is_verified ? 'active' : ''}" id="dl-${order.id}" ${order.is_verified ? '' : 'disabled'} onclick="downloadFile('${order.filename}')">TÉLÉCHARGER</button>
             </div>
         `).join('');
     }
 
-    async function verifyCode(id, filename) {
+    async function verifyCode(id) {
         const code = document.getElementById(`code-${id}`).value;
         const { data } = await db.from('codes_points').select('*').eq('code', code).single();
 
         if (data) {
             await db.from('pending_orders').update({ is_verified: true }).eq('id', id);
-            document.getElementById(`dl-${id}`).disabled = false;
-            
-            document.body.insertAdjacentHTML('beforeend', `
-                <div class="popup">
-                    <div class="popup-content">
-                        <div style="font-size: 50px;">✅ 🎉</div>
-                        <h2>Succès !</h2>
-                        <button class="popup-btn" onclick="this.parentElement.parentElement.remove()">OK</button>
-                    </div>
-                </div>`);
+            const btn = document.getElementById(`dl-${id}`);
+            btn.classList.add('active');
+            btn.disabled = false;
+            alert("Succès ! Téléchargement débloqué.");
         } else {
             alert("Code invalide.");
         }
     }
 
-    // Fonction de téléchargement direct
     function downloadFile(filename) {
         const url = `https://jsuvimxjmjiljntmgbzu.supabase.co/storage/v1/object/public/produits/${filename}`;
         const link = document.createElement('a');
         link.href = url;
         link.download = filename;
-        document.body.appendChild(link);
         link.click();
-        document.body.removeChild(link);
     }
 
     window.onload = loadOrders;
