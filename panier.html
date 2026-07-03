@@ -1,180 +1,154 @@
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mon Panier - Shadow Market</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mon Profil - Shadow Market</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        body { background: #050505; color: white; font-family: sans-serif; padding: 20px; }
-        .item-card { border: 1px solid #00ffff; padding: 15px; margin-bottom: 10px; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; background: #111; }
-        .item-info { flex-grow: 1; margin-left: 15px; }
-        .remove-btn { color: #ff3333; font-size: 1.5em; cursor: pointer; border: none; background: none; font-weight: bold; padding: 0 10px; }
+        :root { --bg: #0d0e12; --cyan: #00f2fe; --rose: #ff0055; --text: #fff; }
+        * { box-sizing: border-box; }
+        body { background: var(--bg); color: var(--text); font-family: sans-serif; margin: 0; display: flex; flex-direction: column; align-items: center; overflow-x: hidden; }
         
-        .promo-section { margin-top: 15px; display: flex; gap: 5px; }
-        input[type="text"] { padding: 10px; background: #222; border: 1px solid #00ffff; color: white; border-radius: 4px; width: 60%; }
-        .btn-promo { padding: 10px; background: #00ffff; color: #000; border: none; cursor: pointer; font-weight: bold; border-radius: 4px; }
-        .btn-promo:disabled { opacity: 0.5; cursor: not-allowed; }
+        .menu-toggle { position: absolute; top: 20px; left: 20px; cursor: pointer; z-index: 1000; }
+        .menu-toggle span { display: block; width: 30px; height: 3px; background: var(--cyan); margin: 6px 0; }
+        .nav-menu { position: fixed; left: -100%; top: 0; width: 250px; height: 100%; background: #090a0e; transition: 0.3s; padding: 80px 20px; z-index: 999; border-right: 2px solid var(--cyan); }
+        .nav-menu.open { left: 0; }
+        .nav-menu a { display: block; padding: 15px 0; color: white; text-decoration: none; border-bottom: 1px solid #222; }
+        .nav-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 998; }
+        .nav-overlay.open { display: block; }
+
+        .wrapper { width: 90%; max-width: 360px; margin-top: 80px; text-align: center; border: 2px solid var(--cyan); padding: 20px; border-radius: 20px; background: rgba(255,255,255,0.02); }
+        .user-email-display { font-size: 0.9rem; color: #aaa; margin-bottom: 15px; font-style: italic; word-break: break-all; }
+        .points-display { font-size: 3rem; font-weight: bold; color: var(--cyan); margin: 10px 0; }
         
-        .btn-paiement { width: 100%; padding: 15px; background: #ff3333; border: none; color: white; font-weight: bold; cursor: pointer; margin-top: 20px; font-size: 1.1em; }
-        .total-section { font-size: 1.4em; font-weight: bold; margin-top: 20px; text-align: center; color: #00ffff; }
+        .select-box, .input-box { width: 100%; padding: 12px; margin: 10px 0; background: #1a1c23; border: 1px solid #333; color: white; border-radius: 5px; box-sizing: border-box; }
+        .btn-main { width: 100%; padding: 12px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; text-transform: uppercase; margin-top: 5px; transition: 0.3s; }
+        .btn-main:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-echanger { background: var(--cyan); color: #000; }
+        .btn-fusion { background: var(--rose); color: white; }
+
+        #customModal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:2000; justify-content:center; align-items:center; }
+        .modal-box { background:#1a1c23; border:2px solid var(--cyan); padding:30px; border-radius:20px; text-align:center; width:80%; max-width:300px; }
+        #modalMsg { color:#aaa; margin:15px 0; white-space: pre-line; }
     </style>
 </head>
 <body>
 
-    <h1>Mon Panier</h1>
-    <div id="panier-liste"></div>
-    
-    <!-- Code Créateur -->
-    <div class="promo-section">
-        <input type="text" id="code-createur-input" placeholder="Code créateur...">
-        <button class="btn-promo" id="btn-createur" onclick="appliquerCreateur()">Appliquer</button>
-    </div>
-    <p id="msg-createur" style="font-size: 0.8em; margin-top: 5px;"></p>
+    <div class="menu-toggle" onclick="toggleNav()"><span></span><span></span><span></span></div>
+    <div id="navOverlay" class="nav-overlay" onclick="closeNav()"></div>
 
-    <!-- Code Points -->
-    <div class="promo-section">
-        <input type="text" id="code-points-input" placeholder="Code points...">
-        <button class="btn-promo" id="btn-points" onclick="appliquerPoints()">Appliquer</button>
-    </div>
-    <p id="msg-points" style="font-size: 0.8em; margin-top: 5px;"></p>
-
-    <div class="total-section">
-        Total : <span id="total-somme">0.00</span> €
+    <div id="nav" class="nav-menu">
+        <a href="index.html">🏠 Accueil</a>
+        <a href="profil.html">👤 Profil</a>
+        <a href="mes_commandes.html">📦 Mes Commandes</a>
+        <a href="points.html">💎 Mes Points</a>
+        <a href="bibliotheque.html">📚 Bibliothèque</a>
+        <hr style="border: 0; border-top: 1px solid #333; margin: 20px 0;">
+        <a href="#" onclick="logoutUser(event)" style="color: var(--rose);">⏻ Déconnexion</a>
     </div>
 
-    <button class="btn-paiement" onclick="versPaiement()">PASSER AU PAIEMENT</button>
+    <div id="customModal">
+        <div class="modal-box">
+            <div style="font-size:3rem; margin-bottom:10px;">✅ 🎉</div>
+            <h3 id="modalTitle" style="color:white; margin:0;">Succès !</h3>
+            <p id="modalMsg"></p>
+            <button onclick="closeModal()" style="background:var(--cyan); border:none; padding:10px 20px; border-radius:5px; font-weight:bold; cursor:pointer;">OK</button>
+        </div>
+    </div>
+
+    <div class="wrapper">
+        <h2>ESPACE PERSONNEL</h2>
+        <div id="user-email" class="user-email-display">Chargement...</div>
+        <div class="points-display" id="pts">0</div>
+        
+        <div class="boutique-box">
+            <label>1. CONVERTIR MES POINTS</label>
+            <select id="points-select" class="select-box">
+                <option value="2">2 Points</option>
+                <option value="5">5 Points</option>
+                <option value="10">10 Points</option>
+                <option value="20">20 Points</option>
+                <option value="50">50 Points</option>
+                <option value="100">100 Points</option>
+            </select>
+            <button id="btn-echanger" class="btn-main btn-echanger" onclick="echanger()">ÉCHANGER</button>
+            
+            <label style="display:block; margin-top:15px;">2. FUSIONNER UN CODE</label>
+            <input type="text" id="code-input" class="input-box" placeholder="Ex: CODE-XXXXXXXX">
+            <button id="btn-fusion" class="btn-main btn-fusion" onclick="fusionner()">FUSIONNER</button>
+        </div>
+    </div>
 
     <script>
-        const db = supabase.createClient(
-          'https://jsuvimxjmjiljntmgbzu.supabase.co',
-          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzdXZpbXhqbWppbGpudG1nYnp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI0Njk0NTgsImV4cCI6MjA5ODA0NTQ1OH0.F6aDK6oTyp3Tlb9fmkqpzgn4KGAxA5-ClIKlkqzfcR4'
-        );
+        // CORRECTION : Utilisation de la constante db uniforme pour éviter les collisions de namespace
+        const db = supabase.createClient("https://jsuvimxjmjiljntmgbzu.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzdXZpbXhqbWimdbp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI0Njk0NTgsImV4cCI6MjA5ODA0NTQ1OH0.F6aDK6oTyp3Tlb9fmkqpzgn4KGAxA5-ClIKlkqzfcR4");
 
-        let prixBaseTotal = 0;
-        let tauxCreateur = 0;
-        let remisePoints = 0; 
+        function showModal(title, msg) {
+            document.getElementById('modalTitle').innerText = title;
+            document.getElementById('modalMsg').innerText = msg;
+            document.getElementById('customModal').style.display = 'flex';
+        }
+        function closeModal() { document.getElementById('customModal').style.display = 'none'; }
 
-        function chargerPanier() {
-            let panier = JSON.parse(localStorage.getItem('monPanier')) || [];
-            let liste = document.getElementById('panier-liste');
-            prixBaseTotal = 0;
-            liste.innerHTML = '';
+        function toggleNav() { document.getElementById('nav').classList.toggle('open'); document.getElementById('navOverlay').classList.toggle('open'); }
+        function closeNav() { document.getElementById('nav').classList.remove('open'); document.getElementById('navOverlay').classList.remove('open'); }
 
-            panier.forEach((p, index) => {
-                const prix = parseFloat(p.price) || 0;
-                prixBaseTotal += prix;
-                liste.innerHTML += `
-                    <div class="item-card">
-                        <img src="${p.image_url || ''}" width="50" style="border-radius: 4px;">
-                        <div class="item-info">
-                            <strong>${p.name || 'Produit'}</strong><br>${prix.toFixed(2)} €
-                        </div>
-                        <button class="remove-btn" onclick="supprimerArticle(${index})">X</button>
-                    </div>
-                `;
-            });
-            calculerTotal();
+        async function init() {
+            const { data: { user } } = await db.auth.getUser();
+            if(!user) { window.location.href = "login.html"; return; }
+            document.getElementById('user-email').innerText = user.email;
+            const { data } = await db.from('profiles').select('loyalty_points').eq('id', user.id).maybeSingle();
+            document.getElementById('pts').innerText = data ? data.loyalty_points : 0;
         }
 
-        // Système anti-bug : Recherche par tableau plutôt que par ligne stricte
-        async function appliquerCreateur() {
-            const codeSaisi = document.getElementById('code-createur-input').value.trim();
-            const msg = document.getElementById('msg-createur');
-            const btn = document.getElementById('btn-createur');
-
-            if (!codeSaisi) { return; }
-            btn.disabled = true;
-            msg.innerText = "Vérification...";
-
+        async function echanger() {
+            const btn = document.getElementById('btn-echanger');
+            const amount = document.getElementById('points-select').value;
+            btn.disabled = true; btn.innerText = "TRAITEMENT...";
             try {
-                const { data, error } = await db
-                    .from('creators')
-                    .select('commission_rate')
-                    .eq('code', codeSaisi); // Suppression de .single()
+                // CORRECTION : Appel harmonisé de la fonction RPC convert_points_en_code
+                const { data, error } = await db.rpc('convert_points_en_code', { amount: parseInt(amount) });
+                if (error) throw error;
 
-                if (error) {
-                    msg.innerText = "Erreur Supabase : " + error.message;
-                    msg.style.color = "#ff3333";
-                    tauxCreateur = 0;
-                } else if (!data || data.length === 0) {
-                    msg.innerText = "Code créateur invalide.";
-                    msg.style.color = "#ff3333";
-                    tauxCreateur = 0;
-                } else {
-                    // On prend le premier résultat trouvé dans le tableau
-                    tauxCreateur = parseFloat(data[0].commission_rate); 
-                    msg.innerText = `Code créateur appliqué ! Remise de ${(tauxCreateur * 100).toFixed(0)}%.`;
-                    msg.style.color = "#00ff00";
+                // CORRECTION : Extraction ultra robuste de la valeur de retour (au cas où Supabase renvoie un tableau ou un objet)
+                let codeGenere = data;
+                if (Array.isArray(data) && data.length > 0) {
+                    codeGenere = data[0];
+                } else if (data && typeof data === 'object') {
+                    codeGenere = data.code || data.result || JSON.stringify(data);
                 }
-                calculerTotal();
-            } catch (err) {
-                msg.innerText = "Erreur système : " + err.message;
-                msg.style.color = "#ff3333";
-            } finally {
-                btn.disabled = false;
+
+                showModal("Félicitations !", `Code généré : ${codeGenere}\n\nVous pouvez l'utiliser directement sur votre panier.`);
+                await init();
+            } catch (err) { 
+                showModal("Erreur", err.message); 
+            } finally { 
+                btn.disabled = false; btn.innerText = "ÉCHANGER"; 
             }
         }
 
-        // Système anti-bug : Évite le crash "Cannot coerce result"
-        async function appliquerPoints() {
-            const codeSaisi = document.getElementById('code-points-input').value.trim();
-            const msg = document.getElementById('msg-points');
-            const btn = document.getElementById('btn-points');
-
-            if (!codeSaisi) { return; }
-            btn.disabled = true;
-            msg.innerText = "Vérification...";
-
+        async function fusionner() {
+            const btn = document.getElementById('btn-fusion');
+            const code = document.getElementById('code-input').value.trim();
+            if(!code) { showModal("Attention", "Veuillez entrer un code"); return; }
+            btn.disabled = true; btn.innerText = "FUSION...";
             try {
-                const { data, error } = await db
-                    .from('codes_points')
-                    .select('reduction_value, used')
-                    .eq('code', codeSaisi)
-                    .eq('used', false); // Suppression de .single()
-
-                if (error) {
-                    msg.innerText = "Erreur Supabase : " + error.message;
-                    msg.style.color = "#ff3333";
-                    remisePoints = 0;
-                } else if (!data || data.length === 0) {
-                    msg.innerText = "Code invalide ou déjà utilisé.";
-                    msg.style.color = "#ff3333";
-                    remisePoints = 0;
-                } else {
-                    // On prend la première ligne disponible sans faire planter le script
-                    remisePoints = parseFloat(data[0].reduction_value); 
-                    msg.innerText = `Code appliqué ! Remise de ${(remisePoints * 100).toFixed(0)}%.`;
-                    msg.style.color = "#00ff00";
-                }
-                calculerTotal();
-            } catch (err) {
-                msg.innerText = "Erreur système : " + err.message;
-                msg.style.color = "#ff3333";
-            } finally {
-                btn.disabled = false;
+                const { error } = await db.rpc('fusion_code_secure', { code_input: code });
+                if (error) throw error;
+                showModal("Succès !", "Fusion réussie !");
+                document.getElementById('code-input').value = "";
+                await init();
+            } catch (err) { 
+                showModal("Erreur", err.message); 
+            } finally { 
+                btn.disabled = false; btn.innerText = "FUSIONNER"; 
             }
         }
 
-        function calculerTotal() {
-            let totalFinal = prixBaseTotal - (prixBaseTotal * tauxCreateur) - (prixBaseTotal * remisePoints);
-            document.getElementById('total-somme').innerText = Math.max(totalFinal, 0).toFixed(2);
-        }
-
-        function supprimerArticle(index) {
-            let panier = JSON.parse(localStorage.getItem('monPanier')) || [];
-            panier.splice(index, 1);
-            localStorage.setItem('monPanier', JSON.stringify(panier));
-            chargerPanier();
-        }
-
-        function versPaiement() {
-            localStorage.setItem('totalPanier', document.getElementById('total-somme').innerText);
-            localStorage.setItem('codePointsApplique', document.getElementById('code-points-input').value.trim());
-            window.location.href = 'paiement.html';
-        }
-
-        window.onload = chargerPanier;
+        async function logoutUser(e) { e.preventDefault(); await db.auth.signOut(); window.location.href = "login.html"; }
+        window.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
 </html>
