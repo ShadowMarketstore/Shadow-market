@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -47,10 +46,10 @@
     <button class="btn-paiement" onclick="versPaiement()">PASSER AU PAIEMENT</button>
 
     <script>
-        // Initialisation de l'API Supabase
+        // CORRECTION DE LA CLÉ API COMPLETE ET EXACTE : "jsuvimxjmjiljntmgbzu"
         const db = supabase.createClient(
           'https://jsuvimxjmjiljntmgbzu.supabase.co',
-          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzdXZpbXhqbWimdbp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI0Njk0NTgsImV4cCI6MjA5ODA0NTQ1OH0.F6aDK6oTyp3Tlb9fmkqpzgn4KGAxA5-ClIKlkqzfcR4'
+          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzdXZpbXhqbWppbGpudG1nYnp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI4Njk0NTgsImV4cCI6MjA5ODA0NTQ1OH0.F6aDK6oTyp3Tlb9fmkqpzgn4KGAxA5-ClIKlkqzfcR4'
         );
 
         let prixBaseTotal = 0;
@@ -78,7 +77,6 @@
             calculerTotal();
         }
 
-        // CORRECTION : Recherche insensible à la casse avec .ilike() et suppression complète de .single()
         async function appliquerCreateur() {
             const codeSaisi = document.getElementById('code-createur-input').value.trim();
             const msg = document.getElementById('msg-createur');
@@ -89,7 +87,6 @@
             msg.innerText = "Vérification...";
 
             try {
-                // Recherche insensible à la casse pour les codes créateurs
                 const { data, error } = await db
                     .from('creators')
                     .select('commission_rate')
@@ -104,7 +101,6 @@
                     msg.style.color = "#ff3333";
                     tauxCreateur = 0;
                 } else {
-                    // On prend le premier résultat valide trouvé
                     tauxCreateur = parseFloat(data[0].commission_rate); 
                     msg.innerText = `Code appliqué ! Remise de ${(tauxCreateur * 100).toFixed(0)}%.`;
                     msg.style.color = "#00ff00";
@@ -118,7 +114,6 @@
             }
         }
 
-        // CORRECTION : Requête sous forme de tableau (sans .single() pour esquiver l'erreur JSON coercion) et recherche .ilike()
         async function appliquerPoints() {
             const codeSaisi = document.getElementById('code-points-input').value.trim();
             const msg = document.getElementById('msg-points');
@@ -129,7 +124,6 @@
             msg.innerText = "Vérification...";
 
             try {
-                // Recherche insensible à la casse et sécurisée contre les doublons
                 const { data, error } = await db
                     .from('codes_points')
                     .select('reduction_value, used')
@@ -145,7 +139,6 @@
                     msg.style.color = "#ff3333";
                     remisePoints = 0;
                 } else {
-                    // On consomme la première correspondance valide de notre tableau
                     remisePoints = parseFloat(data[0].reduction_value); 
                     msg.innerText = `Code appliqué ! Remise de ${(remisePoints * 100).toFixed(0)}%.`;
                     msg.style.color = "#00ff00";
