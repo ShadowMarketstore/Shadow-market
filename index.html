@@ -19,52 +19,22 @@
         background: #0a0a0a;
     }
 
-    .controls-container { 
-        display: flex; 
-        gap: 15px; 
-        margin-bottom: 15px; 
-        align-items: center; 
-        width: 100%;
-    }
+    .controls-container { display: flex; gap: 15px; margin-bottom: 15px; align-items: center; width: 100%; }
     #search-bar { 
-        flex-grow: 1; 
-        padding: 10px; 
-        border-radius: 10px; 
-        border: 2px solid #00ffff; 
-        background: #0a0a0a; 
-        color: #00ffff; 
-        font-family: 'Courier New', monospace; 
-        box-sizing: border-box;
+        flex-grow: 1; padding: 10px; border-radius: 10px; border: 2px solid #00ffff; 
+        background: #0a0a0a; color: #00ffff; font-family: 'Courier New', monospace; box-sizing: border-box;
     }
-    .hamburger { 
-        font-size: 32px; 
-        color: #00ffff; 
-        cursor: pointer; 
-        text-shadow: 0 0 10px #00ffff; 
-        line-height: 1;
-    }
-
+    .hamburger { font-size: 32px; color: #00ffff; cursor: pointer; text-shadow: 0 0 10px #00ffff; line-height: 1; }
     #main-logo { width: 100%; max-height: 400px; object-fit: contain; display: block; }
 
-    /* Menu latéral catégories */
     #side-menu { position: fixed; top: 0; right: -250px; width: 250px; height: 100%; background: #111; border-left: 2px solid #00ffff; transition: 0.3s; z-index: 2000; padding-top: 60px; }
     .menu-item { padding: 20px; color: #fff; text-decoration: none; display: block; cursor: pointer; border-bottom: 1px solid #333; }
     #sub-menu { display: none; background: #1a1a1a; padding-left: 20px; }
     #sub-menu .menu-item { color: #00ffff; font-size: 0.9em; }
     #suggestions-link { margin-top: 15px; border-top: 1px solid #333; }
 
-    /* Titre agrandi */
-    .section-title { 
-        text-align: center; 
-        color: #00ffff; 
-        font-size: 1.6em; 
-        margin: 20px 0; 
-        text-transform: uppercase; 
-        font-weight: bold; 
-        text-shadow: 0 0 10px #00ffff;
-    }
+    .section-title { text-align: center; color: #00ffff; font-size: 1.6em; margin: 20px 0; text-transform: uppercase; font-weight: bold; text-shadow: 0 0 10px #00ffff; }
 
-    /* Grille produits */
     .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; padding: 10px; }
     .product-card { position: relative; border: 2px solid #00ffff; border-radius: 15px; padding: 10px; background: #111; display: flex; flex-direction: column; min-height: 400px; }
     .product-img { width: 100%; height: 160px; background-size: contain; background-position: center; background-repeat: no-repeat; border-radius: 8px; border: 1.5px solid #DC143C; box-shadow: 0 0 5px rgba(220, 20, 60, 0.5); background-color: #000; }
@@ -81,15 +51,13 @@
 
     .no-results { text-align: center; color: #888; grid-column: 1 / -1; padding: 30px 0; }
 
-    /* Navigation — z-index renforcé + pointer-events explicite pour éviter tout blocage de clic */
-    .floating-nav { position: fixed; bottom: 20px; left: 5%; right: 5%; background: #111; padding: 15px 25px; border-radius: 40px; border: 1px solid #00ffff; display: flex; justify-content: space-between; align-items: center; z-index: 2500; pointer-events: auto; }
-    .nav-link { text-decoration: none; color: white; font-size: 24px; pointer-events: auto; position: relative; z-index: 2501; }
+    .floating-nav { position: fixed; bottom: 20px; left: 5%; right: 5%; background: #111; padding: 15px 25px; border-radius: 40px; border: 1px solid #00ffff; display: flex; justify-content: space-between; align-items: center; z-index: 1000; }
+    .nav-link { text-decoration: none; color: white; font-size: 24px; }
     #cart-count { background: #00ffff; color: #000; border-radius: 50%; padding: 2px 8px; font-size: 0.7em; font-weight: bold; }
   </style>
 </head>
 <body>
 
-  <!-- Menu latéral : catégories fixes + Suggestions -->
   <div id="side-menu">
     <div class="menu-item" onclick="toggleSubMenu()">Catégories ▼</div>
     <div id="sub-menu">
@@ -116,7 +84,6 @@
     <div class="products-grid" id="products-container"><p style="text-align: center;">Chargement...</p></div>
   </main>
 
-  <!-- NAV INFÉRIEURE -->
   <nav class="floating-nav">
     <a href="login.html" class="nav-link">👤</a>
     <a href="panier.html" class="nav-link">🧺 <span id="cart-count">0</span></a>
@@ -129,8 +96,59 @@
   <script>
     const supabaseClient = supabase.createClient('https://jsuvimxjmjiljntmgbzu.supabase.co', 'sb_publishable_Ngm29impwbTLGhuqyCxSJA_E1jXc1DX');
 
-    let allProducts = []; 
+    let allProducts = [];
 
+    // ================= PANIER LIÉ AU COMPTE =================
+    // Clé localStorage utilisée uniquement comme cache tampon, jamais comme source de vérité
+    function guestCartKey() { return 'monPanier_guest'; }
+
+    async function getCurrentUser() {
+      const { data: { user } } = await supabaseClient.auth.getUser();
+      return user;
+    }
+
+    // Charge le panier : depuis Supabase si connecté, depuis localStorage "invité" sinon
+    async function loadCartArray() {
+      const user = await getCurrentUser();
+      if (user) {
+        const { data, error } = await supabaseClient
+          .from('carts')
+          .select('items')
+          .eq('user_id', user.id)
+          .maybeSingle();
+
+        if (error) {
+          console.error("Erreur chargement panier:", error);
+          return [];
+        }
+        const items = (data && data.items) ? data.items : [];
+        localStorage.setItem('monPanier_' + user.id, JSON.stringify(items)); // cache local, par utilisateur
+        return items;
+      } else {
+        return JSON.parse(localStorage.getItem(guestCartKey())) || [];
+      }
+    }
+
+    // Sauvegarde le panier : upsert Supabase si connecté, localStorage invité sinon
+    async function saveCartArray(cartArr) {
+      const user = await getCurrentUser();
+      if (user) {
+        localStorage.setItem('monPanier_' + user.id, JSON.stringify(cartArr));
+        const { error } = await supabaseClient
+          .from('carts')
+          .upsert({ user_id: user.id, items: cartArr, updated_at: new Date().toISOString() });
+        if (error) console.error("Erreur sauvegarde panier:", error);
+      } else {
+        localStorage.setItem(guestCartKey(), JSON.stringify(cartArr));
+      }
+    }
+
+    async function updateCartCount() {
+      const panier = await loadCartArray();
+      document.getElementById('cart-count').innerText = panier.length;
+    }
+
+    // ================= PRODUITS =================
     async function loadData() {
       document.getElementById('main-logo').src = 'https://jsuvimxjmjiljntmgbzu.supabase.co/storage/v1/object/public/logos/site-logo.png?t=' + new Date().getTime();
 
@@ -193,28 +211,21 @@
 
     async function handlePurchase(productId) {
       const product = allProducts.find(p => p.id == productId);
-      
       if (!product || product.stock_quantity <= 0) return;
-      
-      const currentStock = product.stock_quantity;
-      
-      await supabaseClient.from('products').update({ stock_quantity: currentStock - 1 }).eq('id', product.id);
-      
-      let panier = JSON.parse(localStorage.getItem('monPanier')) || [];
+
+      await supabaseClient.from('products').update({ stock_quantity: product.stock_quantity - 1 }).eq('id', product.id);
+
+      const panier = await loadCartArray();
       panier.push(product);
-      localStorage.setItem('monPanier', JSON.stringify(panier));
-      
+      await saveCartArray(panier);
+
       updateCartCount();
       loadData();
     }
 
-    function updateCartCount() {
-      let panier = JSON.parse(localStorage.getItem('monPanier')) || [];
-      document.getElementById('cart-count').innerText = panier.length;
-    }
-
-    window.addEventListener('storage', (e) => {
-      if (e.key === 'monPanier') updateCartCount();
+    // Recharge le compteur dès qu'on se connecte/déconnecte, sans recharger la page
+    supabaseClient.auth.onAuthStateChange(() => {
+      updateCartCount();
     });
 
     window.onload = loadData;
