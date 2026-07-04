@@ -7,48 +7,80 @@
     <style>
         body { 
             font-family: 'Segoe UI', sans-serif; background: #000; color: #fff; margin: 0; 
-            padding: 20px; box-sizing: border-box; padding-bottom: 60px; 
+            padding: 15px; box-sizing: border-box; padding-bottom: 60px; 
         }
 
-        #suggestion-container { 
-            width: 100%; max-width: 500px; margin: 0 auto 25px auto; background: #0a0a0a; padding: 25px; 
-            border: 2px solid #00ffff; border-radius: 15px; box-shadow: 0 0 15px #00ffff; 
-            display: flex; flex-direction: column; gap: 15px;
+        /* Retour en haut à gauche */
+        #back-link {
+            display: inline-flex; align-items: center; gap: 6px;
+            color: #00ffff; text-decoration: none; font-weight: bold;
+            font-size: 0.95em; margin-bottom: 15px; text-shadow: 0 0 6px #00ffff;
         }
-        h2 { text-align: center; color: #00ffff; text-transform: uppercase; text-shadow: 0 0 10px #00ffff; margin: 0; }
-        textarea { 
-            width: 100%; height: 110px; background: #111; color: #00ffff; border: 2px solid #00ffff; 
-            border-radius: 10px; padding: 15px; font-family: 'Courier New', monospace; box-sizing: border-box; resize: none;
-        }
-        textarea:focus { outline: none; border-color: #DC143C; box-shadow: 0 0 10px #DC143C; }
-        button { width: 100%; padding: 15px; background: #DC143C; color: white; font-weight: bold; font-size: 1.1em; border: none; border-radius: 10px; cursor: pointer; text-transform: uppercase; }
-        .back-btn { background: #111; border: 2px solid #00ffff; color: #00ffff; }
 
-        /* === Section commentaires style YouTube === */
+        h2 { text-align: center; color: #00ffff; text-transform: uppercase; text-shadow: 0 0 10px #00ffff; margin: 10px 0 20px 0; font-size: 1.2em; }
+
+        /* Champ de saisie simple, style pilule */
+        #comment-box {
+            display: flex; align-items: center; gap: 10px; background: #111;
+            border-radius: 25px; padding: 10px 18px; margin: 0 auto 25px auto;
+            max-width: 500px; border: 1px solid #333;
+        }
+        #comment-box input {
+            flex: 1; background: transparent; border: none; color: #fff;
+            outline: none; font-size: 0.95em; font-family: 'Segoe UI', sans-serif;
+        }
+        #comment-box input::placeholder { color: #888; }
+        #send-icon {
+            background: none; border: none; color: #00ffff; font-size: 1.3em;
+            cursor: pointer; padding: 0; line-height: 1;
+        }
+        #send-icon:disabled { color: #444; cursor: not-allowed; }
+
+        /* Section commentaires */
         #comments-section { width: 100%; max-width: 500px; margin: 0 auto; }
         #comments-header { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; padding-left: 4px; }
         #comments-header h3 { color: #fff; font-size: 1.05em; margin: 0; font-weight: 600; }
         #comments-header span { color: #888; font-size: 0.95em; }
 
-        .comment-item { display: flex; gap: 12px; padding: 14px 4px; border-bottom: 1px solid #1a1a1a; }
+        .comment-item { display: flex; gap: 12px; padding: 14px 4px; }
+        .comment-thread { border-bottom: 1px solid #1a1a1a; }
         .comment-avatar {
-            width: 38px; height: 38px; min-width: 38px; border-radius: 50%;
+            width: 36px; height: 36px; min-width: 36px; border-radius: 50%;
             background: #111; border: 2px solid #00ffff; color: #00ffff;
             display: flex; align-items: center; justify-content: center;
-            font-weight: bold; font-size: 1em; text-shadow: 0 0 6px #00ffff;
+            font-weight: bold; font-size: 0.95em; text-shadow: 0 0 6px #00ffff;
         }
         .comment-body { flex: 1; min-width: 0; }
         .comment-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 3px; flex-wrap: wrap; }
-        .comment-author { color: #FFD700; font-weight: bold; font-size: 0.9em; }
-        .comment-time { color: #666; font-size: 0.78em; }
-        .comment-text { color: #eee; font-size: 0.95em; line-height: 1.4; word-break: break-word; margin-bottom: 6px; }
-        .comment-actions { display: flex; align-items: center; gap: 18px; }
-        .comment-actions button {
+        .comment-author { color: #FFD700; font-weight: bold; font-size: 0.88em; }
+        .comment-time { color: #666; font-size: 0.76em; }
+        .comment-text { color: #eee; font-size: 0.93em; line-height: 1.4; word-break: break-word; margin-bottom: 6px; }
+
+        .comment-actions { display: flex; align-items: center; gap: 16px; }
+        .react-btn {
             all: unset; display: flex; align-items: center; gap: 5px; cursor: pointer;
-            color: #888; font-size: 0.85em; padding: 4px; width: auto;
+            color: #888; font-size: 0.85em; padding: 4px;
         }
-        .comment-actions button:hover { color: #00ffff; }
-        .comment-actions .like-count { color: #aaa; font-size: 0.8em; }
+        .react-btn.active { color: #00ffff; }
+        .react-count { color: #aaa; font-size: 0.78em; min-width: 8px; }
+        .reply-btn {
+            all: unset; cursor: pointer; color: #888; font-size: 0.85em; font-weight: bold; padding: 4px;
+        }
+        .reply-btn:hover { color: #00ffff; }
+
+        /* Réponses imbriquées */
+        .replies-container { margin-left: 48px; margin-top: 8px; }
+
+        /* Mini champ de réponse */
+        .reply-input-wrapper {
+            display: flex; align-items: center; gap: 8px; margin-top: 10px;
+            background: #111; border-radius: 20px; padding: 8px 14px; border: 1px solid #333;
+        }
+        .reply-input-wrapper input {
+            flex: 1; background: transparent; border: none; color: #fff; outline: none; font-size: 0.9em;
+        }
+        .reply-input-wrapper button { background: none; border: none; color: #00ffff; font-size: 1.1em; cursor: pointer; }
+
         .comment-empty { color: #666; text-align: center; font-size: 0.9em; padding: 25px 0; }
 
         #popup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.75); z-index: 5000; display: none; align-items: center; justify-content: center; }
@@ -59,11 +91,14 @@
 </head>
 <body>
 
-    <div id="suggestion-container">
-        <h2>Suggestions & Retours</h2>
-        <textarea id="msg" placeholder="Votre message..."></textarea>
-        <button onclick="sendComment()">Envoyer</button>
-        <button class="back-btn" onclick="window.location.href='index.html'">Retour à l'accueil</button>
+    <a href="index.html" id="back-link">← Retour</a>
+
+    <h2>Suggestions & Retours</h2>
+
+    <!-- Champ de saisie simple type pilule -->
+    <div id="comment-box">
+        <input type="text" id="msg" placeholder="Ajouter un commentaire...">
+        <button id="send-icon" onclick="sendComment()" disabled>➤</button>
     </div>
 
     <div id="comments-section">
@@ -85,42 +120,65 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        // Client Supabase
         const db = supabase.createClient(
           'https://jsuvimxjmjiljntmgbzu.supabase.co',
           'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzdXZpbXhqbWppbGpudG1nYnp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI0Njk0NTgsImV4cCI6MjA5ODA0NTQ1OH0.F6aDK6oTyp3Tlb9fmkqpzgn4KGAxA5-ClIKlkqzfcR4'
         );
 
-        // Nouvelle fonction de débogage pour voir l'erreur exacte
+        const REACTIONS_KEY = 'shadow_reactions'; // { [commentId]: 'like' | 'dislike' }
+        let allComments = [];
+
+        // Active/désactive le bouton d'envoi selon le contenu du champ
+        const msgInput = document.getElementById('msg');
+        const sendBtn = document.getElementById('send-icon');
+        msgInput.addEventListener('input', () => {
+            sendBtn.disabled = !msgInput.value.trim();
+        });
+        msgInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && msgInput.value.trim()) sendComment();
+        });
+
+        // Récupère le username connecté ou "Anonyme"
+        async function getUserName() {
+            const { data: { user } } = await db.auth.getUser();
+            if (!user) return 'Anonyme';
+            const { data: profile } = await db.from('profiles').select('username').eq('id', user.id).single();
+            return (profile && profile.username) ? profile.username : 'Anonyme';
+        }
+
+        // Envoi d'un commentaire principal (parent_id = null)
         async function sendComment() {
-            const messageInput = document.getElementById('msg');
-            const message = messageInput.value;
-            if (!message.trim()) { showPopup("Veuillez écrire un message."); return; }
+            const message = msgInput.value;
+            if (!message.trim()) return;
 
             try {
-                const { data: { user } } = await db.auth.getUser();
-                let userName = 'Anonyme';
+                const userName = await getUserName();
+                const { error } = await db.from('comments').insert([{ user_name: userName, message: message, parent_id: null }]);
+                if (error) throw error;
 
-                if (user) {
-                    const { data: profile } = await db.from('profiles').select('username').eq('id', user.id).single();
-                    if (profile && profile.username) userName = profile.username;
-                }
-
-                // Tentative d'insertion
-                const { error: insertError } = await db.from('comments').insert([{ user_name: userName, message: message }]);
-                
-                // Si Supabase renvoie une erreur, on déclenche le catch manuellement
-                if (insertError) throw insertError;
-
-                showPopup('Merci ' + userName + ', votre message a bien été envoyé !');
-                messageInput.value = '';
+                msgInput.value = '';
+                sendBtn.disabled = true;
                 loadComments();
 
             } catch (error) {
                 console.error("Erreur détaillée:", error);
-                // Affiche le message d'erreur précis de Supabase dans le pop-up
-                const errorMessage = error.message || error.details || "Une erreur inconnue est survenue.";
-                showPopup("Erreur Supabase : " + errorMessage);
+                showPopup("Erreur Supabase : " + (error.message || "Une erreur inconnue est survenue."));
+            }
+        }
+
+        // Envoi d'une réponse à un commentaire (parent_id = id du parent)
+        async function sendReply(parentId, inputEl) {
+            const message = inputEl.value;
+            if (!message.trim()) return;
+
+            try {
+                const userName = await getUserName();
+                const { error } = await db.from('comments').insert([{ user_name: userName, message: message, parent_id: parentId }]);
+                if (error) throw error;
+                loadComments();
+            } catch (error) {
+                console.error("Erreur détaillée:", error);
+                showPopup("Erreur Supabase : " + (error.message || "Une erreur inconnue est survenue."));
             }
         }
 
@@ -136,44 +194,134 @@
             return `il y a ${j} j`;
         }
 
+        function getReactions() {
+            try { return JSON.parse(localStorage.getItem(REACTIONS_KEY)) || {}; }
+            catch (e) { return {}; }
+        }
+        function saveReactions(obj) {
+            localStorage.setItem(REACTIONS_KEY, JSON.stringify(obj));
+        }
+
+        // Gère le clic sur 👍 ou 👎 : incrémente/décrémente et bascule si déjà réagi
+        async function toggleReaction(commentId, type) {
+            const comment = allComments.find(c => c.id === commentId);
+            if (!comment) return;
+
+            const reactions = getReactions();
+            const current = reactions[commentId]; // 'like' | 'dislike' | undefined
+
+            let newLikes = comment.likes || 0;
+            let newDislikes = comment.dislikes || 0;
+
+            if (current === type) {
+                // Annule la réaction existante
+                if (type === 'like') newLikes = Math.max(0, newLikes - 1);
+                else newDislikes = Math.max(0, newDislikes - 1);
+                delete reactions[commentId];
+            } else {
+                // Retire l'ancienne réaction si elle existe, applique la nouvelle
+                if (current === 'like') newLikes = Math.max(0, newLikes - 1);
+                if (current === 'dislike') newDislikes = Math.max(0, newDislikes - 1);
+                if (type === 'like') newLikes += 1;
+                else newDislikes += 1;
+                reactions[commentId] = type;
+            }
+
+            saveReactions(reactions);
+
+            const { error } = await db.from('comments').update({ likes: newLikes, dislikes: newDislikes }).eq('id', commentId);
+            if (error) {
+                console.error(error);
+                showPopup("Erreur lors de la mise à jour de la réaction.");
+                return;
+            }
+
+            comment.likes = newLikes;
+            comment.dislikes = newDislikes;
+            renderComments();
+        }
+
+        // Affiche/masque le mini champ de réponse sous un commentaire
+        function toggleReplyInput(commentId) {
+            const wrapper = document.getElementById(`reply-wrapper-${commentId}`);
+            if (!wrapper) return;
+            wrapper.style.display = (wrapper.style.display === 'flex') ? 'none' : 'flex';
+            if (wrapper.style.display === 'flex') {
+                wrapper.querySelector('input').focus();
+            }
+        }
+
         async function loadComments() {
+            const { data, error } = await db
+                .from('comments')
+                .select('id, user_name, message, created_at, likes, dislikes, parent_id')
+                .order('created_at', { ascending: true });
+
+            if (error) {
+                console.error(error);
+                document.getElementById('comments-list').innerHTML = '<div class="comment-empty">Erreur de chargement.</div>';
+                return;
+            }
+
+            allComments = data || [];
+            renderComments();
+        }
+
+        // Construit l'arborescence commentaires principaux + réponses, et affiche
+        function renderComments() {
             const list = document.getElementById('comments-list');
             const countEl = document.getElementById('comments-count');
 
-            const { data, error } = await db
-                .from('comments')
-                .select('user_name, message, created_at')
-                .order('created_at', { ascending: false })
-                .limit(30);
-
-            if (error || !data || data.length === 0) {
+            if (!allComments || allComments.length === 0) {
                 list.innerHTML = '<div class="comment-empty">Aucun commentaire pour le moment.</div>';
                 countEl.textContent = '';
                 return;
             }
 
-            countEl.textContent = data.length;
+            countEl.textContent = allComments.length;
 
-            list.innerHTML = data.map(c => {
-                const author = c.user_name || 'Anonyme';
-                const initial = author.charAt(0).toUpperCase();
-                return `
-                <div class="comment-item">
-                    <div class="comment-avatar">${initial}</div>
-                    <div class="comment-body">
-                        <div class="comment-meta">
-                            <span class="comment-author">${author}</span>
-                            <span class="comment-time">${timeAgo(c.created_at)}</span>
-                        </div>
-                        <div class="comment-text">${c.message}</div>
-                        <div class="comment-actions">
-                            <button onclick="showPopup('Fonctionnalité à venir')">👍 <span class="like-count"></span></button>
-                            <button onclick="showPopup('Fonctionnalité à venir')">👎</button>
-                            <button onclick="showPopup('Fonctionnalité à venir')">Répondre</button>
+            const reactions = getReactions();
+            const topLevel = allComments.filter(c => !c.parent_id).sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+            list.innerHTML = topLevel.map(c => {
+                const replies = allComments.filter(r => r.parent_id === c.id);
+                return renderCommentItem(c, reactions, true) + `
+                    <div class="replies-container">
+                        ${replies.map(r => renderCommentItem(r, reactions, false)).join('')}
+                        <div class="reply-input-wrapper" id="reply-wrapper-${c.id}" style="display:none;">
+                            <input type="text" placeholder="Répondre..." onkeydown="if(event.key==='Enter'){sendReply(${c.id}, this); this.value='';}">
+                            <button onclick="const inp=this.previousElementSibling; sendReply(${c.id}, inp); inp.value='';">➤</button>
                         </div>
                     </div>
-                </div>`;
+                `;
             }).join('');
+        }
+
+        function renderCommentItem(c, reactions, isTopLevel) {
+            const author = c.user_name || 'Anonyme';
+            const initial = author.charAt(0).toUpperCase();
+            const myReaction = reactions[c.id];
+
+            return `
+            <div class="comment-item ${isTopLevel ? 'comment-thread' : ''}">
+                <div class="comment-avatar">${initial}</div>
+                <div class="comment-body">
+                    <div class="comment-meta">
+                        <span class="comment-author">${author}</span>
+                        <span class="comment-time">${timeAgo(c.created_at)}</span>
+                    </div>
+                    <div class="comment-text">${c.message}</div>
+                    <div class="comment-actions">
+                        <button class="react-btn ${myReaction === 'like' ? 'active' : ''}" onclick="toggleReaction(${c.id}, 'like')">
+                            👍 <span class="react-count">${c.likes || 0}</span>
+                        </button>
+                        <button class="react-btn ${myReaction === 'dislike' ? 'active' : ''}" onclick="toggleReaction(${c.id}, 'dislike')">
+                            👎 <span class="react-count">${c.dislikes || 0}</span>
+                        </button>
+                        ${isTopLevel ? `<button class="reply-btn" onclick="toggleReplyInput(${c.id})">Répondre</button>` : ''}
+                    </div>
+                </div>
+            </div>`;
         }
 
         function showPopup(message) {
@@ -188,4 +336,3 @@
     </script>
 </body>
 </html>
-
