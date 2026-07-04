@@ -1,99 +1,223 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Shadow Market - Connexion</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <style>
-        body { background: #000; color: #fff; font-family: sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        .order-form { width: 90%; max-width: 400px; background: #111; padding: 30px; border: 2px solid #00f2fe; border-radius: 20px; box-sizing: border-box; }
-        .form-group { margin-bottom: 20px; }
-        label { display: block; color: #00f2fe; margin-bottom: 5px; }
-        input { background: #000; border: 1px solid #00f2fe; color: #fff; padding: 12px; width: 100%; border-radius: 5px; box-sizing: border-box; }
-        .submit-btn { width: 100%; padding: 12px; background: #ff0055; color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; margin-top: 10px; text-transform: uppercase; }
-        #toggleText { cursor: pointer; text-align: center; margin-top: 15px; font-size: 0.8rem; color: #aaa; text-decoration: underline; }
-        .password-wrapper { position: relative; display: flex; align-items: center; }
-        #eyeIcon { position: absolute; right: 10px; cursor: pointer; user-select: none; font-size: 1.2rem; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shadow Market</title>
+  <style>
+    body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: #000; color: #fff; margin: 0; padding: 0; padding-bottom: 120px; }
+    
+    #header-wrapper { 
+        width: 90%; 
+        margin: 20px auto; 
+        border: 3px solid #00ffff; 
+        border-radius: 15px; 
+        padding: 15px; 
+        box-shadow: 0 0 15px #00ffff, inset 0 0 10px #00ffff; 
+        display: flex; 
+        flex-direction: column;
+        background: #0a0a0a;
+    }
+
+    .controls-container { 
+        display: flex; 
+        gap: 15px; 
+        margin-bottom: 15px; 
+        align-items: center; 
+        width: 100%;
+    }
+    #search-bar { 
+        flex-grow: 1; 
+        padding: 10px; 
+        border-radius: 10px; 
+        border: 2px solid #00ffff; 
+        background: #0a0a0a; 
+        color: #00ffff; 
+        font-family: 'Courier New', monospace; 
+        box-sizing: border-box;
+    }
+    .hamburger { 
+        font-size: 32px; 
+        color: #00ffff; 
+        cursor: pointer; 
+        text-shadow: 0 0 10px #00ffff; 
+        line-height: 1;
+    }
+
+    #main-logo { width: 100%; max-height: 400px; object-fit: contain; display: block; }
+
+    /* Menu latéral catégories */
+    #side-menu { position: fixed; top: 0; right: -250px; width: 250px; height: 100%; background: #111; border-left: 2px solid #00ffff; transition: 0.3s; z-index: 2000; padding-top: 60px; }
+    .menu-item { padding: 20px; color: #fff; text-decoration: none; display: block; cursor: pointer; border-bottom: 1px solid #333; }
+    #sub-menu { display: none; background: #1a1a1a; padding-left: 20px; }
+    #sub-menu .menu-item { color: #00ffff; font-size: 0.9em; }
+
+    /* Titre agrandi */
+    .section-title { 
+        text-align: center; 
+        color: #00ffff; 
+        font-size: 1.6em; 
+        margin: 20px 0; 
+        text-transform: uppercase; 
+        font-weight: bold; 
+        text-shadow: 0 0 10px #00ffff;
+    }
+
+    /* Grille produits (inchangée) */
+    .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; padding: 10px; }
+    .product-card { position: relative; border: 2px solid #00ffff; border-radius: 15px; padding: 10px; background: #111; display: flex; flex-direction: column; min-height: 400px; }
+    .product-img { width: 100%; height: 160px; background-size: contain; background-position: center; background-repeat: no-repeat; border-radius: 8px; border: 1.5px solid #DC143C; box-shadow: 0 0 5px rgba(220, 20, 60, 0.5); background-color: #000; }
+    .discount-badge { position: absolute; top: 15px; left: 15px; background: #000; color: #ffffff; border: 1px solid #00ffff; padding: 3px 8px; border-radius: 5px; font-weight: bold; font-size: 0.8em; z-index: 20; }
+    
+    .stock-info { font-size: 0.85em; color: #00ffff; margin: 8px 0; font-weight: bold; }
+    h3 { font-size: 0.95em; margin: 10px 0; min-height: 2.4em; }
+    .price-wrapper { margin: 5px 0; }
+    .old-price { text-decoration: line-through; color: #777; font-size: 0.85em; display: block; }
+    .current-price { color: #ffffff; font-weight: bold; font-size: 1.3em; display: block; }
+    
+    .buy-btn { width: 100%; background: #DC143C; color: white; border: none; padding: 12px; font-weight: bold; cursor: pointer; border-radius: 5px; margin-top: auto; }
+    .buy-btn:disabled { background: #333; color: #777; cursor: not-allowed; }
+
+    .no-results { text-align: center; color: #888; grid-column: 1 / -1; padding: 30px 0; }
+
+    /* Navigation — INTACTE, ne pas modifier */
+    .floating-nav { position: fixed; bottom: 20px; left: 5%; right: 5%; background: #111; padding: 15px 25px; border-radius: 40px; border: 1px solid #00ffff; display: flex; justify-content: space-between; align-items: center; z-index: 1000; }
+    .nav-link { text-decoration: none; color: white; font-size: 24px; }
+    #cart-count { background: #00ffff; color: #000; border-radius: 50%; padding: 2px 8px; font-size: 0.7em; font-weight: bold; }
+  </style>
 </head>
 <body>
 
-<div class="order-form">
-  <h2 id="formTitle" style="color: #00f2fe; text-align: center;">CONNEXION</h2>
-  <form id="authForm">
-    <div class="form-group">
-      <label>Email</label>
-      <input type="email" id="email" required>
+  <!-- Menu latéral : catégories fixes -->
+  <div id="side-menu">
+    <div class="menu-item" onclick="toggleSubMenu()">Catégories ▼</div>
+    <div id="sub-menu">
+        <div class="menu-item" onclick="filterCategory('Tout')">Tout</div>
+        <div class="menu-item" onclick="filterCategory('Free')">Free</div>
+        <div class="menu-item" onclick="filterCategory('Premium')">Premium</div>
+        <div class="menu-item" onclick="filterCategory('Elite')">Elite</div>
     </div>
-    <div class="form-group">
-      <label>Mot de passe</label>
-      <div class="password-wrapper">
-        <input type="password" id="password" required>
-        <span id="eyeIcon" onclick="togglePassword()">🙈</span>
-      </div>
+    <div class="menu-item" onclick="window.location.href='suggestions.html'">Suggestions</div>
+    <div class="menu-item" onclick="document.getElementById('side-menu').style.right = '-250px'" style="color: #DC143C;">Fermer</div>
+  </div>
+
+  <div id="header-wrapper">
+    <div class="controls-container">
+      <input type="text" id="search-bar" placeholder="Rechercher..." onkeyup="searchProducts()">
+      <div class="hamburger" onclick="document.getElementById('side-menu').style.right = '0'">☰</div>
     </div>
-    <button type="submit" class="submit-btn" id="submitBtn">SE CONNECTER</button>
-    <p id="toggleText" onclick="toggleMode()">Pas de compte ? Créer un compte</p>
-  </form>
-</div>
+    <img id="main-logo" src="" alt="Shadow Market">
+  </div>
 
-<script>
-    const db = supabase.createClient(
-        'https://jsuvimxjmjiljntmgbzu.supabase.co',
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzdXZpbXhqbWppbGpudG1nYnp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI0Njk0NTgsImV4cCI6MjA5ODA0NTQ1OH0.F6aDK6oTyp3Tlb9fmkqpzgn4KGAxA5-ClIKlkqzfcR4'
-    );
+  <h2 class="section-title">Produits disponibles maintenant</h2>
 
-    // 1. Vérification automatique : si déjà connecté, rediriger direct vers profil
-    async function checkSession() {
-        const { data: { session } } = await db.auth.getSession();
-        if (session) { window.location.href = "profil.html"; }
+  <main>
+    <div class="products-grid" id="products-container"><p style="text-align: center;">Chargement...</p></div>
+  </main>
+
+  <!-- NAV INFÉRIEURE — zone strictement intacte -->
+  <nav class="floating-nav">
+    <a href="login.html" class="nav-link">👤</a>
+    <a href="panier.html" class="nav-link">🧺 <span id="cart-count">0</span></a>
+    <a href="commande.html" class="nav-link">🛒</a>
+    <a href="index.html" class="nav-link">🏠</a>
+    <a href="https://discord.gg/XUtWdTPYr" target="_blank" class="nav-link">💬</a>
+  </nav>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const supabaseClient = supabase.createClient('https://jsuvimxjmjiljntmgbzu.supabase.co', 'sb_publishable_Ngm29impwbTLGhuqyCxSJA_E1jXc1DX');
+
+    let allProducts = []; // liste complète, utilisée pour recherche + filtre catégorie
+
+    async function loadData() {
+      document.getElementById('main-logo').src = 'https://jsuvimxjmjiljntmgbzu.supabase.co/storage/v1/object/public/logos/site-logo.png?t=' + new Date().getTime();
+
+      const { data: products } = await supabaseClient.from('products').select('*');
+      allProducts = products || [];
+
+      renderProducts(allProducts);
+      updateCartCount();
     }
-    checkSession();
 
-    let isLogin = true;
+    // Affiche la liste de produits fournie (la catégorie n'est jamais affichée sur la carte)
+    function renderProducts(list) {
+      const container = document.getElementById('products-container');
+      container.innerHTML = '';
 
-    function toggleMode() {
-        isLogin = !isLogin;
-        document.getElementById('formTitle').innerText = isLogin ? "CONNEXION" : "CRÉER UN COMPTE";
-        document.getElementById('submitBtn').innerText = isLogin ? "SE CONNECTER" : "S'INSCRIRE";
-        document.getElementById('toggleText').innerText = isLogin ? "Pas de compte ? Créer un compte" : "Déjà un compte ? Connexion";
+      if (!list || list.length === 0) {
+        container.innerHTML = '<div class="no-results">Aucun produit trouvé.</div>';
+        return;
+      }
+
+      list.forEach(p => {
+        const stockVal = p.stock_quantity !== undefined ? p.stock_quantity : 0;
+        const isOutOfStock = stockVal <= 0;
+        const discount = p.old_price > p.price ? Math.round(((p.old_price - p.price) / p.old_price) * 100) : 0;
+
+        const card = document.createElement('div');
+        card.className = 'product-card';
+        const productParam = encodeURIComponent(JSON.stringify(p));
+
+        card.innerHTML = `
+          ${discount > 0 ? `<div class="discount-badge">-${discount}%</div>` : ''}
+          <div class="product-img" style="background-image: url('${p.image_url}')"></div>
+          <h3>${p.name}</h3>
+          <div class="stock-info">Stock : ${isOutOfStock ? 'Épuisé' : stockVal}</div>
+          <div class="price-wrapper">
+              ${p.old_price > p.price ? `<span class="old-price">${p.old_price.toFixed(2)} €</span>` : ''}
+              <span class="current-price">${p.price.toFixed(2)} €</span>
+          </div>
+          <button class="buy-btn" ${isOutOfStock ? 'disabled' : ''} onclick="handlePurchase('${productParam}', ${stockVal})">
+              ${isOutOfStock ? 'ÉPUISÉ' : 'AJOUTER AU PANIER'}
+          </button>
+        `;
+        container.appendChild(card);
+      });
     }
 
-    function togglePassword() {
-        const p = document.getElementById('password');
-        const i = document.getElementById('eyeIcon');
-        if (p.type === 'password') { p.type = 'text'; i.innerText = '🙉'; }
-        else { p.type = 'password'; i.innerText = '🙈'; }
+    // Recherche par nom (insensible à la casse)
+    function searchProducts() {
+      const query = document.getElementById('search-bar').value.toLowerCase();
+      renderProducts(allProducts.filter(p => (p.name || '').toLowerCase().includes(query)));
     }
 
-    document.getElementById('authForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const email = document.getElementById('email').value.trim();
-        const password = document.getElementById('password').value;
-        const btn = document.getElementById('submitBtn');
+    // Affiche/masque le sous-menu catégories
+    function toggleSubMenu() {
+      const sub = document.getElementById('sub-menu');
+      sub.style.display = (sub.style.display === 'block') ? 'none' : 'block';
+    }
 
-        btn.disabled = true;
-        btn.innerText = "TRAITEMENT...";
+    // Filtre les produits par catégorie (Tout / Free / Premium / Elite)
+    function filterCategory(cat) {
+      if (cat === 'Tout') renderProducts(allProducts);
+      else renderProducts(allProducts.filter(p => p.category === cat));
+      document.getElementById('side-menu').style.right = '-250px';
+    }
 
-        try {
-            if (isLogin) {
-                const { error } = await db.auth.signInWithPassword({ email, password });
-                if (error) throw error;
-                window.location.href = "profil.html";
-            } else {
-                // Inscription : Suppression du alert() pour fluidité totale
-                const { error } = await db.auth.signUp({ email, password });
-                if (error) throw error;
-                // Redirection immédiate après succès d'inscription
-                window.location.href = "profil.html";
-            }
-        } catch (err) {
-            alert("Erreur : " + err.message);
-            btn.disabled = false;
-            btn.innerText = isLogin ? "SE CONNECTER" : "S'INSCRIRE";
-        }
+    async function handlePurchase(encodedProduct, currentStock) {
+      if (currentStock > 0) {
+        const product = JSON.parse(decodeURIComponent(encodedProduct));
+        await supabaseClient.from('products').update({ stock_quantity: currentStock - 1 }).eq('id', product.id);
+        let panier = JSON.parse(localStorage.getItem('monPanier')) || [];
+        panier.push(product);
+        localStorage.setItem('monPanier', JSON.stringify(panier));
+        updateCartCount();
+        loadData();
+      }
+    }
+
+    function updateCartCount() {
+      let panier = JSON.parse(localStorage.getItem('monPanier')) || [];
+      document.getElementById('cart-count').innerText = panier.length;
+    }
+
+    // Synchronise le compteur si le panier change depuis un autre onglet
+    window.addEventListener('storage', (e) => {
+      if (e.key === 'monPanier') updateCartCount();
     });
-</script>
+
+    window.onload = loadData;
+  </script>
 </body>
 </html>
