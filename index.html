@@ -64,7 +64,7 @@
         text-shadow: 0 0 10px #00ffff;
     }
 
-    /* Grille produits (inchangée) */
+    /* Grille produits */
     .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; padding: 10px; }
     .product-card { position: relative; border: 2px solid #00ffff; border-radius: 15px; padding: 10px; background: #111; display: flex; flex-direction: column; min-height: 400px; }
     .product-img { width: 100%; height: 160px; background-size: contain; background-position: center; background-repeat: no-repeat; border-radius: 8px; border: 1.5px solid #DC143C; box-shadow: 0 0 5px rgba(220, 20, 60, 0.5); background-color: #000; }
@@ -81,7 +81,7 @@
 
     .no-results { text-align: center; color: #888; grid-column: 1 / -1; padding: 30px 0; }
 
-    /* Navigation — INTACTE, ne pas modifier */
+    /* Navigation */
     .floating-nav { position: fixed; bottom: 20px; left: 5%; right: 5%; background: #111; padding: 15px 25px; border-radius: 40px; border: 1px solid #00ffff; display: flex; justify-content: space-between; align-items: center; z-index: 1000; }
     .nav-link { text-decoration: none; color: white; font-size: 24px; }
     #cart-count { background: #00ffff; color: #000; border-radius: 50%; padding: 2px 8px; font-size: 0.7em; font-weight: bold; }
@@ -113,7 +113,7 @@
     <div class="products-grid" id="products-container"><p style="text-align: center;">Chargement...</p></div>
   </main>
 
-  <!-- NAV INFÉRIEURE — zone strictement intacte -->
+  <!-- NAV INFÉRIEURE -->
   <nav class="floating-nav">
     <a href="login.html" class="nav-link">👤</a>
     <a href="panier.html" class="nav-link">🧺 <span id="cart-count">0</span></a>
@@ -126,7 +126,7 @@
   <script>
     const supabaseClient = supabase.createClient('https://jsuvimxjmjiljntmgbzu.supabase.co', 'sb_publishable_Ngm29impwbTLGhuqyCxSJA_E1jXc1DX');
 
-    let allProducts = []; // liste complète, utilisée pour recherche + filtre catégorie
+    let allProducts = []; 
 
     async function loadData() {
       document.getElementById('main-logo').src = 'https://jsuvimxjmjiljntmgbzu.supabase.co/storage/v1/object/public/logos/site-logo.png?t=' + new Date().getTime();
@@ -134,15 +134,13 @@
       const { data: products } = await supabaseClient.from('products').select('*');
       allProducts = products || [];
 
-      buildCategoryMenu(allProducts); // génère le menu déroulant catégories
+      buildCategoryMenu(allProducts); 
       renderProducts(allProducts);
       updateCartCount();
     }
 
-    // Génère dynamiquement les entrées du sous-menu à partir des catégories réellement présentes en base
     function buildCategoryMenu(list) {
       const subMenu = document.getElementById('sub-menu');
-      // Garde uniquement le premier item ("Tous les produits"), retire les anciens s'il y en a
       subMenu.querySelectorAll('.menu-item.dynamic-cat').forEach(el => el.remove());
 
       const categories = [...new Set(list.map(p => p.category).filter(Boolean))];
@@ -155,7 +153,6 @@
       });
     }
 
-    // Affiche la liste de produits fournie (le champ "category" n'est jamais affiché sur la carte)
     function renderProducts(list) {
       const container = document.getElementById('products-container');
       container.innerHTML = '';
@@ -172,8 +169,9 @@
 
         const card = document.createElement('div');
         card.className = 'product-card';
-        const productParam = encodeURIComponent(JSON.stringify(p));
 
+        // L'encodage du produit entier a été supprimé ici pour éviter les bugs.
+        // On passe uniquement l'ID du produit (p.id) dans la fonction onclick du bouton.
         card.innerHTML = `
           ${discount > 0 ? `<div class="discount-badge">-${discount}%</div>` : ''}
           <div class="product-img" style="background-image: url('${p.image_url}')"></div>
@@ -183,7 +181,7 @@
               ${p.old_price > p.price ? `<span class="old-price">${p.old_price.toFixed(2)} €</span>` : ''}
               <span class="current-price">${p.price.toFixed(2)} €</span>
           </div>
-          <button class="buy-btn" ${isOutOfStock ? 'disabled' : ''} onclick="handlePurchase('${productParam}', ${stockVal})">
+          <button class="buy-btn" ${isOutOfStock ? 'disabled' : ''} onclick="handlePurchase('${p.id}')">
               ${isOutOfStock ? 'ÉPUISÉ' : 'AJOUTER AU PANIER'}
           </button>
         `;
@@ -191,35 +189,42 @@
       });
     }
 
-    // Recherche par nom (insensible à la casse)
     function searchProducts() {
       const query = document.getElementById('search-bar').value.toLowerCase();
       renderProducts(allProducts.filter(p => (p.name || '').toLowerCase().includes(query)));
     }
 
-    // Affiche/masque le sous-menu catégories
     function toggleSubMenu() {
       const sub = document.getElementById('sub-menu');
       sub.style.display = (sub.style.display === 'block') ? 'none' : 'block';
     }
 
-    // Filtre les produits par catégorie (sans jamais l'afficher sur la carte)
     function filterCategory(cat) {
       if (cat === 'Tous') renderProducts(allProducts);
       else renderProducts(allProducts.filter(p => p.category === cat));
       document.getElementById('side-menu').style.right = '-250px';
     }
 
-    async function handlePurchase(encodedProduct, currentStock) {
-      if (currentStock > 0) {
-        const product = JSON.parse(decodeURIComponent(encodedProduct));
-        await supabaseClient.from('products').update({ stock_quantity: currentStock - 1 }).eq('id', product.id);
-        let panier = JSON.parse(localStorage.getItem('monPanier')) || [];
-        panier.push(product);
-        localStorage.setItem('monPanier', JSON.stringify(panier));
-        updateCartCount();
-        loadData();
-      }
+    // Nouvelle version de la fonction handlePurchase : Elle utilise l'ID pour retrouver l'objet complet
+    async function handlePurchase(productId) {
+      // 1. On retrouve le produit complet grâce à son ID
+      const product = allProducts.find(p => p.id == productId);
+      
+      // 2. On vérifie s'il existe et s'il est en stock
+      if (!product || product.stock_quantity <= 0) return;
+      
+      const currentStock = product.stock_quantity;
+      
+      // 3. Mise à jour du stock dans Supabase
+      await supabaseClient.from('products').update({ stock_quantity: currentStock - 1 }).eq('id', product.id);
+      
+      // 4. Ajout au panier local
+      let panier = JSON.parse(localStorage.getItem('monPanier')) || [];
+      panier.push(product);
+      localStorage.setItem('monPanier', JSON.stringify(panier));
+      
+      updateCartCount();
+      loadData(); // Recharge la page pour actualiser l'affichage du stock
     }
 
     function updateCartCount() {
@@ -227,7 +232,6 @@
       document.getElementById('cart-count').innerText = panier.length;
     }
 
-    // Synchronise le compteur si le panier change depuis un autre onglet
     window.addEventListener('storage', (e) => {
       if (e.key === 'monPanier') updateCartCount();
     });
@@ -236,3 +240,4 @@
   </script>
 </body>
 </html>
+
