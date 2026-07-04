@@ -60,6 +60,7 @@
             color: #888; font-size: 0.85em; padding: 4px;
         }
         .react-btn.active { color: #00ffff; }
+        .react-btn:disabled { opacity: 0.5; cursor: wait; }
         .react-count { color: #aaa; font-size: 0.78em; min-width: 8px; }
         .reply-btn {
             all: unset; cursor: pointer; color: #888; font-size: 0.85em; font-weight: bold; padding: 4px;
@@ -133,6 +134,7 @@
         let allComments = [];
         let openReplies = new Set(); // ids des commentaires dont les réponses sont dépliées
         let expandedMessages = new Set(); // ids des messages dépliés en entier
+        let reactionInProgress = new Set(); // évite les doubles clics pendant l'appel réseau
 
         const msgInput = document.getElementById('msg');
         const sendBtn = document.getElementById('send-icon');
@@ -217,15 +219,22 @@
             localStorage.setItem(REACTIONS_KEY, JSON.stringify(obj));
         }
 
+        // Gère le clic sur 👍 ou 👎 : incrémente/décrémente en base et ne met à jour
+        // le localStorage QUE si Supabase confirme l'écriture (corrige le bug RLS silencieux)
         async function toggleReaction(commentId, type) {
+            if (reactionInProgress.has(commentId)) return; // évite le spam-click pendant la requête
+            reactionInProgress.add(commentId);
+            renderComments();
+
             const comment = allComments.find(c => c.id === commentId);
-            if (!comment) return;
+            if (!comment) { reactionInProgress.delete(commentId); return; }
 
             const reactions = getReactions();
             const current = reactions[commentId];
 
             let newLikes = comment.likes || 0;
             let newDislikes = comment.dislikes || 0;
+            const previousReactions = { ...reactions };
 
             if (current === type) {
                 if (type === 'like') newLikes = Math.max(0, newLikes - 1);
@@ -239,17 +248,36 @@
                 reactions[commentId] = type;
             }
 
-            saveReactions(reactions);
+            try {
+                // .select() force Supabase à renvoyer la ligne modifiée : si le tableau est vide,
+                // l'update a été silencieusement bloqué par une policy RLS manquante
+                const { data, error } = await db
+                    .from('comments')
+                    .update({ likes: newLikes, dislikes: newDislikes })
+                    .eq('id', commentId)
+                    .select();
 
-            const { error } = await db.from('comments').update({ likes: newLikes, dislikes: newDislikes }).eq('id', commentId);
-            if (error) {
+                if (error) throw error;
+
+                if (!data || data.length === 0) {
+                    showPopup("La réaction n'a pas été enregistrée en base (policy RLS manquante sur UPDATE pour la table comments). Ajoute une policy d'UPDATE publique dans Supabase.");
+                    reactionInProgress.delete(commentId);
+                    renderComments();
+                    return;
+                }
+
+                // Écriture confirmée en base : on peut mettre à jour le localStorage et l'affichage
+                saveReactions(reactions);
+                comment.likes = newLikes;
+                comment.dislikes = newDislikes;
+
+            } catch (error) {
                 console.error(error);
-                showPopup("Erreur lors de la mise à jour de la réaction.");
-                return;
+                showPopup("Erreur lors de la mise à jour de la réaction : " + (error.message || "erreur inconnue"));
+                saveReactions(previousReactions); // annule le changement local en cas d'échec réseau
             }
 
-            comment.likes = newLikes;
-            comment.dislikes = newDislikes;
+            reactionInProgress.delete(commentId);
             renderComments();
         }
 
@@ -334,6 +362,7 @@
             const author = maskEmail(rawAuthor);
             const initial = rawAuthor.charAt(0).toUpperCase();
             const myReaction = reactions[c.id];
+            const isBusy = reactionInProgress.has(c.id);
 
             // Troncature façon YouTube pour les messages longs
             let textHtml = c.message;
@@ -353,10 +382,10 @@
                     </div>
                     <div class="comment-text">${textHtml}</div>
                     <div class="comment-actions">
-                        <button class="react-btn ${myReaction === 'like' ? 'active' : ''}" onclick="toggleReaction(${c.id}, 'like')">
+                        <button class="react-btn ${myReaction === 'like' ? 'active' : ''}" ${isBusy ? 'disabled' : ''} onclick="toggleReaction(${c.id}, 'like')">
                             👍 <span class="react-count">${c.likes || 0}</span>
                         </button>
-                        <button class="react-btn ${myReaction === 'dislike' ? 'active' : ''}" onclick="toggleReaction(${c.id}, 'dislike')">
+                        <button class="react-btn ${myReaction === 'dislike' ? 'active' : ''}" ${isBusy ? 'disabled' : ''} onclick="toggleReaction(${c.id}, 'dislike')">
                             👎 <span class="react-count">${c.dislikes || 0}</span>
                         </button>
                         ${isTopLevel ? `<button class="reply-btn" onclick="toggleReplyInput(${c.id})">Répondre</button>` : ''}
