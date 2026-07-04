@@ -7,7 +7,6 @@
   <style>
     body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: #000; color: #fff; margin: 0; padding: 0; padding-bottom: 120px; }
     
-    /* Conteneur du logo avec bordure néon cyan */
     #header-wrapper { 
         width: 90%; 
         margin: 20px auto; 
@@ -52,6 +51,7 @@
     .menu-item { padding: 20px; color: #fff; text-decoration: none; display: block; cursor: pointer; border-bottom: 1px solid #333; }
     #sub-menu { display: none; background: #1a1a1a; padding-left: 20px; }
     #sub-menu .menu-item { color: #00ffff; font-size: 0.9em; }
+    #suggestions-link { margin-top: 15px; border-top: 1px solid #333; }
 
     /* Titre agrandi */
     .section-title { 
@@ -89,13 +89,16 @@
 </head>
 <body>
 
-  <!-- Menu latéral : catégories générées dynamiquement -->
+  <!-- Menu latéral : catégories fixes + Suggestions -->
   <div id="side-menu">
     <div class="menu-item" onclick="toggleSubMenu()">Catégories ▼</div>
     <div id="sub-menu">
-        <div class="menu-item" onclick="filterCategory('Tous')">Tous les produits</div>
-        <!-- Les catégories réelles (depuis Supabase) sont injectées ici en JS -->
+        <div class="menu-item" onclick="filterCategory('Tout')">Tout</div>
+        <div class="menu-item" onclick="filterCategory('Free')">Free</div>
+        <div class="menu-item" onclick="filterCategory('Premium')">Premium</div>
+        <div class="menu-item" onclick="filterCategory('Elite')">Elite</div>
     </div>
+    <div class="menu-item" id="suggestions-link" onclick="window.location.href='suggestions.html'">Suggestions</div>
     <div class="menu-item" onclick="document.getElementById('side-menu').style.right = '-250px'" style="color: #DC143C;">Fermer</div>
   </div>
 
@@ -134,23 +137,8 @@
       const { data: products } = await supabaseClient.from('products').select('*');
       allProducts = products || [];
 
-      buildCategoryMenu(allProducts); 
       renderProducts(allProducts);
       updateCartCount();
-    }
-
-    function buildCategoryMenu(list) {
-      const subMenu = document.getElementById('sub-menu');
-      subMenu.querySelectorAll('.menu-item.dynamic-cat').forEach(el => el.remove());
-
-      const categories = [...new Set(list.map(p => p.category).filter(Boolean))];
-      categories.forEach(cat => {
-        const item = document.createElement('div');
-        item.className = 'menu-item dynamic-cat';
-        item.textContent = cat;
-        item.onclick = () => filterCategory(cat);
-        subMenu.appendChild(item);
-      });
     }
 
     function renderProducts(list) {
@@ -170,8 +158,7 @@
         const card = document.createElement('div');
         card.className = 'product-card';
 
-        // L'encodage du produit entier a été supprimé ici pour éviter les bugs.
-        // On passe uniquement l'ID du produit (p.id) dans la fonction onclick du bouton.
+        // L'encodage buggé a été retiré, on utilise uniquement l'ID (p.id)
         card.innerHTML = `
           ${discount > 0 ? `<div class="discount-badge">-${discount}%</div>` : ''}
           <div class="product-img" style="background-image: url('${p.image_url}')"></div>
@@ -200,31 +187,27 @@
     }
 
     function filterCategory(cat) {
-      if (cat === 'Tous') renderProducts(allProducts);
+      if (cat === 'Tout') renderProducts(allProducts);
       else renderProducts(allProducts.filter(p => p.category === cat));
       document.getElementById('side-menu').style.right = '-250px';
     }
 
-    // Nouvelle version de la fonction handlePurchase : Elle utilise l'ID pour retrouver l'objet complet
+    // Fonction d'achat corrigée pour utiliser l'ID du produit
     async function handlePurchase(productId) {
-      // 1. On retrouve le produit complet grâce à son ID
       const product = allProducts.find(p => p.id == productId);
       
-      // 2. On vérifie s'il existe et s'il est en stock
       if (!product || product.stock_quantity <= 0) return;
       
       const currentStock = product.stock_quantity;
       
-      // 3. Mise à jour du stock dans Supabase
       await supabaseClient.from('products').update({ stock_quantity: currentStock - 1 }).eq('id', product.id);
       
-      // 4. Ajout au panier local
       let panier = JSON.parse(localStorage.getItem('monPanier')) || [];
       panier.push(product);
       localStorage.setItem('monPanier', JSON.stringify(panier));
       
       updateCartCount();
-      loadData(); // Recharge la page pour actualiser l'affichage du stock
+      loadData();
     }
 
     function updateCartCount() {
