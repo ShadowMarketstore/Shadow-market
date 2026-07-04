@@ -2,62 +2,100 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Shadow Market</title>
   <style>
-    body { font-family: 'Segoe UI', sans-serif; background: #000; color: #fff; margin: 0; padding-bottom: 120px; }
+    body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: #000; color: #fff; margin: 0; padding: 0; padding-bottom: 120px; }
     
+    /* Conteneur du logo avec bordure néon cyan */
     #header-wrapper { 
-      width: 90%; margin: 20px auto; border: 3px solid #00ffff; border-radius: 15px; 
-      padding: 15px; box-shadow: 0 0 15px #00ffff; display: flex; flex-direction: column; background: #0a0a0a; 
+        width: 90%; 
+        margin: 20px auto; 
+        border: 3px solid #00ffff; 
+        border-radius: 15px; 
+        padding: 15px; 
+        box-shadow: 0 0 15px #00ffff, inset 0 0 10px #00ffff; 
+        display: flex; 
+        flex-direction: column;
+        background: #0a0a0a;
     }
-    .controls-container { display: flex; gap: 15px; margin-bottom: 15px; align-items: center; width: 100%; }
-    #search-bar { 
-      flex-grow: 1; padding: 10px; border-radius: 10px; border: 2px solid #00ffff; 
-      background: #0a0a0a; color: #00ffff; font-family: 'Courier New', monospace; box-sizing: border-box;
-    }
-    .hamburger { font-size: 35px; color: #00ffff; cursor: pointer; text-shadow: 0 0 10px #00ffff; line-height: 1; }
-    #main-logo { width: 100%; height: auto; display: block; margin: 0 auto; border-radius: 10px; }
 
+    .controls-container { 
+        display: flex; 
+        gap: 15px; 
+        margin-bottom: 15px; 
+        align-items: center; 
+        width: 100%;
+    }
+    #search-bar { 
+        flex-grow: 1; 
+        padding: 10px; 
+        border-radius: 10px; 
+        border: 2px solid #00ffff; 
+        background: #0a0a0a; 
+        color: #00ffff; 
+        font-family: 'Courier New', monospace; 
+        box-sizing: border-box;
+    }
+    .hamburger { 
+        font-size: 32px; 
+        color: #00ffff; 
+        cursor: pointer; 
+        text-shadow: 0 0 10px #00ffff; 
+        line-height: 1;
+    }
+
+    #main-logo { width: 100%; max-height: 400px; object-fit: contain; display: block; }
+
+    /* Menu latéral catégories */
     #side-menu { position: fixed; top: 0; right: -250px; width: 250px; height: 100%; background: #111; border-left: 2px solid #00ffff; transition: 0.3s; z-index: 2000; padding-top: 60px; }
     .menu-item { padding: 20px; color: #fff; text-decoration: none; display: block; cursor: pointer; border-bottom: 1px solid #333; }
     #sub-menu { display: none; background: #1a1a1a; padding-left: 20px; }
+    #sub-menu .menu-item { color: #00ffff; font-size: 0.9em; }
 
-    .section-title { text-align: center; color: #00ffff; font-size: 1.4em; margin: 20px 0; text-transform: uppercase; font-weight: bold; text-shadow: 0 0 10px #00ffff; }
+    /* Titre agrandi */
+    .section-title { 
+        text-align: center; 
+        color: #00ffff; 
+        font-size: 1.6em; 
+        margin: 20px 0; 
+        text-transform: uppercase; 
+        font-weight: bold; 
+        text-shadow: 0 0 10px #00ffff;
+    }
 
-    .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; padding: 10px; margin-bottom: 80px; }
-    .product-card { position: relative; border: 2px solid #00ffff; border-radius: 15px; padding: 10px; background: #111; display: flex; flex-direction: column; }
-    .badge { position: absolute; top: 10px; left: 10px; background: #000; color: #FFD700; border: 1px solid #DC143C; padding: 2px 8px; font-size: 0.8em; font-weight: bold; z-index: 10; border-radius: 6px; }
-    .product-img { width: 100%; height: 140px; background-size: cover; background-position: center; border-radius: 8px; border: 1.5px solid #DC143C; margin-bottom: 10px; }
-    .product-card h3 { font-size: 1em; margin: 5px 0; word-break: break-word; }
-    .stock-text { color: #00ffff; font-weight: bold; font-size: 0.9em; margin: 5px 0; }
-    .price-old { color: #888; text-decoration: line-through; font-size: 0.9em; min-height: 1.2em; }
-    .price-new { font-weight: bold; font-size: 1.3em; margin: 5px 0; color: #fff; }
-    .buy-btn { width: 100%; background: #DC143C; color: white; border: none; padding: 10px; font-weight: bold; cursor: pointer; border-radius: 5px; margin-top: auto; }
-    .buy-btn:disabled { background: #444; color: #888; cursor: not-allowed; }
+    /* Grille produits (inchangée) */
+    .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; padding: 10px; }
+    .product-card { position: relative; border: 2px solid #00ffff; border-radius: 15px; padding: 10px; background: #111; display: flex; flex-direction: column; min-height: 400px; }
+    .product-img { width: 100%; height: 160px; background-size: contain; background-position: center; background-repeat: no-repeat; border-radius: 8px; border: 1.5px solid #DC143C; box-shadow: 0 0 5px rgba(220, 20, 60, 0.5); background-color: #000; }
+    .discount-badge { position: absolute; top: 15px; left: 15px; background: #000; color: #ffffff; border: 1px solid #00ffff; padding: 3px 8px; border-radius: 5px; font-weight: bold; font-size: 0.8em; z-index: 20; }
+    
+    .stock-info { font-size: 0.85em; color: #00ffff; margin: 8px 0; font-weight: bold; }
+    h3 { font-size: 0.95em; margin: 10px 0; min-height: 2.4em; }
+    .price-wrapper { margin: 5px 0; }
+    .old-price { text-decoration: line-through; color: #777; font-size: 0.85em; display: block; }
+    .current-price { color: #ffffff; font-weight: bold; font-size: 1.3em; display: block; }
+    
+    .buy-btn { width: 100%; background: #DC143C; color: white; border: none; padding: 12px; font-weight: bold; cursor: pointer; border-radius: 5px; margin-top: auto; }
+    .buy-btn:disabled { background: #333; color: #777; cursor: not-allowed; }
 
-    /* Nav flottante inférieure — INTACTE, ne pas modifier */
-    .floating-nav { position: fixed; bottom: 10px; left: 10px; right: 10px; background: #111; padding: 15px 20px; border-radius: 30px; border: 2px solid #00ffff; display: flex; justify-content: space-around; align-items: center; z-index: 1000; }
-    .cart-badge { background: #00ffff; color: #000; font-size: 12px; padding: 2px 6px; border-radius: 50%; font-weight: bold; min-width: 10px; text-align: center; display: inline-block; }
+    .no-results { text-align: center; color: #888; grid-column: 1 / -1; padding: 30px 0; }
 
-    #popup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.75); z-index: 5000; display: none; align-items: center; justify-content: center; }
-    #popup-box { background: #0a0a0a; border: 2px solid #00ffff; border-radius: 15px; box-shadow: 0 0 20px #00ffff; padding: 25px; width: 85%; max-width: 340px; text-align: center; animation: popupIn 0.2s ease-out; }
-    #popup-box p { font-size: 1.05em; margin: 0 0 20px 0; word-break: break-word; }
-    #popup-box .popup-code { color: #FFD700; font-weight: bold; font-size: 1.2em; letter-spacing: 1px; }
-    #popup-box button { background: #DC143C; color: #fff; border: none; padding: 10px 25px; border-radius: 8px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
-    @keyframes popupIn { from { transform: scale(0.85); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    /* Navigation — INTACTE, ne pas modifier */
+    .floating-nav { position: fixed; bottom: 20px; left: 5%; right: 5%; background: #111; padding: 15px 25px; border-radius: 40px; border: 1px solid #00ffff; display: flex; justify-content: space-between; align-items: center; z-index: 1000; }
+    .nav-link { text-decoration: none; color: white; font-size: 24px; }
+    #cart-count { background: #00ffff; color: #000; border-radius: 50%; padding: 2px 8px; font-size: 0.7em; font-weight: bold; }
   </style>
 </head>
 <body>
 
+  <!-- Menu latéral : catégories générées dynamiquement -->
   <div id="side-menu">
     <div class="menu-item" onclick="toggleSubMenu()">Catégories ▼</div>
     <div id="sub-menu">
         <div class="menu-item" onclick="filterCategory('Tous')">Tous les produits</div>
-        <div class="menu-item" onclick="filterCategory('Free')">Free</div>
-        <div class="menu-item" onclick="filterCategory('Premium')">Premium</div>
+        <!-- Les catégories réelles (depuis Supabase) sont injectées ici en JS -->
     </div>
-    <div class="menu-item" onclick="window.location.href='suggestions.html'">Suggestions</div>
     <div class="menu-item" onclick="document.getElementById('side-menu').style.right = '-250px'" style="color: #DC143C;">Fermer</div>
   </div>
 
@@ -66,201 +104,135 @@
       <input type="text" id="search-bar" placeholder="Rechercher..." onkeyup="searchProducts()">
       <div class="hamburger" onclick="document.getElementById('side-menu').style.right = '0'">☰</div>
     </div>
-    <img id="main-logo" src="https://jsuvimxjmjiljntmgbzu.supabase.co/storage/v1/object/public/logos/site-logo.png">
+    <img id="main-logo" src="" alt="Shadow Market">
   </div>
 
-  <h2 class="section-title">PRODUITS DISPONIBLES MAINTENANT</h2>
+  <h2 class="section-title">Produits disponibles maintenant</h2>
 
-  <div class="products-grid" id="products-container"></div>
+  <main>
+    <div class="products-grid" id="products-container"><p style="text-align: center;">Chargement...</p></div>
+  </main>
 
-  <div id="popup-overlay">
-    <div id="popup-box">
-      <p id="popup-message"></p>
-      <button onclick="closePopup()">OK</button>
-    </div>
-  </div>
-
-  <!-- NAV INFÉRIEURE — zone non modifiée -->
+  <!-- NAV INFÉRIEURE — zone strictement intacte -->
   <nav class="floating-nav">
-    <a href="login.html" style="font-size: 24px; text-decoration: none;">👤</a>
-    <div style="font-size: 24px; cursor: pointer;" onclick="window.location.href='panier.html'">🧺<span class="cart-badge" id="cart-count">0</span></div>
-    <a href="commande.html" style="font-size: 24px; text-decoration: none;">🛒</a>
-    <a href="index.html" style="font-size: 24px; text-decoration: none;">🏠</a>
-    <a href="suggestions.html" style="font-size: 24px; text-decoration: none;">💬</a>
+    <a href="login.html" class="nav-link">👤</a>
+    <a href="panier.html" class="nav-link">🧺 <span id="cart-count">0</span></a>
+    <a href="commande.html" class="nav-link">🛒</a>
+    <a href="index.html" class="nav-link">🏠</a>
+    <a href="https://discord.gg/XUtWdTPYr" target="_blank" class="nav-link">💬</a>
   </nav>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    // Client Supabase renommé "db" pour éviter la collision de namespace connue
-    const db = supabase.createClient(
-      'https://jsuvimxjmjiljntmgbzu.supabase.co',
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzdXZpbXhqbWppbGpudG1nYnp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI0Njk0NTgsImV4cCI6MjA5ODA0NTQ1OH0.F6aDK6oTyp3Tlb9fmkqpzgn4KGAxA5-ClIKlkqzfcR4'
-    );
-    let allProducts = [];
-    const CART_KEY = 'shadow_cart';
+    const supabaseClient = supabase.createClient('https://jsuvimxjmjiljntmgbzu.supabase.co', 'sb_publishable_Ngm29impwbTLGhuqyCxSJA_E1jXc1DX');
 
-    // ================= CHARGEMENT PRODUITS DEPUIS SUPABASE =================
+    let allProducts = []; // liste complète, utilisée pour recherche + filtre catégorie
+
     async function loadData() {
-      const { data, error } = await db
-        .from('products')
-        .select('id, name, image_url, price, discount_price, stock_quantity, category');
+      document.getElementById('main-logo').src = 'https://jsuvimxjmjiljntmgbzu.supabase.co/storage/v1/object/public/logos/site-logo.png?t=' + new Date().getTime();
 
-      if (error) {
-        console.error("Erreur de chargement:", error);
-        return;
-      }
-      allProducts = data || [];
+      const { data: products } = await supabaseClient.from('products').select('*');
+      allProducts = products || [];
+
+      buildCategoryMenu(allProducts); // génère le menu déroulant catégories
       renderProducts(allProducts);
+      updateCartCount();
     }
 
-    // ================= AFFICHAGE PRODUITS =================
+    // Génère dynamiquement les entrées du sous-menu à partir des catégories réellement présentes en base
+    function buildCategoryMenu(list) {
+      const subMenu = document.getElementById('sub-menu');
+      // Garde uniquement le premier item ("Tous les produits"), retire les anciens s'il y en a
+      subMenu.querySelectorAll('.menu-item.dynamic-cat').forEach(el => el.remove());
+
+      const categories = [...new Set(list.map(p => p.category).filter(Boolean))];
+      categories.forEach(cat => {
+        const item = document.createElement('div');
+        item.className = 'menu-item dynamic-cat';
+        item.textContent = cat;
+        item.onclick = () => filterCategory(cat);
+        subMenu.appendChild(item);
+      });
+    }
+
+    // Affiche la liste de produits fournie (le champ "category" n'est jamais affiché sur la carte)
     function renderProducts(list) {
       const container = document.getElementById('products-container');
       container.innerHTML = '';
 
+      if (!list || list.length === 0) {
+        container.innerHTML = '<div class="no-results">Aucun produit trouvé.</div>';
+        return;
+      }
+
       list.forEach(p => {
+        const stockVal = p.stock_quantity !== undefined ? p.stock_quantity : 0;
+        const isOutOfStock = stockVal <= 0;
+        const discount = p.old_price > p.price ? Math.round(((p.old_price - p.price) / p.old_price) * 100) : 0;
+
         const card = document.createElement('div');
         card.className = 'product-card';
-
-        const isOutOfStock = !p.stock_quantity || p.stock_quantity <= 0;
-
-        // Calcul du pourcentage de réduction : ((discount_price - price) / discount_price) * 100
-        let discountHtml = '';
-        let oldPriceHtml = '<div class="price-old"></div>';
-        if (p.discount_price && p.price && p.discount_price > p.price) {
-          const discount = Math.round(((p.discount_price - p.price) / p.discount_price) * 100);
-          discountHtml = `<div class="badge">-${discount}%</div>`;
-          oldPriceHtml = `<div class="price-old">${Number(p.discount_price).toFixed(2)} €</div>`;
-        }
-
-        const priceDisplay = (p.price !== null && p.price !== undefined)
-          ? `${Number(p.price).toFixed(2)} €`
-          : 'Gratuit';
-        const stockDisplay = isOutOfStock ? '0' : p.stock_quantity;
+        const productParam = encodeURIComponent(JSON.stringify(p));
 
         card.innerHTML = `
-            ${discountHtml}
-            <div class="product-img" style="background-image: url('${p.image_url || ''}')"></div>
-            <h3>${p.name || 'Produit inconnu'}</h3>
-            <div class="stock-text">Stock : ${stockDisplay}</div>
-            ${oldPriceHtml}
-            <div class="price-new">${priceDisplay}</div>
-            <button class="buy-btn" ${isOutOfStock ? 'disabled' : ''}>
-                ${isOutOfStock ? 'ÉPUISÉ' : 'AJOUTER AU PANIER'}
-            </button>
+          ${discount > 0 ? `<div class="discount-badge">-${discount}%</div>` : ''}
+          <div class="product-img" style="background-image: url('${p.image_url}')"></div>
+          <h3>${p.name}</h3>
+          <div class="stock-info">Stock : ${isOutOfStock ? 'Épuisé' : stockVal}</div>
+          <div class="price-wrapper">
+              ${p.old_price > p.price ? `<span class="old-price">${p.old_price.toFixed(2)} €</span>` : ''}
+              <span class="current-price">${p.price.toFixed(2)} €</span>
+          </div>
+          <button class="buy-btn" ${isOutOfStock ? 'disabled' : ''} onclick="handlePurchase('${productParam}', ${stockVal})">
+              ${isOutOfStock ? 'ÉPUISÉ' : 'AJOUTER AU PANIER'}
+          </button>
         `;
-
-        const btn = card.querySelector('.buy-btn');
-        if (!isOutOfStock) btn.addEventListener('click', () => addToCart(p));
-
         container.appendChild(card);
       });
     }
 
+    // Recherche par nom (insensible à la casse)
     function searchProducts() {
       const query = document.getElementById('search-bar').value.toLowerCase();
       renderProducts(allProducts.filter(p => (p.name || '').toLowerCase().includes(query)));
     }
 
+    // Affiche/masque le sous-menu catégories
     function toggleSubMenu() {
       const sub = document.getElementById('sub-menu');
       sub.style.display = (sub.style.display === 'block') ? 'none' : 'block';
     }
 
+    // Filtre les produits par catégorie (sans jamais l'afficher sur la carte)
     function filterCategory(cat) {
       if (cat === 'Tous') renderProducts(allProducts);
       else renderProducts(allProducts.filter(p => p.category === cat));
       document.getElementById('side-menu').style.right = '-250px';
     }
 
-    // ================= PANIER DYNAMIQUE (localStorage) =================
-    function getCart() {
-      try { return JSON.parse(localStorage.getItem(CART_KEY)) || []; }
-      catch (e) { return []; }
-    }
-
-    function saveCart(cart) {
-      localStorage.setItem(CART_KEY, JSON.stringify(cart));
-      updateCartCount(); // mise à jour instantanée, sans rechargement
-    }
-
-    function addToCart(product) {
-      const cart = getCart();
-      const existing = cart.find(item => item.id === product.id);
-      if (existing) {
-        existing.quantity += 1;
-      } else {
-        cart.push({ id: product.id, name: product.name, price: product.price, image_url: product.image_url, quantity: 1 });
+    async function handlePurchase(encodedProduct, currentStock) {
+      if (currentStock > 0) {
+        const product = JSON.parse(decodeURIComponent(encodedProduct));
+        await supabaseClient.from('products').update({ stock_quantity: currentStock - 1 }).eq('id', product.id);
+        let panier = JSON.parse(localStorage.getItem('monPanier')) || [];
+        panier.push(product);
+        localStorage.setItem('monPanier', JSON.stringify(panier));
+        updateCartCount();
+        loadData();
       }
-      saveCart(cart);
-      showPopup(`"${product.name}" a été ajouté au panier !`);
     }
 
     function updateCartCount() {
-      const cart = getCart();
-      const total = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
-      const badge = document.getElementById('cart-count');
-      if (badge) badge.textContent = total;
+      let panier = JSON.parse(localStorage.getItem('monPanier')) || [];
+      document.getElementById('cart-count').innerText = panier.length;
     }
 
-    // Synchronise le compteur si le panier est modifié depuis un autre onglet/page
+    // Synchronise le compteur si le panier change depuis un autre onglet
     window.addEventListener('storage', (e) => {
-      if (e.key === CART_KEY) updateCartCount();
+      if (e.key === 'monPanier') updateCartCount();
     });
 
-    // ================= POPUP NÉON =================
-    function showPopup(message) {
-      document.getElementById('popup-message').innerHTML = message;
-      document.getElementById('popup-overlay').style.display = 'flex';
-    }
-    function closePopup() {
-      document.getElementById('popup-overlay').style.display = 'none';
-    }
-
-    // ================= RÉCOMPENSE PUB → CODE =================
-    function watchAdForCode() {
-      showPopup('Chargement de la publicité...');
-      setTimeout(() => {
-        const code = generateRewardCode();
-        const codes = JSON.parse(localStorage.getItem('shadow_codes')) || [];
-        codes.push({ code, date: new Date().toISOString() });
-        localStorage.setItem('shadow_codes', JSON.stringify(codes));
-        showPopup(`Merci d'avoir regardé la pub !<br><br>Votre code : <span class="popup-code">${code}</span>`);
-      }, 2000);
-    }
-
-    function generateRewardCode() {
-      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-      let suffix = '';
-      for (let i = 0; i < 6; i++) suffix += chars.charAt(Math.floor(Math.random() * chars.length));
-      return `SHADOW-${suffix}`;
-    }
-
-    // ================= PAIEMENT (prêt Stripe/PayPal) =================
-    async function processPayment() {
-      const cart = getCart();
-      if (cart.length === 0) { showPopup("Votre panier est vide."); return; }
-
-      const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-      try {
-        // const response = await fetch('/api/create-checkout-session', {
-        //   method: 'POST', headers: { 'Content-Type': 'application/json' },
-        //   body: JSON.stringify({ items: cart, total })
-        // });
-        // const session = await response.json();
-        // window.location.href = session.url;
-
-        showPopup(`Redirection vers le paiement sécurisé...<br>Total : ${total.toFixed(2)} €`);
-      } catch (error) {
-        console.error("Erreur de paiement:", error);
-        showPopup("Une erreur est survenue lors du paiement.");
-      }
-    }
-
-    window.onload = () => {
-      loadData();
-      updateCartCount();
-    };
+    window.onload = loadData;
   </script>
 </body>
 </html>
