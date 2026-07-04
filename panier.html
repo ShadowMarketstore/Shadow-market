@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mon Panier - Shadow Market</title>
-    <!-- Chargement de la bibliothèque officielle Supabase JS -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
@@ -17,225 +16,78 @@
             --border-color: #2b2b36;
         }
 
-        body { 
-            background: var(--bg-color); 
-            color: var(--text-color); 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            padding: 20px; 
-            margin: 0;
-        }
+        body { background: var(--bg-color); color: var(--text-color); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; margin: 0; }
 
         h1 {
-            font-size: 1.8rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--text-color);
-            border-bottom: 2px solid var(--cyan-neon);
-            padding-bottom: 10px;
-            margin-bottom: 20px;
+            font-size: 1.8rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-color);
+            border-bottom: 2px solid var(--cyan-neon); padding-bottom: 10px; margin-bottom: 20px;
             text-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
         }
 
-        .cart-wrapper {
-            max-width: 600px;
-            margin: 0 auto;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
+        .cart-wrapper { max-width: 600px; margin: 0 auto; display: flex; flex-direction: column; gap: 15px; }
 
         .item-container {
-            border: 1px solid var(--cyan-neon);
-            border-radius: 8px;
-            background: #111;
-            overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0, 255, 255, 0.05);
-            transition: transform 0.2s ease;
-            margin-bottom: 15px;
+            border: 1px solid var(--cyan-neon); border-radius: 8px; background: #111; overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 255, 255, 0.05); transition: transform 0.2s ease; margin-bottom: 15px;
         }
 
-        .item-card { 
-            padding: 15px; 
-            display: flex; 
-            align-items: center; 
-            justify-content: space-between; 
-            background: #111;
-            border-bottom: 1px dashed rgba(0, 255, 255, 0.1);
-        }
+        .item-card { padding: 15px; display: flex; align-items: center; justify-content: space-between; background: #111; border-bottom: 1px dashed rgba(0, 255, 255, 0.1); }
 
-        /* Style des images de produits */
-        .product-img {
-            width: 55px;
-            height: 55px;
-            object-fit: cover;
-            border-radius: 6px;
-            border: 1px solid var(--cyan-neon);
-            box-shadow: 0 0 8px rgba(0, 255, 255, 0.2);
-        }
+        .product-img { width: 55px; height: 55px; object-fit: cover; border-radius: 6px; border: 1px solid var(--cyan-neon); box-shadow: 0 0 8px rgba(0, 255, 255, 0.2); }
 
-        .item-info { 
-            flex-grow: 1; 
-            margin-left: 15px; 
-        }
+        .item-info { flex-grow: 1; margin-left: 15px; }
+        .item-title { font-weight: bold; font-size: 1.05rem; color: var(--text-color); }
+        .item-price { color: var(--cyan-neon); font-size: 0.95rem; font-weight: bold; margin-top: 3px; }
 
-        .item-title {
-            font-weight: bold;
-            font-size: 1.05rem;
-            color: var(--text-color);
-        }
+        .remove-btn { color: var(--crimson-neon); font-size: 1.6em; cursor: pointer; border: none; background: none; font-weight: bold; padding: 0 10px; transition: transform 0.2s ease; }
+        .remove-btn:hover { transform: scale(1.2); }
 
-        .item-price {
-            color: var(--cyan-neon);
-            font-size: 0.95rem;
-            font-weight: bold;
-            margin-top: 3px;
-        }
-
-        .remove-btn { 
-            color: var(--crimson-neon); 
-            font-size: 1.6em; 
-            cursor: pointer; 
-            border: none; 
-            background: none; 
-            font-weight: bold; 
-            padding: 0 10px; 
-            transition: transform 0.2s ease;
-        }
-        
-        .remove-btn:hover {
-            transform: scale(1.2);
-        }
-
-        /* Styles pour la description déroulante */
         .desc-toggle-btn {
-            background: rgba(0, 255, 255, 0.03);
-            border: none;
-            color: var(--cyan-neon);
-            width: 100%;
-            padding: 10px 15px;
-            text-align: left;
-            font-size: 0.85rem;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            outline: none;
-            font-weight: 500;
+            background: rgba(0, 255, 255, 0.03); border: none; color: var(--cyan-neon); width: 100%; padding: 10px 15px;
+            text-align: left; font-size: 0.85rem; cursor: pointer; display: flex; justify-content: space-between;
+            align-items: center; outline: none; font-weight: 500;
         }
+        .desc-toggle-btn:hover { background: rgba(0, 255, 255, 0.08); }
 
-        .desc-toggle-btn:hover {
-            background: rgba(0, 255, 255, 0.08);
-        }
+        .desc-content { display: none; padding: 12px 15px; background: #09090d; font-size: 0.85rem; color: #ccc; line-height: 1.4; border-top: 1px solid rgba(0, 255, 255, 0.05); }
+        .desc-content.open { display: block; }
 
-        .desc-content {
-            display: none;
-            padding: 12px 15px;
-            background: #09090d;
-            font-size: 0.85rem;
-            color: #ccc;
-            line-height: 1.4;
-            border-top: 1px solid rgba(0, 255, 255, 0.05);
-        }
+        .promo-section { margin-top: 15px; display: flex; gap: 10px; }
 
-        .desc-content.open {
-            display: block;
-        }
+        input[type="text"] { padding: 12px; background: #111; border: 1px solid var(--cyan-neon); color: white; border-radius: 6px; width: 70%; font-size: 0.95rem; outline: none; }
+        input[type="text"]:focus { box-shadow: 0 0 8px rgba(0, 255, 255, 0.3); }
 
-        /* Sections des Codes */
-        .promo-section { 
-            margin-top: 15px; 
-            display: flex; 
-            gap: 10px; 
-        }
+        .btn-promo { padding: 12px; background: var(--cyan-neon); color: #000; border: none; cursor: pointer; font-weight: bold; border-radius: 6px; font-size: 0.95rem; flex-grow: 1; transition: opacity 0.2s ease; }
+        .btn-promo:hover { opacity: 0.9; }
+        .btn-promo:disabled { opacity: 0.5; cursor: not-allowed; }
 
-        input[type="text"] { 
-            padding: 12px; 
-            background: #111; 
-            border: 1px solid var(--cyan-neon); 
-            color: white; 
-            border-radius: 6px; 
-            width: 70%; 
-            font-size: 0.95rem;
-            outline: none;
-        }
-
-        input[type="text"]:focus {
-            box-shadow: 0 0 8px rgba(0, 255, 255, 0.3);
-        }
-
-        .btn-promo { 
-            padding: 12px; 
-            background: var(--cyan-neon); 
-            color: #000; 
-            border: none; 
-            cursor: pointer; 
-            font-weight: bold; 
-            border-radius: 6px; 
-            font-size: 0.95rem;
-            flex-grow: 1;
-            transition: opacity 0.2s ease;
-        }
-
-        .btn-promo:hover {
-            opacity: 0.9;
-        }
-
-        .btn-promo:disabled { 
-            opacity: 0.5; 
-            cursor: not-allowed; 
-        }
-
-        .promo-msg {
-            font-size: 0.85rem; 
-            margin-top: 6px; 
-            font-weight: 500;
-        }
+        .promo-msg { font-size: 0.85rem; margin-top: 6px; font-weight: 500; }
         
-        .btn-paiement { 
-            width: 100%; 
-            padding: 15px; 
-            background: var(--crimson-neon); 
-            border: none; 
-            color: white; 
-            font-weight: bold; 
-            cursor: pointer; 
-            margin-top: 25px; 
-            font-size: 1.1em; 
-            border-radius: 8px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            box-shadow: 0 4px 15px rgba(255, 51, 51, 0.2);
-            transition: opacity 0.2s ease;
+        .btn-paiement {
+            width: 100%; padding: 15px; background: var(--crimson-neon); border: none; color: white; font-weight: bold;
+            cursor: pointer; margin-top: 25px; font-size: 1.1em; border-radius: 8px; text-transform: uppercase;
+            letter-spacing: 1px; box-shadow: 0 4px 15px rgba(255, 51, 51, 0.2); transition: opacity 0.2s ease;
         }
+        .btn-paiement:hover { opacity: 0.95; }
 
-        .btn-paiement:hover {
-            opacity: 0.95;
-        }
+        .total-section { font-size: 1.5em; font-weight: bold; margin-top: 25px; text-align: center; color: var(--cyan-neon); text-shadow: 0 0 10px rgba(0, 255, 255, 0.2); }
 
-        .total-section { 
-            font-size: 1.5em; 
-            font-weight: bold; 
-            margin-top: 25px; 
-            text-align: center; 
-            color: var(--cyan-neon); 
-            text-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
-        }
+        .account-banner { text-align: center; color: var(--text-muted); font-size: 0.85rem; margin-bottom: 15px; }
     </style>
 </head>
 <body>
 
     <div class="cart-wrapper">
         <h1>Mon Panier</h1>
+        <div id="account-banner" class="account-banner"></div>
         <div id="panier-liste"></div>
         
-        <!-- Code Créateur -->
         <div class="promo-section">
             <input type="text" id="code-createur-input" placeholder="Code créateur...">
             <button class="btn-promo" id="btn-createur" onclick="appliquerCreateur()">Appliquer</button>
         </div>
         <p id="msg-createur" class="promo-msg"></p>
 
-        <!-- Code de Réduction (Cible la table 'coupons' avec is_active et discount_percent) -->
         <div class="promo-section">
             <input type="text" id="code-points-input" placeholder="Code réduction...">
             <button class="btn-promo" id="btn-points" onclick="appliquerPoints()">Appliquer</button>
@@ -250,7 +102,6 @@
     </div>
 
     <script>
-        // Initialisation de la base Supabase
         const db = supabase.createClient(
           'https://jsuvimxjmjiljntmgbzu.supabase.co',
           'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzdXZpbXhqbWppbGpudG1nYnp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI0Njk0NTgsImV4cCI6MjA5ODA0NTQ1OH0.F6aDK6oTyp3Tlb9fmkqpzgn4KGAxA5-ClIKlkqzfcR4'
@@ -258,10 +109,52 @@
 
         let prixBaseTotal = 0;
         let tauxCreateur = 0;
-        let remisePoints = 0; 
+        let remisePoints = 0;
 
-        function chargerPanier() {
-            let panier = JSON.parse(localStorage.getItem('monPanier')) || [];
+        // ================= PANIER LIÉ AU COMPTE =================
+        function guestCartKey() { return 'monPanier_guest'; }
+
+        async function getCurrentUser() {
+          const { data: { user } } = await db.auth.getUser();
+          return user;
+        }
+
+        async function loadCartArray() {
+          const user = await getCurrentUser();
+          if (user) {
+            const { data, error } = await db.from('carts').select('items').eq('user_id', user.id).maybeSingle();
+            if (error) {
+              console.error("Erreur chargement panier:", error);
+              return [];
+            }
+            const items = (data && data.items) ? data.items : [];
+            localStorage.setItem('monPanier_' + user.id, JSON.stringify(items));
+            return items;
+          } else {
+            return JSON.parse(localStorage.getItem(guestCartKey())) || [];
+          }
+        }
+
+        async function saveCartArray(cartArr) {
+          const user = await getCurrentUser();
+          if (user) {
+            localStorage.setItem('monPanier_' + user.id, JSON.stringify(cartArr));
+            const { error } = await db.from('carts').upsert({ user_id: user.id, items: cartArr, updated_at: new Date().toISOString() });
+            if (error) console.error("Erreur sauvegarde panier:", error);
+          } else {
+            localStorage.setItem(guestCartKey(), JSON.stringify(cartArr));
+          }
+        }
+
+        async function afficherBanniereCompte() {
+          const user = await getCurrentUser();
+          const banner = document.getElementById('account-banner');
+          banner.textContent = user ? `Connecté : ${user.email}` : "Panier invité (connectez-vous pour le sauvegarder)";
+        }
+
+        async function chargerPanier() {
+            await afficherBanniereCompte();
+            let panier = await loadCartArray();
             let liste = document.getElementById('panier-liste');
             prixBaseTotal = 0;
             liste.innerHTML = '';
@@ -305,7 +198,6 @@
         function toggleDescription(index) {
             const descDiv = document.getElementById(`desc-${index}`);
             const arrow = document.getElementById(`arrow-${index}`);
-            
             if (descDiv.classList.contains('open')) {
                 descDiv.classList.remove('open');
                 arrow.innerText = "▼";
@@ -315,7 +207,6 @@
             }
         }
 
-        // Vérification des codes créateurs (table 'creators')
         async function appliquerCreateur() {
             const codeSaisi = document.getElementById('code-createur-input').value.trim();
             const msg = document.getElementById('msg-createur');
@@ -327,10 +218,7 @@
             msg.style.color = "#aaa";
 
             try {
-                const { data, error } = await db
-                    .from('creators')
-                    .select('commission_rate')
-                    .ilike('code', codeSaisi);
+                const { data, error } = await db.from('creators').select('commission_rate').ilike('code', codeSaisi);
 
                 if (error) {
                     msg.innerText = "Erreur de connexion : " + error.message;
@@ -341,7 +229,7 @@
                     msg.style.color = "#ff3333";
                     tauxCreateur = 0;
                 } else {
-                    tauxCreateur = parseFloat(data[0].commission_rate); 
+                    tauxCreateur = parseFloat(data[0].commission_rate);
                     msg.innerText = `Code appliqué ! Remise de ${(tauxCreateur * 100).toFixed(0)}% activée.`;
                     msg.style.color = "#00ff00";
                 }
@@ -354,7 +242,6 @@
             }
         }
 
-        // Vérification des codes dans la table 'coupons' avec les bonnes colonnes !
         async function appliquerPoints() {
             const codeSaisi = document.getElementById('code-points-input').value.trim();
             const msg = document.getElementById('msg-points');
@@ -366,29 +253,19 @@
             msg.style.color = "#aaa";
 
             try {
-                // Étape 1 & 2 : On cherche le code et on vérifie que is_active est true
-                const { data, error } = await db
-                    .from('coupons')
-                    .select('discount_percent, is_active')
-                    .ilike('code', codeSaisi)
-                    .eq('is_active', true); 
+                const { data, error } = await db.from('coupons').select('discount_percent, is_active').ilike('code', codeSaisi).eq('is_active', true);
 
                 if (error) {
                     msg.innerText = "Erreur Supabase : " + error.message;
                     msg.style.color = "#ff3333";
                     remisePoints = 0;
                 } else if (!data || data.length === 0) {
-                    // Si on a aucun retour, soit le code n'existe pas, soit il est à FALSE
                     msg.innerText = "Code invalide, expiré ou déjà utilisé.";
                     msg.style.color = "#ff3333";
                     remisePoints = 0;
                 } else {
-                    // Étape 3 : On récupère la valeur depuis discount_percent
                     const coupon = data[0];
-                    
-                    // On convertit le chiffre entier en pourcentage (ex: 20 devient 0.20)
-                    remisePoints = parseFloat(coupon.discount_percent) / 100; 
-                    
+                    remisePoints = parseFloat(coupon.discount_percent) / 100;
                     msg.innerText = `Code appliqué ! Remise de ${(remisePoints * 100).toFixed(0)}% activée.`;
                     msg.style.color = "#00ff00";
                 }
@@ -407,10 +284,10 @@
             document.getElementById('total-somme').innerText = Math.max(totalFinal, 0).toFixed(2);
         }
 
-        function supprimerArticle(index) {
-            let panier = JSON.parse(localStorage.getItem('monPanier')) || [];
+        async function supprimerArticle(index) {
+            let panier = await loadCartArray();
             panier.splice(index, 1);
-            localStorage.setItem('monPanier', JSON.stringify(panier));
+            await saveCartArray(panier);
             chargerPanier();
         }
 
@@ -419,6 +296,11 @@
             localStorage.setItem('codePointsApplique', document.getElementById('code-points-input').value.trim());
             window.location.href = 'paiement.html';
         }
+
+        // Recharge le panier automatiquement si l'utilisateur se connecte/déconnecte
+        db.auth.onAuthStateChange(() => {
+            chargerPanier();
+        });
 
         window.onload = chargerPanier;
     </script>
