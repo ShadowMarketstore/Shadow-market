@@ -5,32 +5,51 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Suggestions - Shadow Market</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #000; color: #fff; margin: 0; padding: 20px; box-sizing: border-box; padding-bottom: 60px; }
+        body { 
+            font-family: 'Segoe UI', sans-serif; background: #000; color: #fff; margin: 0; 
+            padding: 20px; box-sizing: border-box; padding-bottom: 60px; 
+        }
 
         #suggestion-container { 
-            width: 100%; max-width: 500px; margin: 0 auto 30px auto; background: #0a0a0a; padding: 25px; 
+            width: 100%; max-width: 500px; margin: 0 auto 25px auto; background: #0a0a0a; padding: 25px; 
             border: 2px solid #00ffff; border-radius: 15px; box-shadow: 0 0 15px #00ffff; 
             display: flex; flex-direction: column; gap: 15px;
         }
         h2 { text-align: center; color: #00ffff; text-transform: uppercase; text-shadow: 0 0 10px #00ffff; margin: 0; }
         textarea { 
-            width: 100%; height: 120px; background: #111; color: #00ffff; border: 2px solid #00ffff; 
+            width: 100%; height: 110px; background: #111; color: #00ffff; border: 2px solid #00ffff; 
             border-radius: 10px; padding: 15px; font-family: 'Courier New', monospace; box-sizing: border-box; resize: none;
         }
         textarea:focus { outline: none; border-color: #DC143C; box-shadow: 0 0 10px #DC143C; }
         button { width: 100%; padding: 15px; background: #DC143C; color: white; font-weight: bold; font-size: 1.1em; border: none; border-radius: 10px; cursor: pointer; text-transform: uppercase; }
         .back-btn { background: #111; border: 2px solid #00ffff; color: #00ffff; }
 
-        /* Section commentaires — style épuré */
+        /* === Section commentaires style YouTube === */
         #comments-section { width: 100%; max-width: 500px; margin: 0 auto; }
-        #comments-section h3 { color: #FFD700; text-transform: uppercase; font-size: 1em; letter-spacing: 1px; margin: 0 0 15px 4px; }
-        .comment-item { 
-            background: #0a0a0a; border-left: 3px solid #00ffff; border-radius: 8px; 
-            padding: 12px 15px; margin-bottom: 10px; 
+        #comments-header { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; padding-left: 4px; }
+        #comments-header h3 { color: #fff; font-size: 1.05em; margin: 0; font-weight: 600; }
+        #comments-header span { color: #888; font-size: 0.95em; }
+
+        .comment-item { display: flex; gap: 12px; padding: 14px 4px; border-bottom: 1px solid #1a1a1a; }
+        .comment-avatar {
+            width: 38px; height: 38px; min-width: 38px; border-radius: 50%;
+            background: #111; border: 2px solid #00ffff; color: #00ffff;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: bold; font-size: 1em; text-shadow: 0 0 6px #00ffff;
         }
-        .comment-author { color: #00ffff; font-weight: bold; font-size: 0.9em; }
-        .comment-text { color: #ddd; font-size: 0.95em; margin-top: 4px; line-height: 1.4; word-break: break-word; }
-        .comment-empty { color: #666; text-align: center; font-size: 0.9em; padding: 20px 0; }
+        .comment-body { flex: 1; min-width: 0; }
+        .comment-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 3px; flex-wrap: wrap; }
+        .comment-author { color: #FFD700; font-weight: bold; font-size: 0.9em; }
+        .comment-time { color: #666; font-size: 0.78em; }
+        .comment-text { color: #eee; font-size: 0.95em; line-height: 1.4; word-break: break-word; margin-bottom: 6px; }
+        .comment-actions { display: flex; align-items: center; gap: 18px; }
+        .comment-actions button {
+            all: unset; display: flex; align-items: center; gap: 5px; cursor: pointer;
+            color: #888; font-size: 0.85em; padding: 4px; width: auto;
+        }
+        .comment-actions button:hover { color: #00ffff; }
+        .comment-actions .like-count { color: #aaa; font-size: 0.8em; }
+        .comment-empty { color: #666; text-align: center; font-size: 0.9em; padding: 25px 0; }
 
         #popup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.75); z-index: 5000; display: none; align-items: center; justify-content: center; }
         #popup-box { background: #0a0a0a; border: 2px solid #00ffff; border-radius: 15px; box-shadow: 0 0 20px #00ffff; padding: 25px; width: 85%; max-width: 340px; text-align: center; }
@@ -48,7 +67,10 @@
     </div>
 
     <div id="comments-section">
-        <h3>Derniers retours</h3>
+        <div id="comments-header">
+            <h3>Commentaires</h3>
+            <span id="comments-count"></span>
+        </div>
         <div id="comments-list">
             <div class="comment-empty">Chargement...</div>
         </div>
@@ -63,6 +85,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
+        // Client Supabase renommé "db" pour éviter la collision de namespace connue
         const db = supabase.createClient(
           'https://jsuvimxjmjiljntmgbzu.supabase.co',
           'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzdXZpbXhqbWppbGpudG1nYnp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI0Njk0NTgsImV4cCI6MjA5ODA0NTQ1OH0.F6aDK6oTyp3Tlb9fmkqpzgn4KGAxA5-ClIKlkqzfcR4'
@@ -87,7 +110,7 @@
 
                 showPopup('Merci ' + userName + ', votre message a bien été envoyé !');
                 messageInput.value = '';
-                loadComments(); // rafraîchit la liste sans recharger la page
+                loadComments();
 
             } catch (error) {
                 console.error("Erreur lors de l'envoi:", error);
@@ -95,26 +118,57 @@
             }
         }
 
-        // Charge et affiche les derniers commentaires (style épuré)
+        // Affiche un temps relatif façon YouTube (il y a X min/h/j)
+        function timeAgo(dateString) {
+            if (!dateString) return '';
+            const diffMs = Date.now() - new Date(dateString).getTime();
+            const min = Math.floor(diffMs / 60000);
+            if (min < 1) return "à l'instant";
+            if (min < 60) return `il y a ${min} min`;
+            const h = Math.floor(min / 60);
+            if (h < 24) return `il y a ${h} h`;
+            const j = Math.floor(h / 24);
+            return `il y a ${j} j`;
+        }
+
         async function loadComments() {
             const list = document.getElementById('comments-list');
+            const countEl = document.getElementById('comments-count');
+
             const { data, error } = await db
                 .from('comments')
                 .select('user_name, message, created_at')
                 .order('created_at', { ascending: false })
-                .limit(10);
+                .limit(30);
 
             if (error || !data || data.length === 0) {
-                list.innerHTML = '<div class="comment-empty">Aucun retour pour le moment.</div>';
+                list.innerHTML = '<div class="comment-empty">Aucun commentaire pour le moment.</div>';
+                countEl.textContent = '';
                 return;
             }
 
-            list.innerHTML = data.map(c => `
+            countEl.textContent = data.length;
+
+            list.innerHTML = data.map(c => {
+                const author = c.user_name || 'Anonyme';
+                const initial = author.charAt(0).toUpperCase();
+                return `
                 <div class="comment-item">
-                    <div class="comment-author">${c.user_name || 'Anonyme'}</div>
-                    <div class="comment-text">${c.message}</div>
-                </div>
-            `).join('');
+                    <div class="comment-avatar">${initial}</div>
+                    <div class="comment-body">
+                        <div class="comment-meta">
+                            <span class="comment-author">${author}</span>
+                            <span class="comment-time">${timeAgo(c.created_at)}</span>
+                        </div>
+                        <div class="comment-text">${c.message}</div>
+                        <div class="comment-actions">
+                            <button onclick="showPopup('Fonctionnalité à venir')">👍 <span class="like-count"></span></button>
+                            <button onclick="showPopup('Fonctionnalité à venir')">👎</button>
+                            <button onclick="showPopup('Fonctionnalité à venir')">Répondre</button>
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
         }
 
         function showPopup(message) {
