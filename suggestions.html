@@ -85,12 +85,13 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        // Client Supabase renommé "db" pour éviter la collision de namespace connue
+        // Client Supabase
         const db = supabase.createClient(
           'https://jsuvimxjmjiljntmgbzu.supabase.co',
           'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzdXZpbXhqbWppbGpudG1nYnp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI0Njk0NTgsImV4cCI6MjA5ODA0NTQ1OH0.F6aDK6oTyp3Tlb9fmkqpzgn4KGAxA5-ClIKlkqzfcR4'
         );
 
+        // Nouvelle fonction de débogage pour voir l'erreur exacte
         async function sendComment() {
             const messageInput = document.getElementById('msg');
             const message = messageInput.value;
@@ -105,7 +106,10 @@
                     if (profile && profile.username) userName = profile.username;
                 }
 
+                // Tentative d'insertion
                 const { error: insertError } = await db.from('comments').insert([{ user_name: userName, message: message }]);
+                
+                // Si Supabase renvoie une erreur, on déclenche le catch manuellement
                 if (insertError) throw insertError;
 
                 showPopup('Merci ' + userName + ', votre message a bien été envoyé !');
@@ -113,12 +117,13 @@
                 loadComments();
 
             } catch (error) {
-                console.error("Erreur lors de l'envoi:", error);
-                showPopup("Une erreur est survenue lors de l'envoi.");
+                console.error("Erreur détaillée:", error);
+                // Affiche le message d'erreur précis de Supabase dans le pop-up
+                const errorMessage = error.message || error.details || "Une erreur inconnue est survenue.";
+                showPopup("Erreur Supabase : " + errorMessage);
             }
         }
 
-        // Affiche un temps relatif façon YouTube (il y a X min/h/j)
         function timeAgo(dateString) {
             if (!dateString) return '';
             const diffMs = Date.now() - new Date(dateString).getTime();
