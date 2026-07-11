@@ -36,12 +36,19 @@
     .section-title { text-align: center; color: #00ffff; font-size: 1.6em; margin: 20px 0; text-transform: uppercase; font-weight: bold; text-shadow: 0 0 10px #00ffff; }
 
     .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; padding: 10px; }
-    .product-card { position: relative; border: 2px solid #00ffff; border-radius: 15px; padding: 10px; background: #111; display: flex; flex-direction: column; min-height: 400px; }
+    .product-card { position: relative; border: 2px solid #00ffff; border-radius: 15px; padding: 10px; background: #111; display: flex; flex-direction: column; min-height: 400px; overflow: hidden; }
     .product-img { width: 100%; height: 160px; background-size: contain; background-position: center; background-repeat: no-repeat; border-radius: 8px; border: 1.5px solid #DC143C; box-shadow: 0 0 5px rgba(220, 20, 60, 0.5); background-color: #000; }
     .discount-badge { position: absolute; top: 15px; left: 15px; background: #000; color: #ffffff; border: 1px solid #00ffff; padding: 3px 8px; border-radius: 5px; font-weight: bold; font-size: 0.8em; z-index: 20; }
     
     .stock-info { font-size: 0.85em; color: #00ffff; margin: 8px 0; font-weight: bold; }
-    h3 { font-size: 0.95em; margin: 10px 0; min-height: 2.4em; }
+    h3 { 
+        font-size: 0.95em; 
+        margin: 10px 0; 
+        min-height: 2.4em; 
+        overflow-wrap: break-word; 
+        word-break: break-word; 
+        hyphens: auto; 
+    }
     .price-wrapper { margin: 5px 0; }
     .old-price { text-decoration: line-through; color: #777; font-size: 0.85em; display: block; }
     .current-price { color: #ffffff; font-weight: bold; font-size: 1.3em; display: block; }
@@ -232,3 +239,4 @@
   </script>
 </body>
 </html>
+
