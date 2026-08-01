@@ -12,7 +12,7 @@
             --success-green: #28a745; 
             --white: #ffffff; 
             --gray: #444444; 
-            --red-pay: #ff2a2a; /* Couleur pour le bouton payer */
+            --red-pay: #ff2a2a;
         }
         
         body { 
@@ -27,7 +27,6 @@
             padding: 20px;
         }
 
-        /* Bouton Retour */
         .back-btn {
             position: absolute;
             top: 20px;
@@ -43,7 +42,6 @@
         
         .container { width: 100%; max-width: 450px; margin-top: 50px; }
         
-        /* Ajout de flexbox pour bien espacer les éléments internes */
         .order-card { 
             border: 2px solid var(--cyan); 
             padding: 20px; 
@@ -55,19 +53,15 @@
             gap: 12px; 
         }
         
-        /* Nom du produit en Cyan Néon */
         .product-name { font-size: 18px; font-weight: bold; color: var(--cyan); text-align: center; }
         
-        /* Style du Bouton Payer */
         .btn-pay { width: 100%; padding: 12px; background: var(--red-pay); border: none; color: var(--white); font-weight: bold; cursor: pointer; border-radius: 5px; }
         .btn-pay:hover { background: #ff4444; }
 
         input { width: 100%; padding: 12px; background: #000; border: 1px solid var(--cyan); color: var(--white); border-radius: 8px; box-sizing: border-box; text-align: center; }
         
-        /* Bouton Valider en Cyan Néon */
         .btn-validate { width: 100%; padding: 12px; background: var(--cyan); border: none; color: #000; font-weight: bold; cursor: pointer; border-radius: 5px; }
         
-        /* Bouton Télécharger : Gris par défaut, Vert ✅ après */
         .btn-download { width: 100%; padding: 12px; background: var(--gray); color: #ccc; border: none; font-weight: bold; cursor: pointer; border-radius: 5px; }
         .btn-download.active { background: var(--success-green); color: white; }
     </style>
@@ -84,26 +78,31 @@
 <script>
     const db = supabase.createClient("https://jsuvimxjmjiljntmgbzu.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpzdXZpbXhqbWppbGpudG1nYnp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI0Njk0NTgsImV4cCI6MjA5ODA0NTQ1OH0.F6aDK6oTyp3Tlb9fmkqpzgn4KGAxA5-ClIKlkqzfcR4");
 
-    // Lien de paiement général de la boutique
-    const LIEN_CHECKOUT = "https://ton-lien-de-paiement.com/checkout";
+    const LIEN_CHECKOUT = "https://ton-lien-de-paiement.com/checkout"; // À Remplacer
 
     async function loadOrders() {
         const { data: { user } } = await db.auth.getUser();
-        if (!user) return;
+        if (!user) {
+            document.getElementById('orders-list').innerHTML = "<p style='text-align:center;'>Veuillez vous connecter.</p>";
+            return;
+        }
 
-        const { data } = await db.from('pending_orders').select('*').eq('user_id', user.id);
+        const { data, error } = await db.from('pending_orders').select('*').eq('user_id', user.id);
         
+        if (error || !data || data.length === 0) {
+            document.getElementById('orders-list').innerHTML = "<p style='text-align:center;'>Aucune commande en cours.</p>";
+            return;
+        }
+
         const listDiv = document.getElementById('orders-list');
         listDiv.innerHTML = data.map(order => {
             
-            // Formatage conditionnel du prix s'il existe dans la BDD
             const priceDisplay = order.price ? `(${order.price} €)` : '';
 
             return `
             <div class="order-card">
                 <div class="product-name">${order.product_name}</div>
                 
-                <!-- Le bouton payer n'apparaît que si la commande n'est pas encore vérifiée -->
                 ${!order.is_verified ? `
                     <button class="btn-pay" onclick="window.open('${LIEN_CHECKOUT}', '_blank')">
                         PAYER ${priceDisplay}
@@ -118,21 +117,32 @@
     }
 
     async function verifyCode(id) {
-        const code = document.getElementById(`code-${id}`).value;
-        const { data } = await db.from('codes_points').select('*').eq('code', code).single();
+        const code = document.getElementById(`code-${id}`).value.trim();
+        
+        if(!code) {
+            alert("Veuillez entrer un code.");
+            return;
+        }
 
-        if (data) {
+        // ÉTAPE CLÉ : On vérifie la commande spécifique dans pending_orders
+        const { data, error } = await db.from('pending_orders').select('code_activation').eq('id', id).single();
+
+        // Si la commande existe et que le code_activation correspond exactement à ce que le client a tapé
+        if (data && data.code_activation === code) {
             await db.from('pending_orders').update({ is_verified: true }).eq('id', id);
             
-            // Recharge la page pour faire disparaître le bouton "Payer" et activer le bouton vert
             alert("Succès ! Téléchargement débloqué.");
             window.location.reload(); 
         } else {
-            alert("Code invalide.");
+            alert("Code invalide ou incorrect pour cette commande.");
         }
     }
 
     function downloadFile(filename) {
+        if(!filename || filename === 'NULL') {
+            alert("Le fichier n'est pas encore disponible.");
+            return;
+        }
         const url = `https://jsuvimxjmjiljntmgbzu.supabase.co/storage/v1/object/public/produits/${filename}`;
         const link = document.createElement('a');
         link.href = url;
